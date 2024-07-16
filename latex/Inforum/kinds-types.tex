@@ -1,0 +1,44 @@
+%fix later.
+
+\begin{figure}[t]
+	\centering
+	%\begin{minipage}{.45\textwidth}
+		\begin{align*}
+			\TT \grmeq &&&&&&&& \text{\small Type}\\
+			& \tiota && \text{\small type constructor} && \tabs \alpha\kind T && \text{\small  type-level abstraction}\\
+			& \talpha && \text{\small  type variable} && \tapp TT && \text{\small  type-level application}
+        \end{align*}
+        \begin{align*}
+           \tiota \grmeq &&&&&&&&&&& \text{\small\qquad\quad {Type constructor}}\\
+            % Functional
+			&\Arrow && \karrow \kast {\karrow {\kast}{\tkind}} &&  \text{\small arrow} && \typec{\varrecs{\overline{l_i}}} && \kindc{\overline{{\kast \Rightarrow}}\,\tkind} && \text{\small record/variant}\\
+			&\tmu \kind && \karrow {(\karrow \kind \kind)} {\kind} && \text{\small recursive type}
+			&& \Sharp && \karrow \kast \skind &&\text{\small input/output} \\
+            % Session types
+            &\Semi && \karrow \skind {\karrow \skind \skind} && \text{\small seq.composition}
+			 && \typec{\odot{\{\overline{l_i}\}}} && \kindc{\overline{{\skind
+						\Rightarrow}}\,\skind} && \text{\small internal/external choice}\\
+            &\quant \kind && \karrow {(\karrow \kind \kast)} \skind && \text{\small exists/forall}
+            && \Dual && \karrow{\skind}{\skind} && \text{\small dual operator}\\
+            &\Wait && \skind && \text{\small wait} && \Close && \skind && \text{\small close} \\
+			&\Skip && \skind && \text{\small skip} &&&
+        \end{align*}
+    \begin{align*}
+    \typec{\varrecs{}} \grmeq{} \typec{\records{}} \grmor \typec{\variants{}}
+    &&
+    \typec\sharp \grmeq{} \typec? \grmor{} \typec!
+    &&
+    \choice \grmeq{} \intchoice \grmor \extchoice
+    &&
+    \quant\kind \grmeq{} \typec{\exists_\kind} \grmor \typec{\forall_\kind}
+  \end{align*}
+    %\end{minipage}
+    \caption{The syntax of types and constructors.}
+    \label{fig:syntax-types}
+\end{figure}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "samplepaper"
+%%% End:

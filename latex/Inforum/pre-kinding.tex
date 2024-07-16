@@ -1,0 +1,22 @@
+% !TeX root = samplepaper.tex
+
+\begin{figure}[t]
+  \declrel{Pre-kinding}{$\prekind \Delta T \kind$}
+  \begin{mathpar}
+    \infer[\pkconst]{}
+    {\prekind \Delta \iota {\kind_\iota}}
+    \quad
+    \infer[\pkvar]{\tbind\alpha\kind\in{\Delta}}{\prekind \Delta \alpha \kind}
+    \quad
+    \infer[\pktabs]{\prekind {\Delta+\tbind\alpha \kind} {T} {\kind'}}{\prekind \Delta {\tabs\alpha \kind \TT} {\karrow \kind {\kind'}}}
+    \quad
+    \inferrule[\pktapp]{\prekind \Delta {T} {\karrow \kind {\kind'}} \;\;\, \prekind \Delta U \kind}{\prekind \Delta {\tapp T U} {\kind'}}
+  \end{mathpar}
+  \caption{Pre-kinding.}
+  \label{fig:pre-kinding}
+\end{figure}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "samplepaper"
+%%% End:
