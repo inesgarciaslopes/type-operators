@@ -1,0 +1,263 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf0 \expnd0\expndtw0\kerning0
+----------------------- REVIEW 1 ---------------------\
+SUBMISSION: 42\
+TITLE: Integrating Type Operators into the FreeST Programming Language\
+AUTHORS: Paula Lopes, Vasco T. Vasconcelos and Diana Costa\
+\
+----------- Overall evaluation -----------\
+SCORE: 2 (accept)\
+----- TEXT:\
+This paper presents a bisimulation based type equivalence definition for a higher order functional calculus typed by context-free session types. The paper is well written and presents a simple and neat idea, which is good. The work is then applied to a programming language (FreeST) which is also nice. This work is build on several previous works from some of the authors and extends this previous work in a clear way. A few comments follow.\
+\
+- Related to Figure 2 please explain in more detail (with some examples) the notion of type reduction. For example, the Dual modality is intuitive but it deserves some motivation.\
+\
+- Section 4 needs illustrating examples\
+\
+- A latex detail: please use more the definition environment. Important definitions (such as bisimulation\'85) are given in the text and should be formal definitions.\
+\
+A last comment about the Validation section: this is at the same time a nice section and a pitfall. It is nice because it is rather cool to use Quickcheck to gain confidence about formal results. It is a pitfall because passing quickcheck tests is not a proof, and thus proofs are still needed. This is ok for the scope of Inforum, but we urge the authors to work on formal proofs for the presented properties.\
+\
+In summary, I liked the paper, and the authors should improve it and send it to a stronger conference in the future.\
+\
+\
+\
+----------------------- REVIEW 2 ---------------------\
+SUBMISSION: 42\
+TITLE: Integrating Type Operators into the FreeST Programming Language\
+AUTHORS: Paula Lopes, Vasco T. Vasconcelos and Diana Costa\
+\
+----------- Overall evaluation -----------\
+SCORE: 2 (accept)\
+----- TEXT:\
+Paper Summary:\
+\
+This paper presents a lambda calculus with higher-order polymorphism (in the sense of Fomega) and equirecursive, context-free session types and its integration into FreeST,\
+a functional programming language in this space. The main contribution of the paper is a bisimulation-based type equivalence algorithm for the language, reducing the problem\
+to bisimilarity of simple grammars.\
+\
+Review:\
+\
+This paper presents a strategy for deciding type equivalence of context-free session types with higher-order polymorphism. The strategy consists of translating such types to \
+words of non-terminal symbols, producing a simple grammar. The bisimilarity of such grammars can then be decided using an algorithm by Almeida et al.\
+Thus, the crux of this work lies in the definition of the LTS for types and in the translation function word(T). My main complaint about this work is that essentially no explanation\
+is provided of either of these two key components of the work. No intuition is given as to how we can always produce a simple grammar, nor is any discussion given as to why the presented\
+LTS is even reasonable to begin with -- what is its relation with type reduction? Even some informal discussion would be useful and is, in my opinion, necessary.\
+\
+The validation of the work does not rely on formal theorems (which is fine), but rather on testing via Quickcheck. Naturally, this only provides some degree of assurance wrt the implementation \
+rather than the actual soundness and completeness of the strategy, but this is reasonable given the venue and the work itself.\
+\
+I also found that the paper assumes a lot of its readers. The authors make little effort in introducing session types at all, let alone the specific formulation found in this paper. I also think this is an area that must be improved in the final version of the paper. \
+\
+I think this work is interesting and worthy of publication in INFORUM, pending the following changes (the paper has plenty of "white space" and remaining space, so that should not be a concern):\
+\
+- Carefully explain the word(T) function definition, potentially with an example, elaborating on why we can always produce a simple grammar from a higher-order polymorphic type.\
+- Explain the rules of the LTS and argue why the LTS is reasonable, given the definition of type reduction/normalization.\
+- Given some brief introduction of context-free session types (e.g. read off the meaning of a type in terms of its IO behaviour)\
+\
+\
+\
+----------------------- REVIEW 3 ---------------------\
+SUBMISSION: 42\
+TITLE: Integrating Type Operators into the FreeST Programming Language\
+AUTHORS: Paula Lopes, Vasco T. Vasconcelos and Diana Costa\
+\
+----------- Overall evaluation -----------\
+SCORE: 2 (accept)\
+----- TEXT:\
+I find this article to be relatively well written and aligned with the topics of INForum 2024. Hence I recommend acceptance.\
+\
+Some more comments and suggestions follow below.\
+\
+\
+## General comments and suggestions\
+\
+The structure of the paper could be improved. Namely Section 3 covers around 6 pages (out of 11 pages) without any subsection, and jumping between relatively different topics that could be better organised. This section is called `System F\uc0\u956 \u8727 ;\u969 `, but you never present the language, and only address the types -- maybe a better title could reflect this.\
+\
+Furthermore, I would recommend to mention in the introduction:\
+\
+\'a0 - the explicit and precise contributions so far; and\
+\'a0 - a summary of the core challenges and the validation approach\
+\
+This would allow the reader to have a more complete picture without having to read the full paper. Only in the very end you mention that you have an Haskell implementation of some of the rules, which could be mentioned upfront.\
+\
+I also missed what precisely is implemented so far. I believe only the reduction rules in Fig. 2, but it was not fully clear to me. Maybe you also implemented the rules of Fig. 5 and a search for bisimilarity (as it does not sound too difficult in this case). Adding a link to your experiments would also help support your contributions.\
+\
+Regarding the rules, they all seem to be very deterministic.\
+\
+\'a0- Fig. 2 focuses on reducing only the left-most part of the term and it seems to me that there is only one choice at a time (by design);\
+\'a0 \'a0+ here only the beta-reduction can induce infinite reductions, which is easy to miss and could be highlighted at this point with the (\\x.xx)(\\x.xx) example instead of later;\
+\
+\'a0- Fig. 5 focuses on exposing the structure of the term to labels (to be compared via bisimulation)\
+\'a0 \'a0+ here there seems to be more than one choice possible, but it is still deterministic (making the bisimulation very easy to find, and probably a simpler notion would be enough).\
+\
+Regarding the bisimilarity of grammars - I am not sure how these are defined, and I got the impression that there were too many concepts that were not explained or defined when summarising the work by Almeida et al. [2].\
+\
+Finally, I would have liked to see a more complex example, maybe with a motivation storyline behind it (e.g., needing to "open" some files to be used by different worker-components, and to "close" them before proceeding). Maybe to show that it could be simplified, or that a problem could be detected (and that it could not be captured without the context-free nature).\
+\
+\
+## Minor comments\
+\
+- \'a72, in the 2nd example with an abstraction - I suggest keeping the alpha in the same place as in the first example (instead of beta), and rename beta for something else.\
+- Fig. 1: I suggest adding parenthesis, e.g., in `* => (* => T)` (even though the community on functional programming knows this).\
+- Suggestion throughout \'a73: whenever you introduce a new concept (e.g., proper type, type operator, type formation, well-formed), use the \\emph environment to highlight it.\
+- There is a typo in Fig. 2, rule R-D\uc0\u8704  (is the same as R-D\u8707 )\
+- A type `T` is pre-kinded if `\uc0\u8710  \u8866 pre T : \u954 `; I would add "for some context `\u8710 ` and kind `\u954 `" (or "`T` is pre-kinded if there exists (`\u8710 ` and `\u954 `) such that (...).")\
+- Fig. 5, rule L-Seq1: The syntax seems to be missing something.\
+- Fig. 5, rule L-ConstApp: I could not understand the premises.\
+- Fig. 6: I could not follow the syntax to define "word(T)" - I think some extra explanations would be useful.\
+\
+\
+\
+----------------------- REVIEW 4 ---------------------\
+SUBMISSION: 42\
+TITLE: Integrating Type Operators into the FreeST Programming Language\
+AUTHORS: Paula Lopes, Vasco T. Vasconcelos and Diana Costa\
+\
+----------- Overall evaluation -----------\
+SCORE: 2 (accept)\
+----- TEXT:\
+# Sum\'e1rio\
+\
+Este artigo apresenta a integra\'e7\'e3o do c\'e1lculo lambda de ordem superior\
+com tipos equi-recursivos e tipos de sess\'e3o livres de contexto na\
+linguagem de programa\'e7\'e3o FreeST. Os autores apresentam as dificuldades\
+t\'e9cnicas inerentes \'e0 utiliza\'e7\'e3o de um sistema de tipos t\'e3o expressivo,\
+assim como os desafios de implementar um tal sistema numa linguagem de\
+programa\'e7\'e3o. \'c9 igualmente apresentada uma abordagem para demonstrar\
+equival\'eancia de tipos, atrav\'e9s de uma tradu\'e7\'e3o para gram\'e1ticas em\
+forma normal de Greibach.\
+\
+# Avalia\'e7\'e3o geral\
+\
+Este artigo apresenta um contributo e extens\'f5es interessantes \'e0\
+linguagem FreeST. A inclus\'e3o de operadores de tipo e a implementa\'e7\'e3o\
+de um procedimento de equival\'eancia aumentam consideravelmente a\
+expressividade da linguagem. A implementa\'e7\'e3o um sistema de tipos t\'e3o\
+rico est\'e1 bem alicer\'e7ada nas meta-propriedades deste sistema,\
+fornecendo garantias importantes de corre\'e7\'e3o ao trabalho\
+desenvolvido. A abordagem seguida para a equival\'eancia de tipos,\
+atrav\'e9s de redu\'e7\'e3o do problema para bissimilaridade entre gram\'e1ticas,\
+parece-me o contributo mais interessante deste artigo. Por isso,\
+acredito firmemente que este artigo deveria ser aceite para\
+apresenta\'e7\'e3o no INForum 2024.\
+\
+O artigo est\'e1 bem escrito e apresenta uma estrutura coerente. No\
+entanto, a apresenta\'e7\'e3o \'e9 muitas vezes apressada e pouco polida. As\
+minhas maiores cr\'edticas prendem-se com a Sec\'e7\'e3o 2 (Motiva\'e7\'e3o) e Sec\'e7\'e3o\
+5 (Valida\'e7\'e3o). Al\'e9m disso, o artigo n\'e3o ocupa integralmente as 12\
+p\'e1ginas permitidas pelo INForum, portanto acredito que os autores\
+ter\'e3o margem suficiente para melhorar a apresenta\'e7\'e3o na vers\'e3o final,\
+caso o artigo seja aceite.\
+\
+# Coment\'e1rios detalhados\
+\
+\'a0 - Introduction, "[...] comes with its own set of challenges,\
+\'a0 \'a0 especially when it comes to type equivalence algorithms".\
+\
+\'a0 \'a0 Porqu\'ea? Dito apenas desta forma soa demasiado vago e como apenas\
+\'a0 \'a0 um problema pequeno, quando na verdade n\'e3o o \'e9. Dar mais detalhes\
+\'a0 \'a0 e intui\'e7\'e3o aqui teriam ajudado (estamos no primeiro par\'e1grafo do\
+\'a0 \'a0 artigo, \'e9 ainda muito importante prender e motivar o leitor). Uma\
+\'a0 \'a0 refer\'eancia tamb\'e9m poderia ajudar.\
+\
+\'a0 - Motivation, pp 2, par\'e1grafo Beyond first-order context-free\
+\'a0 \'a0 session types.\
+\
+\'a0 \'a0 A descri\'e7\'e3o apresentada neste par\'e1grafo recorre j\'e1 a muitos\
+\'a0 \'a0 conceitos e nota\'e7\'e3o que s\'f3 poderemos compreender em todo o\
+\'a0 \'a0 detalhe a partir da sec\'e7\'e3o 3.\
+\
+\'a0 - Motivation, pp 2, par\'e1grafo Duality as an external macro (or not).\
+\
+\'a0 \'a0 At\'e9 \'e0 \'faltima frase, o par\'e1grafo lia-se muito bem e transmitia de\
+\'a0 \'a0 facto uma mensagem intuitiva e de motiva\'e7\'e3o para o resto do\
+\'a0 \'a0 trabalho. No entanto, a \'faltima frase \'e9 completamente obscura e\
+\'a0 \'a0 muito vaga para este contexto. Nesta fase t\'e3o inicial do artigo,\
+\'a0 \'a0 seria interessante motivar o leitor com mais exemplos ou pelos\
+\'a0 \'a0 problemas concretos e como este trabalho (sem entrar em detalhes)\
+\'a0 \'a0 prop\'f5e de facto solu\'e7\'f5es. Al\'e9m disso, no resto do artigo n\'e3o\
+\'a0 \'a0 encontramos mais nenhuma refer\'eancia \'e0 dualidade de tipos sess\'e3o,\
+\'a0 \'a0 portanto torna-se dif\'edcil perceber a import\'e2ncia deste par\'e1grafo.\
+\
+\'a0 - Motivation.\
+\
+\'a0 \'a0 A minha maior cr\'edtica \'e9 que esta \'e9 uma sec\'e7\'e3o important\'edssima e\
+\'a0 \'a0 acaba por ser demasiado curta e com pouco conte\'fado. Pelo texto\
+\'a0 \'a0 apresentado n\'e3o se consegue perceber o que \'e9 de facto trabalho\
+\'a0 \'a0 novo e o que j\'e1 est\'e1 implementado em FreeST. Havendo ainda espa\'e7o\
+\'a0 \'a0 no artigo, seria importante mostrar aqui exemplos mais elaboradas,\
+\'a0 \'a0 n\'e3o s\'f3 de tipos mas tamb\'e9m de programas que actualmente j\'e1 podemos\
+\'a0 \'a0 escrever em FreeST e outros que ainda n\'e3o s\'e3o poss\'edveis de\
+\'a0 \'a0 exprimir na linguagem, mas que gra\'e7as a este trabalho j\'e1 o poder\'e3o\
+\'a0 \'a0 ser.\
+\
+\'a0 - Pp 6, equival\'eancia entre tipos T e U.\
+\
+\'a0 \'a0 A apresenta\'e7\'e3o do itemize que se segue \'e9 estranha. Para al\'e9m do\
+\'a0 \'a0 impacto visual, j\'e1 que introduz um espa\'e7o branco enorme no corpo\
+\'a0 \'a0 do artigo, n\'e3o se percebe se esta apresenta\'e7\'e3o seria um teorema,\
+\'a0 \'a0 uma defini\'e7\'e3o ou de facto um exemplo. Seria por isso apropriado\
+\'a0 \'a0 utilizar um ambiente que realce a natureza do que se pretende\
+\'a0 \'a0 apresentar.\
+\
+\'a0 - Fim da sec\'e7\'e3o Challenges.\
+\
+\'a0 \'a0 A escolha de pseudo-c\'f3digo para ilustrar o processo de\
+\'a0 \'a0 normaliza\'e7\'e3o parece-me estranha. a codifica\'e7\'e3o utilizada parece\
+\'a0 \'a0 demasiado pr\'f3xima de c\'f3digo Haskell. Por isso, teria sido melhor\
+\'a0 \'a0 apresentar de facto a implementa\'e7\'e3o em Haskell. Os autores\
+\'a0 \'a0 poderiam tamb\'e9m optar por uma apresenta\'e7\'e3o baseada em regras de\
+\'a0 \'a0 infer\'eancia, j\'e1 que a mensagem importante \'e9 o algoritmo.\
+\
+\'a0 - Sec\'e7\'e3o 5, Validation.\
+\
+\'a0 \'a0 Esta parece-me a sec\'e7\'e3o com o conte\'fado mais pobre do artigo. Desde\
+\'a0 \'a0 logo, \'e9 um mist\'e9rio completo a utiliza\'e7\'e3o da biblioteca\
+\'a0 \'a0 Quickcheck. S\'f3 com algum poder de adivinha\'e7\'e3o, baseada na\
+\'a0 \'a0 descri\'e7\'e3o da m\'e1quina em que se realizaram os testes, se poder\'e1\
+\'a0 \'a0 inferir que a implementa\'e7\'e3o do sistema \'e9 feita em Haskell.\
+\
+\'a0 \'a0 No entanto, a minha maior quest\'e3o \'e9 porque \'e9 que os autores\
+\'a0 \'a0 concentram a valida\'e7\'e3o apenas na gera\'e7\'e3o de tipos\
+\'a0 \'a0 aleat\'f3rios. Porque n\'e3o apresentam termos da linguagem FreeST\
+\'a0 \'a0 estendida que podemos agora verificar? Depois de ler esta sec\'e7\'e3o\
+\'a0 \'a0 fico com a sensa\'e7\'e3o que de facto n\'e3o h\'e1 grande rela\'e7\'e3o entre a\
+\'a0 \'a0 linguagem FreeST e o trabalho aqui apresentado.\
+\
+\'a0 - Typos e gralhas de apresenta\'e7\'e3o.\
+\
+\'a0 \'a0 - "figure" --> Figure\
+\
+\'a0 \'a0 - Um pouco ao longo de todo o artigo: linhas que come\'e7am com\
+\'a0 \'a0 \'a0 s\'edmbolos.\
+\
+\'a0 \'a0 - Na conclus\'e3o, primeira linha: falta um ponto e v\'edrgula no nome\
+\'a0 \'a0 \'a0 do sistema?\
+\
+\'a0 \'a0 - Ref\'eancias: algumas refer\'eancias apresentam um duplo link para o\
+\'a0 \'a0 \'a0 mesmo DOI (muito provavelmente a entrada bibtex continha o campo\
+\'a0 \'a0 \'a0 doi e url). Utilizem apenas o DOI.\
+\
+\
+\
+----------------------- REVIEW 5 ---------------------\
+SUBMISSION: 42\
+TITLE: Integrating Type Operators into the FreeST Programming Language\
+AUTHORS: Paula Lopes, Vasco T. Vasconcelos and Diana Costa\
+\
+----------- Overall evaluation -----------\
+SCORE: 2 (accept)\
+----- TEXT:\
+Este \'e9 um meta-review, com um sum\'e1rio do que o PC acha serem as quest\'f5es essenciais a endere\'e7ar na vers\'e3o camera-ready.\
+\
+O artigo assume muito dos seus leitores, apresentando de forma demasiado resumida alguns aspetos cr\'edticos, usando mesmo conceitos elaborados sem os introduzir. Vale a pena explicar melhor as intui\'e7\'f5es e detalhes t\'e9cnicos centrais, ilustrando com mais exemplos.\
+\
+As contribui\'e7\'f5es do artigo devem tamb\'e9m ser melhor sistematizadas, bem como o trabalho que foi de facto realizado.}
