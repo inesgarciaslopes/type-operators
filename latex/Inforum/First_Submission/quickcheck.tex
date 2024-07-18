@@ -1,0 +1,29 @@
+\renewcommand{\arraystretch}{1.0}
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{| @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.25\linewidth}|}
+        \hline
+        \textbf{Property} & \textbf{Description} & \textbf{Number of Tests} \\
+        \hline
+        prop\_rename & Validates node structure remains unchanged after renaming & Passed all\\
+        \hline
+        prop\_tree\_structure & Confirms renaming maintains tree structure & Passed all\\
+        \hline
+        prop\_rename\_idempotent & Checks that renaming twice is equivalent to once & Passed all\\
+        \hline
+        prop\_reduction\_preserves\linebreak\_renaming & If $\lambdared TU$ and $\TT = \rename(\TT)$ then $\UT = \rename(\UT)$ & Passed 23464\newline Discarded 200000\\
+        \hline
+        prop\_renaming\_preserves\linebreak\_alpha\_congruence & Ensures alpha congruent types remain congruent after renaming & Passed 5858\newline  Discarded 200000\\
+        \hline
+        prop\_renaming\_reflects\linebreak\_alpha\_congruence & If $\TT$ and $\UT$ are alpha-congruent, then $\rename(\TT) = \rename(\UT)$ & Passed 5858\newline  Discarded 200000\\
+        \hline
+        prop\_nf\_does\_not\_reduce & Ensures that types in normal form do not reduce further & Passed 2374\newline  Discarded 200000\\
+        \hline
+        prop\_reduced\_is\_not\_nf & If $\lambdared TU$ then $\judgementlabel{not}(\issnf T)$ & Passed 2374\newline  Discarded 200000\\
+        \hline
+        prop\_preservation & If $\istype\Delta T \kind$ and $\betared{T}{U}$, then $\istype \Delta U \kind$ & Passed 576\newline  Discarded 200000\\
+        \hline
+    \end{tabular}
+    \caption{Tested properties with Quickcheck.}
+    \label{tab:properties}
+\end{table}

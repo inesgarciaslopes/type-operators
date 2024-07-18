@@ -1,0 +1,142 @@
+% !TeX root = samplepaper.tex
+
+\begin{figure}[t]
+  %
+  \begin{align*}
+	\tsymc a &\grmeq
+    % \tsymc\alpha \grmor \tsymc\iota \grmor
+     \tsymc{\alpha_i} \grmor \tsymc{\iota_i} \grmor
+               \tsymc{\lambda\alpha\colon\kind}
+  & (i\ge0, \tsymc\iota\neq\Skip)
+  && \text{Transition labels}
+  \end{align*}
+  % 
+  \declrel{Labelled transition system}{$\ltsred{T}{a}{U}$}
+  %
+  \begin{mathpar}
+  \infer[\rulename{L-Red}]{
+    \lambdared TU 
+    \quad
+    \ltsred{U}{a}{V}
+  }{
+    \ltsred{T}{a}{V}
+  }
+  
+  \infer[\rulename{L-Var1}]{
+    m\geq 0
+  }{
+    \ltsred{\alpha\ T_1\ldots T_m}{\alpha_0}\Skip
+  }
+  
+  \infer[\rulename{L-Var2}]{
+    1\leq j\leq m
+  }{
+    \ltsred{\alpha\ T_1\ldots T_m}{\alpha_j}{T_j}
+  }
+  
+  \infer[\rulename{L-Const}]{
+    \tiota \neq \Skip
+  }{
+    \ltsred\iota{\iota_0}\Skip
+  }
+  
+  \infer[\rulename{L-ConstApp}]{
+    \typec \iota= \function{}{}, \typec{\odot{\{\overline{\ell_i}\}}}, \typec{\varrecs{\overline{\ell_i}}}
+    \quad
+    1\leq j\leq m
+  }{
+    \ltsred{\iota\ T_1\ldots T_m}{\iota_j}{T_j}
+  }
+  
+  \infer[\rulename{L-Abs}]{
+    \ltsred{\tlambda \alpha\kind T}{\lambda\alpha\colon\kind}{T}
+  }{}
+
+  \infer[\rulename{L-Quant1}]{
+    \ltsred{\quant\kind\ T}
+    {\lquant\kind_1}{T}
+  }{}
+  
+  \infer[\rulename{L-Quant2}]{
+    \ltsred{\quant\kind\ T}
+    {\lquant\kind_2}\Skip
+    }{}
+
+  \infer[\rulename{L-Msg1}]{
+    \ltsred{\MSGn T}{\sharp_1}{T}
+  }{}
+  
+  \infer[\rulename{L-Msg2}]{
+    \ltsred{\MSGn T}{\sharp_2}{\Skip}
+  }{}
+  
+  \infer[\rulename{L-Seq1}]{
+    \ltsred{;\ T}{;_1}{T}
+  }{}
+  
+  \infer[\rulename{L-VarSeq1}]{
+    m\geq 0
+  }{
+    \ltsred{\semit{(\alpha\ T_1\ldots T_m)}U}{\alpha_0}{U}
+  }
+  
+  \infer[\rulename{L-VarSeq2}]{
+    1\leq j\leq m
+  }{
+    \ltsred{\semit{(\alpha\ T_1\ldots T_m)}U}{\alpha_j}{T_j}
+  }
+
+  \infer[\rulename{L-QuantSeq1}]{
+        \ltsred{\semit{(\quant\kind\ T)}U}{\lquant\kind_1}{T}
+  }{}
+  
+  \infer[\rulename{L-QuantSeq2}]{
+        \ltsred{\semit{(\quant\kind\ T)}U}{\lquant\kind_2}{U}
+  }{}
+  
+  \infer[\rulename{L-MsgSeq1}]{
+    \ltsred{\semit{\MSGn T}U}{\sharp_1}{T}
+  }{}
+  
+  \infer[\rulename{L-MsgSeq2}]{
+    \ltsred{\semit{\MSGn T}U}{\sharp_2}{U}
+  }{}
+  
+  \infer[\rulename{L-ChoiceSeq}]{
+    1\leq j\leq m
+  }{
+    \ltsred{\semit{\choice\records{\overline{\ell_i\colon T_i}}}U}{\tsymc{\odot{\{\overline{\ell_i}\}}_j}}{\semit{T_j}U}
+  }
+  
+  \infer[\rulename{L-WaitSeq}]{
+    \ltsred{\semit\Wait U}{\keyword{Wait}}{\Skip}
+  }{}
+
+  \infer[\rulename{L-CloseSeq}]{
+    \ltsred{\semit\Close U}{\keyword{Close}}{\Skip}
+  }{}
+  
+  \infer[\rulename{L-DualVar1}]{
+    \ltsred{\tdual{(\alpha\ T_1\ldots T_m)}}{\Duall_1}{\alpha\ T_1\ldots T_m}
+  }{}
+  
+  \infer[\rulename{L-DualVar2}]{
+    \ltsred{\tdual{(\alpha\ T_1\ldots T_m)}}{\Duall_2}{\Skip}
+  }{}
+  
+  \infer[\rulename{L-DualSeq1}]{
+    \ltsred{\semit{(\tdual{(\alpha\ T_1\ldots T_m)})} U}{\Duall_1}{\alpha\ T_1\ldots T_m}
+  }{}
+  
+  \infer[\rulename{L-DualSeq2}]{
+    \ltsred{\semit{(\tdual{(\alpha\ T_1\ldots T_m)})} U}{\Duall_2}{U}
+  }{}
+  \end{mathpar}
+  \caption{Labelled transition system for types.}
+  \label{fig:lts}
+\end{figure}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "samplepaper"
+%%% End:
