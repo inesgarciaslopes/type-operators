@@ -104,7 +104,7 @@ Duality is the relationship between two session types that allows them to correc
 \section{System $F^{\mu_*;}_\omega$}\label{sec:system}
 In programming languages, terms are categorized by types, which in turn may be categorized by kinds. In our system, a kind $\kind$ is either a base kind $\kast$--which is either a session or a functional kind, $\skind$ or $\tkind$, respectively--or a higher-order kind  $\karrow \kind \kindp$. A proper type refers to a type that classifies a value, such as an integer or a boolean, thus has a base kind. In contrast, type operators act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. This is the core of our work. Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order types.
 
-\input{LaTeX2e+Proceedings+Templates+download/kinds-types}
+\input{kinds-types}
 
 A type is either a type constructor $\tiota$, a type variable $\talpha$, an abstraction $\tabs{\talpha}{\kind}{\typec{T}}$ or an application $\tapp{\typec{T}}{\typec{T}}$. A detailed list of type constructors is in figure \ref{fig:syntax-types}. Note that the last three constructors are actually type constants, while the rest are type constructors. Observe also that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\kind (\tlambda{\alpha}{\kind}{T})}$ and likewise $\tquantinfix\alpha\kind \TT$ is an abbreviation for $\tforall\kind(\tlambda{\alpha}{\kind}{T})$ or $\texists\kind(\tlambda{\alpha}{\kind}{T})$.
 
@@ -114,7 +114,7 @@ Before we can define well-formed types, we must define the normal form of a type
 With respect to Costa et al. \cite{PocasCMV23}, we promoted polymorphism to kind $\skind$, which entails the introduction of the existential type $\texists \kind$, dual of $\tforall \kind$, and the corresponding reduction rules.
 We also introduce reductions under abstractions with rule \rabs.
 
-\input{LaTeX2e+Proceedings+Templates+download/type-reduction}
+\input{type-reduction}
 
 %vv
 %\input{LaTeX2e+Proceedings+Templates+download/ex-confluence}
@@ -128,7 +128,7 @@ Lastly, in order to define a well-formed type, we introduce the concept of \text
 Note that in rule \pktabs, $\Delta + \tbind\talpha\kind$ represents updating the pre-kind of the type variable $\talpha$ to a new pre-kind $\kind$ in the context $\Delta$ if $\tbind\talpha\kindp\in\Delta$ for some $\kindp$, or storing the pre-kind of $\talpha$ in the context $\Delta$ if otherwise. Combined with normalisation, pre-kinding enables us to decide type formation.
 In section \ref{sec:challenges} we explain why this step is relevant to our solution. 
 
-\input{LaTeX2e+Proceedings+Templates+download/pre-kinding}
+\input{pre-kinding}
 
 Type formation is defined by the judgment $\judgementrelctx{\Delta}{\typec{T}}{\colon}{\kind}$, where $\Delta$ is the kinding context, storing the kinds of type variables as in $\talpha\colon\kind$. Expanding the work by Costa et al. \cite{PocasCMV23}, kinding rules now depend on the pre-kinding system.
 A type $\TT$ is well-formed if $\TT$ is pre-kinded, $\prekind \Delta T \kind$, and $\TT$ normalises, $\isnormalised \TT$.
@@ -140,13 +140,13 @@ We must consider a restriction in the kind of the recursive type $\typec{\mu_\ki
 Inspired by the renaming approach of Gauthier and Pottier \cite{GauthierP04}, we introduce \textit{minimal renaming}, which uses the least amount of variable names necessary.
 %This notion of minimal renaming enables the translation of types into simple grammars.
 This renaming operation, defined in figure \ref{fig:rename} consists on replacing a type \typec{T} by its minimal alpha-conversion. We assume that a countable ordered set of (fresh) type variables, $\{\typec{\upsilon_1},\ldots,\typec{\upsilon_n},\ldots\}$, is available. We rename bound variables in \typec{T} by the smallest possible variable available, \textit{i.e.}, the first which is not free on the type. Note that the $S$ parameter in the definition corresponds to the set of unavailable type variables for renaming.  Also, by $\first(S)$ we mean the smallest variable not in the set $S$. The notion of variable substitution, $\typec{T}\subs{v}{\talpha}$, and free variables of a type, $\fv(\TT)$, are the standard ones from literature \cite{tapl}.
-\input{LaTeX2e+Proceedings+Templates+download/minimal-renaming}
+\input{minimal-renaming}
 %\input{LaTeX2e+Proceedings+Templates+download/ex-renaming}
 
 Moving on, we introduce our notion of type equivalence based on type bisimulation, along the lines of Gay and Hole \cite{DBLP:journals/acta/GayH05}.
 This bisimulation is built from the labelled transition system \cite{Sangiorgi_2011} described in figure \ref{fig:lts}.
 
-\input{LaTeX2e+Proceedings+Templates+download/lts}
+\input{lts}
 
 A type relation $\mathcal{R}$ is a bisimulation if for all pairs of types $(\typec{T},\typec{U})\in\mathcal{R}$ and transition label $\tsymc{a}$ we have:
 
@@ -215,7 +215,7 @@ A production rule in $\mathcal{R}$ is written as $\ltsred{\Xnt}{a}{\ntdelta}$: t
 \paragraph{Decidability of equivalence.} Deciding whether two types are bisimilar takes two steps: the first phase is based on function $\word({\typec{T}})$, described in figure \ref{fig:word}, that translates types to words of non-terminal symbols. This function terminates producing a simple grammar.     
 Then, we have to check if two grammars are bisimilar, that is if $\word({\typec{T}}) \gequiv \word({\typec{U}})$. The algorithm used to check the bisimilarity of simple grammars is the one introduced by Almeida et al. \cite{AlmeidaMV20}.
 
-\input{LaTeX2e+Proceedings+Templates+download/word}
+\input{word}
 
 \section{Challenges}\label{sec:challenges}
 In the original system, the rules for type formation instated that for an application type to be kinded, the type must normalise. So, types that reduce indefinitely are not considered well-formed.
@@ -266,7 +266,7 @@ The following pseudo-code illustrates the process for determining if $\typec{T}$
 \section{Validation}
 Our validation process uses a suite of randomly generated types, leveraging the Quickcheck library\cite{DBLP:conf/icfp/ClaessenH00} to ensure these types have specific properties. An arbitrary type generator is defined using the \textit{Arbitrary} typeclass, employing the \textit{frequency} function to generate type operators with specific probabilities. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \textit{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. For better statistics we ensure proper distribution of type constructors. We present next the list of properties tested with a \textit{maxSuccess} of 200.000 tests:
 
-\input{LaTeX2e+Proceedings+Templates+download/quickcheck}
+\input{quickcheck}
 
 Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3.
 
