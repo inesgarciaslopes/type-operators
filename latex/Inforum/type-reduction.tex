@@ -41,7 +41,7 @@
 
         \infer[\rdexists]{}{\lambdared{\tapp {\Dual}{(\texists{\kind} \TT)}}{}}{\tforall{\kind} \TT}
 
-        \infer[\rdforall]{}{\lambdared{\tapp {\Dual}{(\texists{\kind} \TT)}}{}}{\tforall{\kind} \TT}
+        \infer[\rdforall]{}{\lambdared{\tapp {\Dual}{(\tforall{\kind} \TT)}}{}}{\texists{\kind} \TT}
 	\end{mathpar}
 	\caption{Type reduction.}
 	\label{fig:reduction}
