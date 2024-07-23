@@ -1,15 +1,24 @@
-% !TeX root = samplepaper.tex
+% !TeX root = main.tex
 
-\begin{figure}[t]
+\begin{figure}[t!]
   \declrel{Type formation}{$\istype \Delta T \kind$}
   \begin{mathpar}
-    \inferrule[\kindrulename{T}]{\prekind \Delta T \kind \;\ \isnormalised{T}}{\istype \Delta T {\kind}}
+    \infer[\kconst]{\prekind{\Delta}{\iota}{\kind_\iota}}{\istype \Delta \iota {\kind_\iota}}
+    \quad
+    \infer[\kvar]{\prekind{\Delta}{\alpha}{\kind}}
+    {\istype \Delta \alpha \kind}
+    \quad
+    \infer[\ktabs]{\prekind{\Delta}{\TT}{\kind'} \;\;\, \isnormalised{\TT}}
+    {\istype \Delta {\tabs\alpha \kind \TT} {\karrow \kind {\kind'}}}
+    \quad
+    \inferrule[\ktapp]{\prekind \Delta {T} {\karrow \kind {\kind'}} \;\;\, \prekind \Delta U \kind \;\;\, \isnormalised {\tapp TU}}
+    {\istype \Delta {\tapp T U} {\kind'}}
   \end{mathpar}
-  %\caption{Type formation.}
+  \caption{Type formation.}
   \label{fig:type-formation}
 \end{figure}
 
 %%% Local Variables:
 %%% mode: latex
-%%% TeX-master: "samplepaper"
+%%% TeX-master: "main"
 %%% End:
