@@ -159,29 +159,58 @@ We focus on the third approach, which we detail in \cref{sec:deciding-type-equiv
 
 %An equivalent approach is to translate types into grammars in Greibach normal form \cite{AutebertG84} and use a known algorithm to decide bisimilarity of grammars later.
 
-\section{Deciding type formation}\label{sec:deciding-type-formation}
-We introduce the concept of \emph{pre-kinding}. We denote this as $\prekind \Delta T \kind$, that is, $\typec{T}$ is pre-kinded with kind $\kind$ under the kinding context $\Delta$, a map from type variables to kinds. The rules for pre-kinding can be found in Figure \ref{fig:pre-kinding}.
-Note that in rule \pktabs, $\Delta + \tbind\talpha\kind$ represents updating the pre-kind of the type variable $\talpha$ to a new pre-kind $\kind$ in the context $\Delta$ if $\tbind\talpha\kindp\in\Delta$ for some $\kindp$, or storing the pre-kind of $\talpha$ in the context $\Delta$ if otherwise. Combined with normalisation, pre-kinding enables us to decide type formation.
-In the original system, the rules for type formation instated that for an application type to be kinded, the type must normalise. So, types that reduce indefinitely are not considered well-formed.
+\section{Deciding Type Formation}\label{sec:deciding-type-formation}
+The rules for type formation in \cref{fig:type-formation} involve determining if an application type $\TT\UT$ normalises.
+Types that reduce infinitely many times must be excluded. However, determining whether $\isnormalised {\TT\UT}$ may not terminate. Po\c{c}as et al. \cite{PocasCMV23} propose a two-step solution to this problem.
+The first stage is the introduction of the concept of \emph{pre-kinding}. We denote this as $\prekind \Delta T \kind$, that is, $\typec{T}$ is pre-kinded with kind $\kind$ under the kinding context $\Delta$, a map from type variables to kinds. The rules for pre-kinding can be found in \cref{fig:pre-kinding}. They differ from the rules for type formation in that in rule \pktapp there is no verification of the normalisation of $\TT\UT$. Pre-kinding excludes some (but not all) types that do not normalise, as is the case of $\typec{(\tlambda{\alpha}{\kind}{\alpha \alpha})(\tlambda{\alpha}{\kind}{\alpha \alpha})}$, in \cref{fig:ex-pre-kinding}.
 
-\begin{equation*}
-\infer[\ktapp]{
-\istype \Delta {T} {\karrow \kind {\kind'}} 
-\quad
-\istype \Delta U \kind 
-\quad
-\isnormalised {\tapp TU}}
-{\istype \Delta {\tapp T U} {\kind'}}
-\end{equation*}
+\input{pre-kinding}
 
-However, determining whether $\isnormalised {\TT\UT}$ may not terminate. For example, the infamous type $\typec{(\lambda x.x\ x)(\lambda x.x\ x)}$ never reaches a normal form. In order to address the challenge of non-terminating normalisation, we adopted a \textit{pre-kinding} approach. The type $\typec{(\lambda x.x\ x)(\lambda x.x\ x)}$ for example, is not pre-kinded, so it is discarded right away.
+\begin{figure}[t]
+	\begin{equation*}
+		\inferrule*[rightstyle = {\scriptsize \sc}, right = PK-TApp]{
+			\inferrule*[rightstyle = {\scriptsize \sc}, right = PK-TAbs]{
+				\inferrule*[rightstyle = {\scriptsize \sc}, right = PK-TApp, rightskip=9em]{
+					\infer[\textsc{\scriptsize PK-Var}]{
+						\kind = \karrow {\kind''} {\kind'}
+					}{
+						\prekind {\typec{\alpha}:\kind} {\alpha} {\karrow {\kind''} {\kind'}}
+					}
+					\quad
+					\infer[\textsc{\scriptsize PK-Var}]{
+						\bot}{
+						\prekind {\typec{\alpha}:\kind} {\alpha} {\kind''}
+					}
+				}{
+					\prekind {\typec{\alpha}:\kind} {\alpha \alpha} {\kind'}
+				}
+			}
+			{
+				\prekind {} {\tlambda{\alpha}{\kind}{\alpha \alpha}} {\karrow {\kind} {\kind'}}
+			}
+			\qquad
+			\inferrule*[]{
+				\vdots}{
+				\prekind {} {\tlambda{\alpha}{\kind}{\alpha \alpha}} {\kind}
+			}
+		}
+		{
+			\prekind {} {(\tlambda{\alpha}{\kind}{\alpha \alpha})(\tlambda{\alpha}{\kind}{\alpha \alpha})} {\kind'}
+		}
+	\end{equation*}
+	\caption{Example of an unsuccessful derivation of kind for $\typec{(\tlambda{\alpha}{\kind}{\alpha \alpha})(\tlambda{\alpha}{\kind}{\alpha \alpha})}$.}
+	\label{fig:ex-pre-kinding}
+\end{figure}
 
-For a type which is pre-kinded, we can guarantee termination of $\isnormalised {\TT}$. In particular, we found a way to deal with other problematic types for normalisation, as are recursive types. Note that the reduction of recursive types might not decrease the size of the type. For example, the type $\tmu\skind\ (\tabs\alpha\skind\alpha)$ is pre-kinded but it keeps reducing to itself in two steps, so we must conclude that it does not normalise.
-When we deal with normalisation, we will separate the way we treat recursive types from the rest.
+For a type which is pre-kinded, termination of $\isnormalised {\TT}$ is guaranteed. Note that some recursive types are problematic for normalisation, as the reduction of some types might not decrease their size. For example, the type $\tmu\skind\ (\tabs\alpha\skind {\alpha;\Skip})$ is pre-kinded but successive reduction steps keep adding $\typec{;}\Skip$ to the tail of the type so we must conclude that it does not normalise.
+When dealing with normalisation, we separate the way we treat recursive types from the rest.
 In particular, we divide the reduction rules into two groups: $\muarrow$ refers to reductions that use the $\rmu$ rule and $\lseqarrow$ refers to reductions that never invoke the $\rmu$ rule. Thus, $\betaarrow\ =\ \lseqarrow\cup\muarrow$. We can now extend this notion into normalisation $\lseqnormalred TU$ and $\munormalred TU$ respectively.
-%However, this approach still leaves gaps. For example, the type $\tlambda \alpha \kind ({\tapp {\tmu \kind} {\tlambda \alpha \kind \alpha}})$ passes pre-kinding and normalisation checks since only the head of the type is required to be in weak head normal form, without ensuring the body's normalisation. This brought the necessity for a stronger notion of normal form, one that fully evaluates every sub-expression of a type, described in figure \ref{fig:snf}.
 
-\paragraph{Decidability of type formation.} Take $\Delta$, $\TT$, $\kind$. First we determine if $\prekind\Delta T \kind$. If $\TT$ fails to be pre-kinded, it is not kinded either. Otherwise, we check whether $\TT$ normalises, specifically seeking infinite reduction sequences. In the presence of recursive types, such sequences would have between two $\mu$-reductions a finite number of $\beta$-reductions.
+In order to check if a type $\TT$ is well-formed, we first synthetise the kind of $\TT$, \ie we determine if $\prekind\Delta T \kind$ for some $\Delta, \kind$. If $\TT$ fails to be pre-kinded, it is not kinded either.
+
+
+\todo{rewrite from here.}
+Otherwise, we check whether $\TT$ normalises, specifically seeking infinite reduction sequences. In the presence of recursive types, such sequences would have between two $\mu$-reductions a finite number of $\beta$-reductions.
 $\TT = \lseqnormalred{\typec{T_0}}{\typec{T'_0}}\mured{}{\typec{T_1}}\lseqnormalred{}{\typec{T'_1}}\mured{}{\typec{T_2}}\lseqnormalred{}{\typec{T'_2}}\mured{}{\cdots}$.
 If $\typec{T'_i}$ does not reduce by any $\mu$-reduction, we can determine that $\typec{T}$ normalises. Otherwise, since $\tmu\kast\ \UT$ is restricted to the base kind $\kast$, it must reduce by one of these:
 \begin{equation*}\begin{aligned}
