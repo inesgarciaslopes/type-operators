@@ -76,6 +76,7 @@ Vasco T. Vasconcelos}
 %
 \begin{abstract}
 Context-free session types emerged from the need to expand session type theory to non-regular protocols. Their inclusion in type systems enhances the expressiveness and adaptability of communication protocols in programming languages, yet pose a significant challenge for type equivalence algorithms. In this work, we study System $F^{\mu_*;}_\omega$, the higher-order polymorphic lambda calculus equipped with equirecursive and context-free session types, as well as its seamless integration into FreeST, a functional programming language governed by context-free session types.
+We follow Poças et al. \cite{PocasCMV23} type equivalence approach, based on type bisimulation, and ensure decidability by reducing the problem to the bisimilarity of simple grammars.
 
 
 \keywords{Higher-order Kinds \and Context-Free Session Types \and Session Polymorphism \and Type Equivalence \and Simple Grammar.}
@@ -86,22 +87,23 @@ In the field of programming languages, the drive for more advanced and expressiv
 
 FreeST \cite{AlmeidaMTV22}, a functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Context-free session types, unlike regular session types, are not restricted to tail recursion, thus allow the description of more sophisticated communication protocols. Almeida et al. \cite{AlmeidaMV20} developed the current type equivalence algorithm for FreeST, based on the translation of types into a simple grammar. The next step is to extend the language to a higher-order setting where type equivalence is still decidable.
 
-In this work, we study the System $F^{\mu_*;}_\omega$, the higher-order polymorphic lambda calculus equipped with equirecursive and context-free session types and its incorporation into a programming language. We seek to bridge the gap between advanced type theory and practical compiler design, ensuring that the powerful capabilities of context-free session types can be effectively utilized without compromising on performance or reliability.
+In this work, we study the System $F^{\mu_*;}_\omega$, the higher-order polymorphic lambda calculus equipped with equirecursive and context-free session types and its incorporation into a programming language. We follow a bisimulation-based type equivalence, proposed by Poças et al. \cite{PocasCMV23}, which supports the robust implementation of advanced type systems in programming languages. We seek to bridge the gap between advanced type theory and practical compiler design, ensuring that the powerful capabilities of context-free session types can be effectively utilized without compromising on performance or reliability.
 
 In the development of modern type systems, combining advanced features such as equirecursion, higher-order polymorphism, and higher-order context-free session types presents unique challenges and opportunities. The primary motivation for our research is to integrate these elements into a cohesive type system that can be practically incorporated into programming languages. Therefore, we are interested in practical algorithms for type equivalence checking to be incorporated into compilers.
 
 \paragraph{Context-free session types.}
-\todo{completar}
+Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the session type $\Skip$--neutral element of sequential composition--which represents a protocol with no actions.
+Instead of writing $\OUTn\Int\INn\Int\typec{. T}$ (T being the recursive tail), we can write $\OUTn\Int\INn\Int$, a type that receives an integer and sends back an integer. It is also important to distinguish the $\End$ type from the $\Skip$: the former represents the closing of a channel, where no further communication is possible, while the latter allows the continuation of communication on the channel. 
 
 \paragraph{Beyond first-order context-free session types.}
 Types are categorised by kinds $\kind$. For example, the recursive type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\Close$ describes a protocol for safely streaming integer trees on a channel, where the recursion variable $\talpha$ is of kind session $\skind$. If the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. We want to go further, namely, we are interested in abstracting the type that is received on the tree channel, by writing $\tabs{\beta}{\tkind}{\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\beta\Semi\ \alpha}}\Semi\Close}$, where $\tkind$ is the kind of functional types.
 Abstractions introduce higher-order kinds which lead to the  introduction of type operators into our language.
 
 \paragraph{Duality as an external macro (or not).}
-Duality is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server). For example, the session type $\OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\INn\Int$. Typically, duality is offered as a built in constructor \cite{DBLP:journals/corr/abs-2004-01322}. However, we believe duality should be internal, by means of a type operator.\todo{why is this our belief?}
+Duality is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server). For example, the session type $\OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\INn\Int$. Typically, duality is offered as a built in constructor \cite{DBLP:journals/corr/abs-2004-01322}. However, we believe duality should be internal, by means of a type operator, since in a polymorphic setting duality cannot be eliminated without the introduction of co-variables.
 
 \paragraph{Outline.}
-\todo{reescrever} The rest of the paper is organised as follows: Section 2 summarises the motivation behind our research; Section 3 introduces System $F^{\mu_*;}_\omega$ and type equivalence; Section 4 presents the challenges encountered during this research; Section 5 validates our work and Section 6 wraps up the paper.
+The rest of the paper is organised as follows: \cref*{sec:system} introduces System $F^{\mu_*;}_\omega$ and type equivalence; \cref*{sec:deciding-type-formation} presents the challenges encountered during this research and prove the decidability of type formation; \cref*{sec:deciding-type-equivalence} explains the decidability of type equivalence; \cref*{sec:implementation} describes our implementation process and validates our work and \cref*{sec:conclusion} wraps up the paper.
 
 \section{System $F^{\mu_*;}_\omega$}\label{sec:system}
 In programming languages, terms are categorized by types, which in turn may be categorized by kinds. In our system, a \emph{kind} $\kind$ is either a base kind $\kast$--which is either a session or a functional kind, $\skind$ or $\tkind$, respectively--or a higher-order kind  $\karrow \kind \kindp$. A \emph{proper type} refers to a type that has a base kind. In contrast, \emph{type operators} act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. This is the core of our work. Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order types.
@@ -223,7 +225,7 @@ Then, we have to check if two grammars are bisimilar, that is if $\word({\typec{
 
 [EXAMPLE T~U (grammar)]
 
-\section{Implementation and validation}
+\section{Implementation and validation}\label{sec:implementation}
 TO-DO
 
 \begin{itemize}
@@ -241,8 +243,8 @@ Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, a
 
 While randomly generated types facilitate a robust analysis, certain properties, such as the preservation property, prove challenging to test comprehensively. This difficulty arises from the simplicity of our generator and the inherent probability of randomly generated test cases preserving such properties. To achieve better results, more complex generators tailored to specific properties would be required, though such generators are often challenging to design and implement. 
 
-\section{Conclusion}
-To summarise, we explored the integration of $F^{\mu_*}_\omega$ with context-free session types into the functional programming language FreeST. Context-free session types enhance the expressiveness and adaptability of communication protocols in programming languages by extending beyond the limitations of regular session types. Our work addressed the significant challenges posed by type equivalence algorithms within this advanced type system. Our findings underscore the importance of handling recursive types separately to ensure termination of normalisation. By refining the reduction rules and employing a pre-kinding approach, we are able to decide type formation.
+\section{Conclusion}\label{sec:conclusion}
+\todo{Rewrite} To summarise, we explored the integration of $F^{\mu_*}_\omega$ with context-free session types into the functional programming language FreeST. Context-free session types enhance the expressiveness and adaptability of communication protocols in programming languages by extending beyond the limitations of regular session types. Our work addressed the significant challenges posed by type equivalence algorithms within this advanced type system. Our findings underscore the importance of handling recursive types separately to ensure termination of normalisation. By refining the reduction rules and employing a pre-kinding approach, we are able to decide type formation.
 We proposed a bisimulation-based type equivalence method for System $F^{\mu_*;}_\omega$, demonstrating its practicality and efficiency in ensuring decidability. By reducing the problem to the bisimilarity of simple grammars, we provided a robust solution for type equivalence checking, facilitating the implementation of advanced type systems in real-world programming languages.
 
 \medskip
