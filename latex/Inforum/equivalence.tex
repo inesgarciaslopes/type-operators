@@ -1,5 +1,8 @@
 \section{Dedicing type equivalence}\label{sec:deciding-type-equivalence}
 \todo{organizar secção}
+
+\input{word}
+
 A grammar in \emph{Greibach normal form} \cite{AutebertG84} is a tuple of the form $(\mathcal{T, N}, \ntgamma, \mathcal{R})$, where:
 \begin{itemize}
 	\item $\mathcal{T}$ is a finite set of terminal symbols, $\tsymc{a}$, $\tsymc{b}$, $\tsymc{c}$; 
@@ -9,9 +12,8 @@ A grammar in \emph{Greibach normal form} \cite{AutebertG84} is a tuple of the fo
 \end{itemize}
 A production rule in $\mathcal{R}$ is written as $\ltsred{\Xnt}{a}{\ntdelta}$: the left side of the arrow must be a non-terminal, $\Xnt\in\mathcal{N}$, while the right side must be a word. Note that $\ntdelta$ can be the empty word. Grammars in GNF are \emph{simple} when for every non-terminal and terminal symbol there is at most one production $\ltsred{\Xnt}{a}{\ntdelta}$ \cite{KorenjakH66}.
 
-Deciding whether two types are bisimilar takes two steps: the first phase is based on function $\word({\typec{T}})$, described in Figure \ref{fig:word}, that translates types to words of non-terminal symbols. This function terminates producing a simple grammar.     
+Deciding whether two (renamed) types are bisimilar takes two steps: the first phase is based on function $\word({\typec{T}})$, described in Figure \ref{fig:word}, that translates types to words of non-terminal symbols. 
+\todo{explain in more detail how word works}. This function terminates producing a simple grammar. \todo{Elaborate on why we can always produce a simple grammar - Reviewer 2}     
 Then, we have to check if two grammars are bisimilar, that is if $\word({\typec{T}}) \gequiv \word({\typec{U}})$. The algorithm used to check the bisimilarity of simple grammars is the one introduced by Almeida et al. \cite{AlmeidaMV20}.
 
-\input{word}
-
-[EXAMPLE T~U (grammar)]
+\todo{grammar example: T$\sim$U}
