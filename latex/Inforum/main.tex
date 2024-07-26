@@ -127,7 +127,7 @@ In \cref{sec:deciding-type-formation} we prove the decidability of type formatio
 \input{type-formation.tex}
 
 \paragraph{Type equivalence.}
-\todo{why do we care about type equivalence.}
+Type equivalence allows us to check whether two types, even if syntactically different, correspond to the same protocol. 
 It is expected that two types that are alpha-congruent are equivalent, like for example $\tlambda{\alpha}{\kind}{\alpha}$ and $\tlambda{\beta}{\kind}{\beta}$. However, the task of checking if two types are equivalent may involve the performance of (variable) substitutions on-the-fly as one crosses along the types. We will avoid this by performing a renaming operation once on both types, right at the beginning of the type equivalence checking process. We follow the notion of renaming in \cite{PocasCMV23}.
 Po\c{c}as et al \cite{PocasCMV23} propose three possible ways to check whether two (renamed) types are equivalent:
 \begin{itemize}
