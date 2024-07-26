@@ -20,17 +20,19 @@
 						\Rightarrow}}\,\skind} && \text{\small internal/external choice}\\
             &\quant \kind && \karrow {(\karrow \kind \kast)} \skind && \text{\small exists/forall}
             && \Dual && \karrow{\skind}{\skind} && \text{\small dual operator}\\
-            &\End\:\Sharp && \skind && \text{\small wait/close} && \Skip && \skind && \text{\small skip} 
+            &\End && \skind && \text{\small wait/close} && \Skip && \skind && \text{\small skip} 
 			%&\Skip && \skind && \text{\small skip} &&&
         \end{align*}
     \begin{align*}
-    \typec{\varrecs{}} \grmeq{} \typec{\records{}} \grmor \typec{\variants{}}
+    \typec{\varrecs{}} \grmeq{} \typec{\records{}} \!\grmor\! \typec{\variants{}}
     &&
-    \typec\sharp \grmeq{} \typec? \grmor{} \typec!
+    \typec\sharp \grmeq{} \typec? \!\grmor\! \typec!
     &&
-    \choice \grmeq{} \intchoice \grmor \extchoice
+    \choice \grmeq{} \intchoice \!\grmor\! \extchoice
     &&
-    \quant\kind \grmeq{} \typec{\exists_\kind} \grmor \typec{\forall_\kind}
+    \quant\kind \grmeq{} \typec{\exists_\kind} \!\grmor\! \typec{\forall_\kind}
+    &&
+    \End \grmeq{} \Wait \!\grmor\! \Close
   \end{align*}
     %\end{minipage}
     \caption{The syntax of types and constructors.}
