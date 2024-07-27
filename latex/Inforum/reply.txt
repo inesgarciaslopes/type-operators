@@ -20,9 +20,6 @@ A last comment about the Validation section: this is at the same time a nice sec
 passing quickcheck tests is not a proof, and thus proofs are still needed. This is ok for the scope of Inforum, but we urge the authors to work on formal proofs for the presented properties.
 R: 
 
-
-In summary, I liked the paper, and the authors should improve it and send it to a stronger conference in the future.
-
 -----------------
 
 Reviewer 2:
@@ -31,47 +28,29 @@ This paper presents a lambda calculus with higher-order polymorphism (in the sen
 a functional programming language in this space. The main contribution of the paper is a bisimulation-based type equivalence algorithm for the language, reducing the problem
 to bisimilarity of simple grammars.
 
-Review:
+Carefully explain the word(T) function definition, potentially with an example, elaborating on why we can always produce a simple grammar from a higher-order polymorphic type.
+R:
 
-This paper presents a strategy for deciding type equivalence of context-free session types with higher-order polymorphism. The strategy consists of translating such types to
-words of non-terminal symbols, producing a simple grammar. The bisimilarity of such grammars can then be decided using an algorithm by Almeida et al.
-Thus, the crux of this work lies in the definition of the LTS for types and in the translation function word(T). My main complaint about this work is that essentially no explanation
-is provided of either of these two key components of the work. No intuition is given as to how we can always produce a simple grammar, nor is any discussion given as to why the presented
-LTS is even reasonable to begin with -- what is its relation with type reduction? Even some informal discussion would be useful and is, in my opinion, necessary.
+Explain the rules of the LTS and argue why the LTS is reasonable, given the definition of type reduction/normalization.
+R:
 
-The validation of the work does not rely on formal theorems (which is fine), but rather on testing via Quickcheck. Naturally, this only provides some degree of assurance wrt the implementation
-rather than the actual soundness and completeness of the strategy, but this is reasonable given the venue and the work itself.
-
-I also found that the paper assumes a lot of its readers. The authors make little effort in introducing session types at all, let alone the specific formulation found in this paper. I also think this is an area that must be improved in the final version of the paper.
-
-I think this work is interesting and worthy of publication in INFORUM, pending the following changes (the paper has plenty of "white space" and remaining space, so that should not be a concern):
-
-- Carefully explain the word(T) function definition, potentially with an example, elaborating on why we can always produce a simple grammar from a higher-order polymorphic type.
-- Explain the rules of the LTS and argue why the LTS is reasonable, given the definition of type reduction/normalization.
-- Given some brief introduction of context-free session types (e.g. read off the meaning of a type in terms of its IO behaviour)
-
-
+Given some brief introduction of context-free session types (e.g. read off the meaning of a type in terms of its IO behaviour)
+R:
 
 -----------------
 
 Reviewer 3:
-I find this article to be relatively well written and aligned with the topics of INForum 2024. Hence I recommend acceptance.
-
-Some more comments and suggestions follow below.
-
-
-## General comments and suggestions
-
 The structure of the paper could be improved. Namely Section 3 covers around 6 pages (out of 11 pages) without any subsection, and jumping between relatively different topics that could be better organised. This section is called `System Fμ∗;ω`, but you never present the language, and only address the types -- maybe a better title could reflect this.
+R:
 
 Furthermore, I would recommend to mention in the introduction:
 
   - the explicit and precise contributions so far; and
   - a summary of the core challenges and the validation approach
+R:
 
-This would allow the reader to have a more complete picture without having to read the full paper. Only in the very end you mention that you have an Haskell implementation of some of the rules, which could be mentioned upfront.
-
-I also missed what precisely is implemented so far. I believe only the reduction rules in Fig. 2, but it was not fully clear to me. Maybe you also implemented the rules of Fig. 5 and a search for bisimilarity (as it does not sound too difficult in this case). Adding a link to your experiments would also help support your contributions.
+Adding a link to your experiments would also help support your contributions.
+R:
 
 Regarding the rules, they all seem to be very deterministic.
 
@@ -80,30 +59,43 @@ Regarding the rules, they all seem to be very deterministic.
 
  - Fig. 5 focuses on exposing the structure of the term to labels (to be compared via bisimulation)
    + here there seems to be more than one choice possible, but it is still deterministic (making the bisimulation very easy to find, and probably a simpler notion would be enough).
+R:
 
 Regarding the bisimilarity of grammars - I am not sure how these are defined, and I got the impression that there were too many concepts that were not explained or defined when summarising the work by Almeida et al. [2].
+R:
 
 Finally, I would have liked to see a more complex example, maybe with a motivation storyline behind it (e.g., needing to "open" some files to be used by different worker-components, and to "close" them before proceeding). Maybe to show that it could be simplified, or that a problem could be detected (and that it could not be captured without the context-free nature).
-
+R:
 
 ## Minor comments
 
-- §2, in the 2nd example with an abstraction - I suggest keeping the alpha in the same place as in the first example (instead of beta), and rename beta for something else.
-- Fig. 1: I suggest adding parenthesis, e.g., in `* => (* => T)` (even though the community on functional programming knows this).
-- Suggestion throughout §3: whenever you introduce a new concept (e.g., proper type, type operator, type formation, well-formed), use the \emph environment to highlight it.
-- There is a typo in Fig. 2, rule R-D∀ (is the same as R-D∃)
-- A type `T` is pre-kinded if `∆ ⊢pre T : κ`; I would add "for some context `∆` and kind `κ`" (or "`T` is pre-kinded if there exists (`∆` and `κ`) such that (...).")
-- Fig. 5, rule L-Seq1: The syntax seems to be missing something.
-- Fig. 5, rule L-ConstApp: I could not understand the premises.
-- Fig. 6: I could not follow the syntax to define "word(T)" - I think some extra explanations would be useful.
+§2, in the 2nd example with an abstraction - I suggest keeping the alpha in the same place as in the first example (instead of beta), and rename beta for something else.
+R:
 
+Fig. 1: I suggest adding parenthesis, e.g., in `* => (* => T)` (even though the community on functional programming knows this).
+R:
 
+Suggestion throughout §3: whenever you introduce a new concept (e.g., proper type, type operator, type formation, well-formed), use the \emph environment to highlight it.
+R:
+
+There is a typo in Fig. 2, rule R-D∀ (is the same as R-D∃)
+R:
+
+A type `T` is pre-kinded if `∆ ⊢pre T : κ`; I would add "for some context `∆` and kind `κ`" (or "`T` is pre-kinded if there exists (`∆` and `κ`) such that (...).")
+R:
+
+Fig. 5, rule L-Seq1: The syntax seems to be missing something.
+R:
+
+Fig. 5, rule L-ConstApp: I could not understand the premises.
+R:
+
+Fig. 6: I could not follow the syntax to define "word(T)" - I think some extra explanations would be useful.
+R:
 
 -----------------
 
 Reviewer 4:
-# Sumário
-
 Este artigo apresenta a integração do cálculo lambda de ordem superior
 com tipos equi-recursivos e tipos de sessão livres de contexto na
 linguagem de programação FreeST. Os autores apresentam as dificuldades
@@ -113,49 +105,24 @@ programação. É igualmente apresentada uma abordagem para demonstrar
 equivalência de tipos, através de uma tradução para gramáticas em
 forma normal de Greibach.
 
-# Avaliação geral
-
-Este artigo apresenta um contributo e extensões interessantes à
-linguagem FreeST. A inclusão de operadores de tipo e a implementação
-de um procedimento de equivalência aumentam consideravelmente a
-expressividade da linguagem. A implementação um sistema de tipos tão
-rico está bem alicerçada nas meta-propriedades deste sistema,
-fornecendo garantias importantes de correção ao trabalho
-desenvolvido. A abordagem seguida para a equivalência de tipos,
-através de redução do problema para bissimilaridade entre gramáticas,
-parece-me o contributo mais interessante deste artigo. Por isso,
-acredito firmemente que este artigo deveria ser aceite para
-apresentação no INForum 2024.
-
-O artigo está bem escrito e apresenta uma estrutura coerente. No
-entanto, a apresentação é muitas vezes apressada e pouco polida. As
-minhas maiores críticas prendem-se com a Secção 2 (Motivação) e Secção
-5 (Validação). Além disso, o artigo não ocupa integralmente as 12
-páginas permitidas pelo INForum, portanto acredito que os autores
-terão margem suficiente para melhorar a apresentação na versão final,
-caso o artigo seja aceite.
-
-# Comentários detalhados
-
-  - Introduction, "[...] comes with its own set of challenges,
-    especially when it comes to type equivalence algorithms".
-
-    Porquê? Dito apenas desta forma soa demasiado vago e como apenas
+Introduction, "[...] comes with its own set of challenges,
+especially when it comes to type equivalence algorithms". 
+Porquê? Dito apenas desta forma soa demasiado vago e como apenas
     um problema pequeno, quando na verdade não o é. Dar mais detalhes
     e intuição aqui teriam ajudado (estamos no primeiro parágrafo do
     artigo, é ainda muito importante prender e motivar o leitor). Uma
     referência também poderia ajudar.
+R:
 
-  - Motivation, pp 2, parágrafo Beyond first-order context-free
-    session types.
-
-    A descrição apresentada neste parágrafo recorre já a muitos
+Motivation, pp 2, parágrafo Beyond first-order context-free
+    session types. 
+A descrição apresentada neste parágrafo recorre já a muitos
     conceitos e notação que só poderemos compreender em todo o
     detalhe a partir da secção 3.
+R:
 
-  - Motivation, pp 2, parágrafo Duality as an external macro (or not).
-
-    Até à última frase, o parágrafo lia-se muito bem e transmitia de
+Motivation, pp 2, parágrafo Duality as an external macro (or not).
+Até à última frase, o parágrafo lia-se muito bem e transmitia de
     facto uma mensagem intuitiva e de motivação para o resto do
     trabalho. No entanto, a última frase é completamente obscura e
     muito vaga para este contexto. Nesta fase tão inicial do artigo,
@@ -164,10 +131,10 @@ caso o artigo seja aceite.
     propõe de facto soluções. Além disso, no resto do artigo não
     encontramos mais nenhuma referência à dualidade de tipos sessão,
     portanto torna-se difícil perceber a importância deste parágrafo.
+R:
 
-  - Motivation.
-
-    A minha maior crítica é que esta é uma secção importantíssima e
+Motivation.
+A minha maior crítica é que esta é uma secção importantíssima e
     acaba por ser demasiado curta e com pouco conteúdo. Pelo texto
     apresentado não se consegue perceber o que é de facto trabalho
     novo e o que já está implementado em FreeST. Havendo ainda espaço
@@ -176,28 +143,28 @@ caso o artigo seja aceite.
     escrever em FreeST e outros que ainda não são possíveis de
     exprimir na linguagem, mas que graças a este trabalho já o poderão
     ser.
+R:
 
-  - Pp 6, equivalência entre tipos T e U.
-
-    A apresentação do itemize que se segue é estranha. Para além do
+Pp 6, equivalência entre tipos T e U.
+A apresentação do itemize que se segue é estranha. Para além do
     impacto visual, já que introduz um espaço branco enorme no corpo
     do artigo, não se percebe se esta apresentação seria um teorema,
     uma definição ou de facto um exemplo. Seria por isso apropriado
     utilizar um ambiente que realce a natureza do que se pretende
     apresentar.
+R:
 
-  - Fim da secção Challenges.
-
-    A escolha de pseudo-código para ilustrar o processo de
+Fim da secção Challenges.
+A escolha de pseudo-código para ilustrar o processo de
     normalização parece-me estranha. a codificação utilizada parece
     demasiado próxima de código Haskell. Por isso, teria sido melhor
     apresentar de facto a implementação em Haskell. Os autores
     poderiam também optar por uma apresentação baseada em regras de
     inferência, já que a mensagem importante é o algoritmo.
+R:
 
-  - Secção 5, Validation.
-
-    Esta parece-me a secção com o conteúdo mais pobre do artigo. Desde
+Secção 5, Validation.
+Esta parece-me a secção com o conteúdo mais pobre do artigo. Desde
     logo, é um mistério completo a utilização da biblioteca
     Quickcheck. Só com algum poder de adivinhação, baseada na
     descrição da máquina em que se realizaram os testes, se poderá
@@ -209,21 +176,7 @@ caso o artigo seja aceite.
     estendida que podemos agora verificar? Depois de ler esta secção
     fico com a sensação que de facto não há grande relação entre a
     linguagem FreeST e o trabalho aqui apresentado.
-
-  - Typos e gralhas de apresentação.
-
-    - "figure" --> Figure
-
-    - Um pouco ao longo de todo o artigo: linhas que começam com
-      símbolos.
-
-    - Na conclusão, primeira linha: falta um ponto e vírgula no nome
-      do sistema?
-
-    - Refências: algumas referências apresentam um duplo link para o
-      mesmo DOI (muito provavelmente a entrada bibtex continha o campo
-      doi e url). Utilizem apenas o DOI.
-
+R:
 
 
 -----------------
@@ -232,5 +185,7 @@ Reviewer 5:
 Este é um meta-review, com um sumário do que o PC acha serem as questões essenciais a endereçar na versão camera-ready.
 
 O artigo assume muito dos seus leitores, apresentando de forma demasiado resumida alguns aspetos críticos, usando mesmo conceitos elaborados sem os introduzir. Vale a pena explicar melhor as intuições e detalhes técnicos centrais, ilustrando com mais exemplos.
+R:
 
 As contribuições do artigo devem também ser melhor sistematizadas, bem como o trabalho que foi de facto realizado.
+R:
