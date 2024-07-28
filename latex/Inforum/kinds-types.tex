@@ -18,9 +18,9 @@
             &\Semi && \karrow \skind {\karrow \skind \skind} && \text{\small seq.composition}
 			 && \typec{\odot{\{\overline{l_i}\}}} && \kindc{\overline{{\skind
 						\Rightarrow}}\,\skind} && \text{\small internal/external choice}\\
-            &\quant \kind && \karrow {(\karrow \kind \kast)} \skind && \text{\small exists/forall}
+            &\quant \kind && \karrow {(\karrow \kind \kast)} \tkind && \text{\small exists/forall}
             && \Dual && \karrow{\skind}{\skind} && \text{\small dual operator}\\
-            &\End && \skind && \text{\small wait/close} && \Skip && \skind && \text{\small skip} 
+            &\End_{\typec{\sharp}} && \skind && \text{\small wait/close} && \Skip && \skind && \text{\small skip} 
 			%&\Skip && \skind && \text{\small skip} &&&
         \end{align*}
     \begin{align*}
@@ -31,8 +31,6 @@
     \choice \grmeq{} \intchoice \!\grmor\! \extchoice
     &&
     \quant\kind \grmeq{} \typec{\exists_\kind} \!\grmor\! \typec{\forall_\kind}
-    &&
-    \End \grmeq{} \Wait \!\grmor\! \Close
   \end{align*}
     %\end{minipage}
     \caption{The syntax of types and constructors.}

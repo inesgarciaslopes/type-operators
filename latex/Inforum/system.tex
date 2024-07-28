@@ -1,19 +1,21 @@
 \section{System $F^{\mu_*;}_\omega$}\label{sec:system}
-In programming languages, terms are categorized by types, which in turn may be categorized by kinds. In our system, a \emph{kind} $\kind$ is either a base kind $\kast$--which is either a session or a functional kind, $\skind$ or $\tkind$, respectively--or a higher-order kind  $\karrow \kind \kindp$. A \emph{proper type} refers to a type that has a base kind. In contrast, \emph{type operators} act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. This is the core of our work. Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order types.
+In programming languages, terms are categorized by types, which in turn may be categorized by kinds. In our system, a \emph{kind} $\kind$ is either a base kind $\kast$---which is either a session or a functional kind, $\skind$ or $\tkind$, respectively---or a higher-order kind  $\karrow \kind \kindp$. A \emph{proper type} refers to a type that has a base kind. In contrast, \emph{type operators} act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. This is the core of our work. Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order kinds.
 
 \input{kinds-types}
 
-A type is either a type constructor $\tiota$, a type variable $\talpha$, an abstraction $\tabs{\talpha}{\kind}{\typec{T}}$ or an application $\tapp{\typec{T}}{\typec{T}}$. A detailed list of types and constructors is in \cref{fig:syntax-types}. Note that the last three constructors are actually type constants. Observe also that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\kind (\tlambda{\alpha}{\kind}{T})}$ and likewise $\tquantinfix\alpha\kind \TT$ is an abbreviation for $\tforall\kind(\tlambda{\alpha}{\kind}{T})$ or $\texists\kind(\tlambda{\alpha}{\kind}{T})$.
+A type is either a type constructor $\tiota$, a type variable $\talpha$, an abstraction $\tabs{\talpha}{\kind}{\typec{T}}$ or an application $\tapp{\typec{T}}{\typec{T}}$. A detailed list of types and constructors is in \cref{fig:syntax-types}. Observe that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\kind (\tlambda{\alpha}{\kind}{T})}$ and similarly for $\tquantinfix\alpha\kind \TT$. 
 
-Before we can define well-formed types, we must define the normal form of a type; we do so by defining a system of reduction rules in \cref{fig:reduction}. This system is an adaptation of that proposed by Po\c{c}as et al. \cite{PocasCMV23} that is confluent, by adding the proviso that $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \rseqtwo and \rdctx. \emph{Confluence} states that, if there are two distinct reduction paths for a given type, $\afunction{T}{U}$ and $\afunction{T}{V}$, then both paths will eventually converge into the same final reduced type $\typec{W}$. Our variant features a single reduction path, thus confluence immediately follows.
-With respect to Po\c{c}as et al. \cite{PocasCMV23}, we promoted polymorphism to kind $\skind$, which entails the introduction of the existential type $\texists \kind$, dual of $\tforall \kind$, and the corresponding reduction rules.
+\todo{Not all types are of interest. Examples.}
+
+Before we can discuss type formation, we must define the weak head normal form of a type; we do so by defining a system of reduction rules in \cref{fig:reduction}. This system is that of Po\c{c}as et al. \cite{PocasCMV23} made confluent by adding the proviso that $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \rseqtwo and \rdctx. \emph{Confluence} states that, if there are two distinct reductions for a given type, $\afunction{T}{U}$ and $\afunction{T}{V}$, then both paths will eventually converge into the same final reduced type $\typec{W}$. Our variant features a single reduction path, thus confluence immediately follows.
+%With respect to Po\c{c}as et al. \cite{PocasCMV23}, we promoted polymorphism to kind $\skind$, which entails the introduction of the existential type $\texists \kind$, dual of $\tforall \kind$, and the corresponding reduction rules.
 
 \input{type-reduction}
 
-A type is in \emph{normal form}, denoted $\issnf{T}$, if it has been completely reduced, \textit{i.e.}, no further reductions are possible. In other words, $\issnf{T}$ iff $\typec{T} \nrightarrow$. Then we can say that type $\typec{T}$ \emph{normalises} to type $\typec{U}$, written $\isnorm{T}{U}$, if $\issnf{U}$ and $\typec{U}$ is reached from $\typec{T}$ in a finite number of reduction steps. The predicate $\isnormalised{T}$ means that $\isnorm{T}{U}$ for some $\typec{U}$.
+A type is in \emph{normal form}, denoted $\iswhnf{T}$, if it has been completely reduced, \textit{i.e.}, no further reductions are possible. In other words, $\iswhnf{T}$ iff $\typec{T} \nrightarrow$. Then we can say that type $\typec{T}$ \emph{normalises} to type $\typec{U}$, written $\isnorm{T}{U}$, if $\iswhnf{U}$ and $\typec{U}$ is reached from $\typec{T}$ in a finite number of reduction steps. The predicate $\isnormalised{T}$ means that $\isnorm{T}{U}$ for some $\typec{U}$.
 Note that not all types normalise, \ie some have an infinite sequence of reductions, such as $\TT = \typec{(\lambda x. xx)(\lambda x. xx)} \longrightarrow \typec{(\lambda x. xx)\subs{(\lambda x. xx)} {x}} = \TT \longrightarrow \typec{\cdots}$--which is stuck in a loop of reductions to itself via the application of rule \rbeta--and $\UT = \typec{\tmu\skind (\tlambda{\alpha}{\skind}{\alpha;\Skip})} \rightarrow (\tlambda{\alpha}{\skind}{\alpha;\Skip})\UT \rightarrow \typec{U;\Skip} \rightarrow_2 \typec{U;\Skip;\Skip} \rightarrow \typec{\cdots}$--which successively applies rules \rmu, \rbeta in combination with \rseqtwo, resulting in the unending addition of a trailing $\Skip$.
 
-Finally, we introduce \emph{well-formed types}. We use $\judgementrelctx{\Delta}{\typec{T}}{\colon}{\kind}$ to denote that $\typec{T}$ is a \emph{well-formed type} with kind $\kind$ under the kinding context $\Delta$, a map from type variables to kinds. The rules for type formation can be found in \cref{fig:type-formation}.
+Finally, we introduce \emph{well-formed types}. We use $\judgementrelctx{\Delta}{\typec{T}}{\colon}{\kind}$ to denote that $\typec{T}$ is a \emph{well-formed type} with kind $\kind$ under the kinding context $\Delta$, a map from type variables to kinds. The rules for type formation are in \cref{fig:type-formation}.
 Note that in rule \ktabs, $\Delta + \tbind\talpha\kind$ represents updating the kind of the type variable $\talpha$ to a new kind $\kind$ in the context $\Delta$ if $\tbind\talpha\kindp\in\Delta$ for some $\kindp$, or storing the kind of $\talpha$ in the context $\Delta$ if otherwise.
 In \cref{sec:deciding-type-formation} we prove the decidability of type formation. 
 
@@ -21,12 +23,13 @@ In \cref{sec:deciding-type-formation} we prove the decidability of type formatio
 
 \paragraph{Type equivalence.}
 Type equivalence allows us to check whether two types, even if syntactically different, correspond to the same protocol. 
-It is expected that two types that are alpha-congruent are equivalent, like for example $\tlambda{\alpha}{\kind}{\alpha}$ and $\tlambda{\beta}{\kind}{\beta}$. However, the task of checking if two types are equivalent may involve the performance of (variable) substitutions on-the-fly as one crosses along the types. We will avoid this by performing a renaming operation once on both types, right at the beginning of the type equivalence checking process. We follow the notion of renaming in \cite{PocasCMV23}.
-Po\c{c}as et al \cite{PocasCMV23} propose three possible ways to check whether two (renamed) types are equivalent:
-\begin{itemize}
-    \item by using a set of coinductive rules;
-    \item by means of a bisimulation on types, built from a labelled transition system;
-    \item by translating types to grammars and checking bisimulation of grammars.
-\end{itemize}
+It is expected that two types that are alpha-congruent are equivalent, like for example $\tlambda{\alpha}{\kind}{\alpha}$ and $\tlambda{\beta}{\kind}{\beta}$. However, the task of checking if two types are equivalent may involve substitutions on-the-fly as one crosses along the types. We will avoid this by performing a renaming operation once on both types, right at the beginning of the type equivalence checking process. We follow the notion of renaming in \cite{PocasCMV23}.
 
-We focus on the third approach, which we detail in \cref{sec:deciding-type-equivalence}.
+%Po\c{c}as et al \cite{PocasCMV23} propose three possible ways to check whether two (renamed) types are equivalent:
+%\begin{itemize}
+%    \item by using a set of coinductive rules;
+%    \item by means of a bisimulation on types, built from a labelled transition system;
+%    \item by translating types to grammars and checking bisimulation of grammars.
+%\end{itemize}
+%
+%We focus on the third approach, which we detail in \cref{sec:deciding-type-equivalence}.

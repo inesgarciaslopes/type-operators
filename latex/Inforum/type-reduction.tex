@@ -21,9 +21,9 @@
 		
 		%\infer[\rdend]{}{\lambdared {\tapp \Dual \End}{\End}}
 
-        \infer[\rdwait]{}{\lambdared{\tapp \Dual \Wait}{\Close}}
+        \infer[\rdwait]{}{\lambdared{\tapp \Dual {\End_?}}{\End_!}}
 
-        \infer[\rdclose]{}{\lambdared{\tapp \Dual \Close}{\Wait}}
+        \infer[\rdclose]{}{\lambdared{\tapp \Dual {\End_!}}{\End_?}}
 		
 		\infer[\rdin]{}{\lambdared{\tapp \Dual {(\tapp ?T)}}{\tapp !T}}
 		
@@ -37,9 +37,9 @@
 		
 		\infer[\rddvar]{}{\lambdared{\tapp {\Dual} {(\tapp \Dual (\alpha\ \TT_1\ldots \TT_m))}}{\alpha\ \TT_1\ldots \TT_m}}
 
-        \infer[\rdexists]{}{\lambdared{\tapp {\Dual}{(\texists{\kind} \TT)}}{}}{\tforall{\kind} \TT}
-
-        \infer[\rdforall]{}{\lambdared{\tapp {\Dual}{(\tforall{\kind} \TT)}}{}}{\texists{\kind} \TT}
+%        \infer[\rdexists]{}{\lambdared{\tapp {\Dual}{(\texists{\kind} \TT)}}{}}{\tforall{\kind} \TT}
+%
+%        \infer[\rdforall]{}{\lambdared{\tapp {\Dual}{(\tforall{\kind} \TT)}}{}}{\texists{\kind} \TT}
 	\end{mathpar}
 	\caption{Type reduction.}
 	\label{fig:reduction}
