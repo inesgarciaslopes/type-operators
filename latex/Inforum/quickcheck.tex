@@ -3,13 +3,13 @@
     \centering
     \begin{tabular}{| @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.25\linewidth}|}
         \hline
-        prop\_whnf\_does\_not\_reduce & Ensures that types in weak head normal form do not reduce further & Passed all.\newline Time x.\\
+        prop\_whnf\_does\_not\_reduce & Ensures that types in weak head normal form do not reduce further & Passed all.\newline Time 8.41s\\
         \hline
-        prop\_reduced\_is\_not\_whnf & If $\lambdared TU$ then $\judgementlabel{not}(\issnf T)$ & Passed all.\newline Time x.\\
+        prop\_reduced\_is\_not\_whnf & If $\lambdared TU$ then $\judgementlabel{not}(\issnf T)$ & Passed all.\newline Time 8.44s\\
         \hline
-        prop\_preservation & If $\istype\Delta T \kind$ and $\betared{T}{U}$, then $\istype \Delta U \kind$ & Passed 90.\newline Time x.\\
+        prop\_preservation & If $\istype\Delta T \kind$ and $\betared{T}{U}$, then $\istype \Delta U \kind$ & Passed 90.\newline Time 7.40s\\
         \hline
-        prop\_bisimilar & If $\istype\Delta T \kind$ and $\betared{T}{T}$, then $\word(T)\sim\word(U)$ & Passed 90.\newline Time x.\\
+        prop\_bisimilar & If $\istype\Delta T \kind$ and $\betared{T}{T}$, then $\word(T)\sim\word(U)$ & Passed 90.\newline Time 8.41s\\
         \hline
     \end{tabular}
     \caption{Tested properties with Quickcheck.}
