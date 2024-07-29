@@ -1,17 +1,18 @@
-\section{Dedicing type equivalence}\label{sec:deciding-type-equivalence}
-Following Poças et al \cite{PocasCMV23}, the problem of checking whether two (renamed) types are equivalent is reduced to translating types into grammars and checking bisimilarity there. We say that a grammar in \emph{Greibach normal form} \cite{AutebertG84} is a tuple of the form $(\mathcal{T, N}, \ntgamma, \mathcal{R})$, where:
+\section{Dedicing Type Equivalence}\label{sec:deciding-type-equivalence}
+Following Poças et al. \cite{PocasCMV23}, the problem of checking whether two (renamed) types are equivalent is reduced to translating types into grammars and checking bisimilarity there. A grammar in \emph{Greibach normal form} \cite{AutebertG84} is a tuple $(\mathcal{T, N}, \ntgamma, \mathcal{R})$, where:
 \begin{itemize}
 	\item $\mathcal{T}$ is a finite set of terminal symbols, $\tsymc{a}$, $\tsymc{b}$, $\tsymc{c}$; 
 	\item $\mathcal{N}$ is a finite set of non-terminal symbols, $\Xnt, \Ynt, \Znt$;
 	\item $\ntgamma\in\mathcal{N}^*$ is the starting word;
-	\item $\mathcal{R} \subseteq \N \times \T \times \N^*$ is a finite set of productions.
+	\item $\mathcal{R} \subseteq \N \times \T \times \N^*$ is a finite set of production rules.
 \end{itemize}
 
 \input{word}
-A production rule in $\mathcal{R}$ is written as $\ltsred{\Xnt}{a}{\ntdelta}$: the left side of the arrow must be a non-terminal, $\Xnt\in\mathcal{N}$, while the right side must be a word. Note that $\ntdelta$ can be the empty word. Grammars in GNF are \emph{simple} when for every non-terminal and terminal symbol there is at most one production $\ltsred{\Xnt}{a}{\ntdelta}$ \cite{KorenjakH66}.
+A production rule in $\mathcal{R}$ is written as $\ltsred{\Xnt}{a}{\ntdelta}$. Grammars in GNF are \emph{simple} when, for every non-terminal symbol $\Xnt$ and every terminal symbol $\tsymc{a}$, there is at most one production rule $\ltsred{\Xnt}{a}{\ntdelta}$ \cite{KorenjakH66}.
 
-The function $\word({\typec{T}})$, described in Figure \ref{fig:word}, is responsible for translating types to words of non-terminal symbols. First consider a type in weak head normal form, that is, $\iswhnf{T}$. The construction of $\word(\TT)$ will create a fresh new terminal, $\Ynt$, and update the set of productions of $\TT$, accordingly to one of the cases found in $\word'$. In fact, we only had a new fresh non terminal if the type visited is syntactically different from all previously visited types. If $\TT$ normalises to $\Skip$, i.e. $\normalred T\Skip$, we return the empty word. Otherwise, if there exists a type $\UT$ different from $\Skip$ such that $T$ normalises to $U$, $\normalred TU \neq \Skip$, consider $\word(\UT) = \Znt \ntdelta$ and $\Ynt$ a fresh new terminal. For each production of $Z$ of the form $\gltsred Z a {\gamma}$, then $\Ynt$ has a production of the form $\gltsred Y a {\gamma\delta}$. 
-This function terminates producing a simple grammar. \todo{Elaborate on why we can always produce a simple grammar - Reviewer 2}     
-After this translation, we have to check if two grammars are bisimilar, that is if $\word({\typec{T}}) \gequiv \word({\typec{U}})$. The algorithm used to check the bisimilarity of simple grammars is the one introduced by Almeida et al. \cite{AlmeidaMV20}.
+The function $\word({\typec{T}})$, described in \cref{fig:word}, translates types to words of non-terminal symbols. If a type $\TT$ is in weak head normal form, the construction of $\word(\TT)$ creates a fresh non-terminal, $\Ynt$, and updates the set of productions of $\TT$, according to one of the cases found in $\word'$. Actually, a fresh non-terminal is created only if the type currently in scope is syntactically different from all previously visited types. If $\TT$ is not in weak head normal form and normalises to $\Skip$, we return the empty word; otherwise, if there exists a type $\UT\neq \Skip$ such that $\TT$ normalises to $\UT$, consider $\word(\UT) = \Znt \ntdelta$ and $\Ynt$ a fresh new terminal. For each production of $\Znt$ of the form $\gltsred Z a {\gamma}$, then $\Ynt$ has a production of the form $\gltsred Y a {\gamma\delta}$. 
+The application of the $\word$ function to a type $\TT$ terminates producing a simple grammar. This is only possible because our well-formed types normalise, and all of its subtypes normalise as well. Furthermore, since we keep track of already visited types, we are able to reuse non-terminal symbols, which is crucial for dealing with recursive types.
+
+We check if two types are equivalent by means of translating the (renamed) types to a simple grammar, and then checking if their bisimilarity, \ie if $\word({\typec{T}}) \gequiv \word({\typec{U}})$. The algorithm used to check bisimilarity of simple grammars is the one introduced by Almeida et al. \cite{AlmeidaMV20}.
 
 \todo{grammar example: T$\sim$U}
