@@ -13,9 +13,9 @@
     \\
     \word'(\Skip) &= \emptyword
     \\
-    \word'(\Wait) &= \Ynt, \R := \R \cup \{\gltsred Y\Waitl{\bot}\}
-    \\
-    \word'(\Close) &= \Ynt, \R := \R \cup \{\gltsred Y\Closel{\bot}\}
+    \word'(\End_{\typec{\sharp}}) &=  \Ynt, \R := \R \cup \{\gltsred Y{\tsymc{\Endl}}{\bot}\}
+%    \\
+%    \word'(\Close) &= \Ynt, \R := \R \cup \{\gltsred Y\Closel{\bot}\}
     \\
     \word'(\tlambda{\alpha}\kind T) &= \Ynt, \R := \R \cup \{\gltsred Y {\lambda\alpha\colon\kind}{\wordb{\TT}}\}
     \\
@@ -35,12 +35,12 @@
     \\
     \word'(\tdual{(\talpha\ \typec{T_1}\typec{\ldots}\typec{T_m})}) &= \Ynt, \R := \R \cup \{\gltsred Y{\Duall_1}{\wordb{\talpha\ \typec{T_1}\typec{\ldots}\typec{T_m}}}, \gltsred Y{\Duall_2}\emptyword\}
   \end{align*}
-  $^*$ $\typec{\iota}\neq \Skip,\Wait,\Close$\\
+  $^*$ $\typec{\iota}\neq \Skip,\End_{\typec{\sharp}}$\\
   $^{**}$ $\typec{\iota} = \function{}{}$, $\typec{\choice\{\overline{l_i}\}}$, $\typec{\varrecs{\overline{l_i}}}$ \\
   $\Ynt$ is a fresh non-terminal symbol\\
   $\nsymc \epsilon$ is the empty word\\
   $\nsymc \bot$ is a non-terminal symbol without productions\\
-  \caption{Function word(\TT).}
+  \caption{Function word($\TT$).}
   \label{fig:word}
 \end{figure}
 
