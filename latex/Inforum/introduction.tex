@@ -1,4 +1,4 @@
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 In the field of programming languages, the drive for more advanced and expressive type systems never stops. This journey has led us from the foundational System $F$\cite{DBLP:conf/programm/Reynolds74} to the more intricate System $F^{\mu}_\omega$\cite{DBLP:conf/popl/CaiGO16}. Integrating these advanced systems into real-world programming languages, however, comes with its own set of challenges, especially when it comes to type equivalence.
 
 FreeST \cite{AlmeidaMTV22}, a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Context-free session types, unlike regular session types, are not restricted to tail recursion, thus allowing the description of more sophisticated communication protocols. FreeST's current type equivalence algorithm, developed by Almeida et al. \cite{AlmeidaMV20} decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The next step is to extend the language to a higher-order setting where type equivalence is still decidable.
