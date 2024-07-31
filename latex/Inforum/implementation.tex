@@ -1,23 +1,12 @@
 \section{Implementation and validation}\label{sec:implementation}
-Our implementation, written in Haskell, consists on eight modules:
-\begin{itemize}
-    \item The \emph{Syntax} module (LoC 118) defines the Type data constructor as well as the higher-order kind system, based on \cref*{fig:syntax-types}. 
-    \item The \emph{Substitution} module (LoC 50) implements capture-avoiding substitution on types.
-    \item The \emph{Normalisation} module (LoC 80) reduces types to weak head normal form, i.e., until no further reduction is possible.
-    \item The \emph{TypeFormation} module (LoC 58) implements the type checking algorithm.
-    \item The \emph{Rename} module (LoC 30) renames bound variables in a type by the smallest possible variable available, i.e., the first which is not free on the type.
-    \item The \emph{WeakHeadNormalForm} module (LoC 86) checks whether a type is in weak head normal form. 
-    \item The \emph{Grammar} module (LoC 74) defines the Grammar data constructor, based on the definition found in \cref*{sec:deciding-type-equivalence}.
-    \item The \emph{TypeToGrammar} module (LoC 179) implements the function $\word$, that converts types into simple grammars.
-\end{itemize}
+Our implementation, written in Haskell, consists on eight modules, as described in \cref{tab:modules}.
+\input{modules.tex}
 
-The current FreeST compiler features an algorithm for type equivalence, which we use to test the bisimilarity of simple grammars.
-
-Our validation process uses a suite of randomly generated types--a small subset of FreeST's types, based on the syntax presented in \cref*{sec:system}--leveraging the Quickcheck library\cite{DBLP:conf/icfp/ClaessenH00} to ensure these types have specific properties. Nevertheless, formal proofs regarding decidability of type formation and equivalence can be found in \cite{PocasCMV23}. 
+The current FreeST compiler features an algorithm for checking the bisimilarity of simple grammars, which we use in our tests. Our testing process takes a suite of randomly generated types---a small subset of FreeST's types, based on the syntax presented in \cref*{sec:system}---leveraging the Quickcheck library\cite{DBLP:conf/icfp/ClaessenH00} to ensure these types have specific properties. Nevertheless, formal proofs regarding decidability of type formation and equivalence can be found in \cite{PocasCMV23}. 
 
 An arbitrary type generator is defined using the \textit{Arbitrary} typeclass, employing the \textit{frequency} function to generate type operators with specific probabilities. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \textit{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. For better statistics we ensure proper distribution of type constructors. The list of properties can be found in \cref{tab:properties}. A total of 200.000 tests were made for each property.
 \input{quickcheck}
 
-Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3. We run each property 10 times and the time presented in \cref{tab:properties} is the average of the sum of each timer minus the best/worst scenarios. 
+Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3. We run each property 10 times and the time presented in \cref{tab:properties} is the average except the best/worst cases. 
 
-While randomly generated types facilitate a robust analysis, certain properties, such as the preservation property and bisimilarity of simple grammars, prove challenging to test comprehensively. This difficulty arises from the simplicity of our generator and the inherent probability of randomly generated test cases preserving such properties. Having randomly generated a type $\TT$, the probability of $\TT$ being well-formed and reducing to some $\UT$ is extremely low. Therefore, most of the tests cases do not satisfy the predicate, $\istype\Delta T \kind$ and $\betared{T}{U}$, and Quickcheck ends up discarding 199.910 tests. To achieve better results, more complex generators tailored to specific properties would be required, though such generators are often challenging to design and implement. 
+While randomly generated types facilitate a robust analysis, certain properties, such as the preservation property and bisimilarity of simple grammars, prove challenging to test comprehensively. This difficulty arises from the simplicity of our generator and the inherent probability that randomly generated test cases preserve such properties. Most of the time, generating a type $\TT$ that is well-formed and reduces to some $\UT$ is very hard. Therefore, most of the tests cases do not satisfy the predicate, $\istype\Delta T \kind$ and $\betared{T}{U}$, and Quickcheck ends up discarding 199.910 tests for the last two properties. To achieve better results, more complex generators tailored to specific properties would be required, though such generators are often challenging to design and implement. 

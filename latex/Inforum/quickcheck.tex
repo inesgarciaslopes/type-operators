@@ -1,15 +1,17 @@
-\renewcommand{\arraystretch}{1.0}
+\renewcommand{\arraystretch}{1.3}
 \begin{table}[h!]
     \centering
-    \begin{tabular}{| @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.25\linewidth}|}
+    \begin{tabular}{| @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.10\linewidth}| @{\hskip 0.1in}p{0.13\linewidth} | @{\hskip 0.1in}p{0.15\linewidth} |}
         \hline
-        prop\_whnf\_does\_not\_reduce & Ensures that types in weak head normal form do not reduce further & Passed all.\newline Time 8.41s\\
+        \textbf{Property} & \textbf{Time} & \textbf{Passed tests} & \textbf{Discarded tests}\\
         \hline
-        prop\_reduced\_is\_not\_whnf & If $\lambdared TU$ then $\judgementlabel{not}(\issnf T)$ & Passed all.\newline Time 8.44s\\
+        If $\iswhnf{T}$ then $\typec{T} \nrightarrow$ & 8.41s & 200.000 & 0\\
         \hline
-        prop\_preservation & If $\istype\Delta T \kind$ and $\betared{T}{U}$, then $\istype \Delta U \kind$ & Passed 90.\newline Time 7.40s\\
+        If $\lambdared TU$ then $\judgementlabel{not}(\iswhnf T)$ & 8.44s & 200.000 & 0\\
         \hline
-        prop\_bisimilar & If $\istype\Delta T \kind$ and $\betared{T}{U}$, then $\word(T)\sim\word(U)$ & Passed 90.\newline Time 8.41s\\
+        If $\istype\Delta T \kind$ and $\betared{T}{U}$ then $\istype \Delta U \kind$ & 7.40s & 90 & 199.910\\
+        \hline
+        If $\istype\Delta T \kind$ and $\betared{T}{U}$ then $\word(T)\sim\word(U)$ & 8.41s & 90 & 199.910\\
         \hline
     \end{tabular}
     \caption{Tested properties with Quickcheck.}
