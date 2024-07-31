@@ -19,9 +19,10 @@
     \\
     \word'(\tlambda{\alpha}\kind T) &= \Ynt, \R := \R \cup \{\gltsred Y {\lambda\alpha\colon\kind}{\wordb{\TT}}\}
     \\
-    \word'(\tiota) &= \Ynt, \R := \R \cup \{\gltsred Y\iota\emptyword\} \quad \small{where \;\typec{\iota}\neq \Skip,\End_{\typec{\sharp}}}
+    \word'(\tiota) &= \Ynt, \R := \R \cup \{\gltsred Y\iota\emptyword\} \quad
+                     \text{where } \typec{\iota}\neq \Skip,\End_{\typec{\sharp}}
     \\
-    \word'(\typec{\iota\ T_1\cdots T_m}) &= \Ynt, \R := \R \cup \{\gltsred Y{\iota_j}{\wordb{\typec{T_j}}}\} \quad \small{where \;\typec{\iota} = \function{}{}, \typec{\choice\{\overline{l_i}\}}, \typec{\varrecs{\overline{l_i}}}}
+    \word'(\typec{\iota\ T_1\cdots T_m}) &= \Ynt, \R := \R \cup \{\gltsred Y{\iota_j}{\wordb{\typec{T_j}}}\} \quad \text{where }\typec{\iota} = \function{}{}, \typec{\choice\{\overline{l_i}\}}, \typec{\varrecs{\overline{l_i}}}
     \\
     \word'(\MSGn\TT) &= \Ynt, \R := \R \cup \{\gltsred Y{\tsymc{\sharp_1}}{\wordb{\TT}\bot}, \gltsred Y{\sharp_2}{\emptyword}\}
     \\
@@ -37,12 +38,13 @@
   \end{align*}
   $\Ynt$ is a fresh non-terminal symbol in all cases,\\ 
   $\nsymc \epsilon$ is the empty word,\\
-  and $\nsymc \bot$ is a non-terminal symbol without productions.\\
+  $\nsymc \bot$ is a non-terminal symbol without productions.\\
   \caption{Function word($\TT$).}
   \label{fig:word}
 \end{figure}
 
+
 %%% Local Variables:
 %%% mode: latex
-%%% TeX-master: "samplepaper"
+%%% TeX-master: "42-CR"
 %%% End:
