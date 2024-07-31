@@ -1,4 +1,6 @@
-\section{Deciding Type Formation}\label{sec:deciding-type-formation}
+\section{Deciding Type Formation}
+\label{sec:deciding-type-formation}
+
 The rules for type formation in \cref{fig:type-formation} involve determining if an application type $\TT\UT$ normalises.
 Poças et al.~\cite{DBLP:conf/esop/PocasCMV23} propose a two-step solution to this problem.
 The first stage is the introduction of the concept of \emph{pre-kinding}. We denote this as $\prekind \Delta T \kind$, that is, $\typec{T}$ is pre-kinded with kind $\kind$ under the kinding context $\Delta$. The rules for pre-kinding are in \cref{fig:pre-kinding}. They differ from the rules for type formation in that, in rule \pktapp, there is no verification of the normalisation of $\TT\UT$. Pre-kinding excludes some (but not all) types that do not normalise, as is the case of $\typec{(\tlambda{\alpha}{\kind}{\alpha \alpha})(\tlambda{\alpha}{\kind}{\alpha \alpha})}$ in \cref{fig:ex-pre-kinding}.
