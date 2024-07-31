@@ -1,25 +1,25 @@
-\renewcommand{\arraystretch}{1.0}
+\renewcommand{\arraystretch}{1.2}
 \begin{table}[h!]
     \centering
     \begin{tabular}{| @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.10\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.45\linewidth}|}
         \hline
         \textbf{Module name} & \textbf{LoC} & \textbf{Description}\\
         \hline
-        Syntax & 118 & defines the Type data constructor as well as the higher-order kind system, based on \cref*{fig:syntax-types}.\\
+        Syntax & 118 & Defines the Type data constructor as well as the higher-order kind system, based on \cref*{fig:syntax-types}.\\
         \hline
-        Substitution & 50 & implements capture-avoiding substitution on types.\\
+        Substitution & 50 & Implements capture-avoiding substitution on types.\\
         \hline
-        Normalisation & 80 & reduces types to weak head normal form, i.e., until no further reduction is possible.\\
+        Normalisation & 80 & Reduces types to weak head normal form, i.e., until no further reduction is possible.\\
         \hline
-        TypeFormation & 58 & implements the type checking algorithm.\\
+        TypeFormation & 58 & Implements the type checking algorithm.\\
         \hline
-        Rename & 30 & renames bound variables in a type by the smallest possible variable available, i.e., the first which is not free on the type.\\
+        Rename & 30 & Renames bound variables in a type by the smallest possible variable available, i.e., the first which is not free on the type.\\
         \hline
-        WeakHeadNormalForm & 86 & checks whether a type is in weak head normal form.\\
+        WeakHeadNormalForm & 86 & Checks whether a type is in weak head normal form.\\
         \hline
-        Grammar & 74 & defines the Grammar data constructor, based on the definition found in \cref*{sec:deciding-type-equivalence}.\\
+        Grammar & 74 & Defines the Grammar data constructor, based on the definition found in \cref*{sec:deciding-type-equivalence}.\\
         \hline
-        TypeToGrammar & 179 & implements the function $\word$, that converts types into simple grammars.\\
+        TypeToGrammar & 179 & Implements the function $\word$, that converts types into simple grammars.\\
         \hline
     \end{tabular}
     \caption{Modules.}
