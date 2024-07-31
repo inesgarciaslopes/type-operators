@@ -5,7 +5,9 @@
         \word (\TT) = \begin{cases}
                         \word'(\TT) & \iswhnf \TT\\
                         \emptyword & \normalred T\Skip\\
-                        \Ynt, \R := \R \cup \{\gltsred Y a {\gamma\delta} \ |\ \tsymc a, \nsymc \gamma : \gltsred Z a {\gamma}\} & \normalred TU \neq \Skip, \word(\UT) = \Znt \ntdelta
+                        \Ynt, \R := \R \cup \{\gltsred Y a {\gamma\delta} \mid
+                        % \tsymc a, \nsymc \gamma : 
+                        \gltsred Z a {\gamma}\} & \normalred TU \neq \Skip, \word(\UT) = \Znt \ntdelta
                     \end{cases}
     \end{align*}
   \begin{align*}
@@ -38,7 +40,7 @@
   \end{align*}
   $\Ynt$ is a fresh non-terminal symbol in all cases,\\ 
   $\nsymc \epsilon$ is the empty word,\\
-  $\nsymc \bot$ is a non-terminal symbol without productions.\\
+  $\nsymc \bot$ is a non-terminal symbol with no productions.
   \caption{Function word($\TT$).}
   \label{fig:word}
 \end{figure}
