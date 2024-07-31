@@ -1,5 +1,7 @@
-\section{Deciding Type Equivalence}\label{sec:deciding-type-equivalence}
-Following Poças et al. \cite{PocasCMV23}, the problem of checking whether two (renamed) types are equivalent is reduced to translating types into grammars and checking bisimilarity. A grammar in \emph{Greibach normal form} \cite{AutebertG84} is a tuple $(\mathcal{T, N}, \ntgamma, \mathcal{R})$, where:
+\section{Deciding Type Equivalence}
+\label{sec:deciding-type-equivalence}
+
+Following Poças et al.~\cite{DBLP:conf/esop/PocasCMV23}, the problem of checking whether two (renamed) types are equivalent is reduced to translating types into grammars and checking bisimilarity. A grammar in \emph{Greibach normal form} \cite{AutebertG84} is a tuple $(\mathcal{T, N}, \ntgamma, \mathcal{R})$, where:
 \begin{itemize}
 	\item $\mathcal{T}$ is a finite set of terminal symbols, $\tsymc{a}$, $\tsymc{b}$, $\tsymc{c}$; 
 	\item $\mathcal{N}$ is a finite set of non-terminal symbols, $\Xnt, \Ynt, \Znt$;
@@ -55,3 +57,8 @@ Putting everything together, we obtain the following simple grammar:
 &&
 \end{align*}
 
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "42-CR"
+%%% End:

@@ -4,7 +4,7 @@ In the field of programming languages, the drive for more advanced and expressiv
 FreeST \cite{AlmeidaMTV22}, a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Context-free session types, unlike regular session types, are not restricted to tail recursion, thus allowing the description of more sophisticated communication protocols. FreeST's current type equivalence algorithm, developed by Almeida et al. \cite{AlmeidaMV20} decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The next step is to extend the language to a higher-order setting where type equivalence is still decidable.
 
 
-In this work, we study the System $F^{\mu_*;}_\omega$, the higher-order polymorphic lambda calculus equipped with equirecursive and context-free session types and its incorporation into a programming language. We follow a bisimulation-based type equivalence, proposed by Poças et al. \cite{PocasCMV23}, which supports the robust implementation of advanced type systems in programming languages. We seek to bridge the gap between advanced type theory and practical compiler design, ensuring that the powerful capabilities of context-free session types can be effectively utilized without compromising on performance or reliability.
+In this work, we study the System $F^{\mu_*;}_\omega$, the higher-order polymorphic lambda calculus equipped with equirecursive and context-free session types and its incorporation into a programming language. We follow a bisimulation-based type equivalence, proposed by Poças et al.~\cite{DBLP:conf/esop/PocasCMV23}, which supports the robust implementation of advanced type systems in programming languages. We seek to bridge the gap between advanced type theory and practical compiler design, ensuring that the powerful capabilities of context-free session types can be effectively utilized without compromising on performance or reliability.
 
 In the development of modern type systems, combining advanced features such as equirecursion, higher-order polymorphism, and higher-order context-free session types presents unique challenges and opportunities. The primary motivation for our research is to integrate these elements into a cohesive type system that can be practically incorporated into programming languages. Therefore, we are interested in practical algorithms for type equivalence checking to be incorporated into compilers.
 
@@ -18,3 +18,8 @@ Duality is the relationship between two session types that allows them to correc
 
 \paragraph{Outline.}
 The rest of the paper is organised as follows: \cref*{sec:system} introduces System $F^{\mu_*;}_\omega$ and type equivalence; \cref*{sec:deciding-type-formation} presents the challenges encountered during this research and prove the decidability of type formation; \cref*{sec:deciding-type-equivalence} explains the decidability of type equivalence; \cref*{sec:implementation} describes our implementation process and validates our work and \cref*{sec:conclusion} wraps up the paper.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "42-CR"
+%%% End:
