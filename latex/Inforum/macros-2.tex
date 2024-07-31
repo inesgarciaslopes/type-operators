@@ -659,7 +659,8 @@ variables}
 %\newcommand{\osredc}{\,\oplab{\rightarrow}{c}\,} % Coinductive
 \newcommand{\isred}[2]{\judgementrel{\termc{#1}}{\rightarrow}{\termc{#2}}}
 \newcommand{\ltsarrow}[1]{\stackrel{#1}{\longrightarrow}}
-\newcommand{\betaarrow}{\longrightarrow}
+%\newcommand{\betaarrow}{\longrightarrow}
+\newcommand{\betaarrow}{\rightarrow} % So that we may use \nrightarrow to negate
 \newcommand{\muarrow}{\longrightarrow_\mu}
 \newcommand{\lseqarrow}{\longrightarrow_{\beta;D}}
 \newcommand{\gltsred}[3]{\nsymc{#1}\ltsarrow{\tsymc{#2}}\nsymc{#3}}
@@ -826,5 +827,5 @@ variables}
 
 %%% Local Variables:
 %%% mode: latex
-%%% TeX-master: "main"
+%%% TeX-master: "42-CR"
 %%% End:
