@@ -18,7 +18,7 @@ and equivalence can be found elsewhere~\cite{PocasCMV23}.
 
 An arbitrary type generator is defined using the \lstinline{Arbitrary} typeclass, employing the \lstinline{frequency} function to generate type operators with specific probabilities. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \lstinline{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. For better statistics we ensure proper distribution of type constructors. The list of properties can be found in \cref{tab:properties}. A total of 200.000 tests were made for each property.
 
-Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3. We run each property 10 times; the time presented in \cref{tab:properties} is the average except the best/worst cases. 
+Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3.
 
 While randomly generated types facilitate a robust analysis, certain properties,
 such as the type-formation preservation property and bisimilarity of simple
@@ -27,7 +27,7 @@ the simplicity of our generator and the inherent low probability that randomly
 generated test cases. The probability of generating a type $\TT$ that is both
 well-formed and reduces is quite small. Therefore, most of the tests cases do
 not satisfy the predicate, $\istype{} T \kind$ and $\betared{T}{U}$, and
-Quickcheck ends up discarding 199.910 tests for the last two properties. To
+Quickcheck ends up discarding 2.000.000 tests for the last two properties. To
 achieve better results, more complex generators, tailored to specific
 properties, would be required. Such generators are often challenging to design
 and implement.
