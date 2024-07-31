@@ -9,7 +9,7 @@
 			& \talpha && \text{\small  type variable} && \tapp TT && \text{\small  type-level application}
         \end{align*}
         \begin{align*}
-           \tiota \grmeq &&&&&&&&&&& \text{\small\qquad\quad {Type constructor}}\\
+           \tiota \grmeq &&&&&&&&&&& \text{\small\qquad {Type constructor}}\\
             % Functional
 			&\Arrow && \karrow \kast {\karrow {\kast}{\tkind}} &&  \text{\small arrow} && \typec{\varrecs{\overline{l_i}}} && \kindc{\overline{{\kast \Rightarrow}}\,\tkind} && \text{\small record/variant}\\
 			&\tmu \kind && \karrow {(\karrow \kind \kind)} {\kind} && \text{\small recursive type}
@@ -17,7 +17,7 @@
             % Session types
             &\Semi && \karrow \skind {\karrow \skind \skind} && \text{\small seq.composition}
 			 && \typec{\odot{\{\overline{l_i}\}}} && \kindc{\overline{{\skind
-						\Rightarrow}}\,\skind} && \text{\small internal/external choice}\\
+						\Rightarrow}}\,\skind} && \text{\small internal/external\:choice}\\
             &\quant \kind && \karrow {(\karrow \kind \kast)} \tkind && \text{\small exists/forall}
             && \Dual && \karrow{\skind}{\skind} && \text{\small dual operator}\\
             &\End_{\typec{\sharp}} && \skind && \text{\small wait/close} && \Skip && \skind && \text{\small skip} 
