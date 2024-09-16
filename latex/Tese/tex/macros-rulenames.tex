@@ -1,0 +1,657 @@
+% !TeX root = main.tex
+
+% BASE NAMES for the various type and process constructors
+
+% Session types
+\newcommand{\Endrulename}{End} % \endrulename is taken by LaTeX
+\newcommand{\inrulename}{In}
+\newcommand{\outrulename}{Out}
+\newcommand{\msgrulename}{Msg}
+\newcommand{\extcrulename}{ExtC}
+\newcommand{\intcrulename}{IntC}
+\newcommand{\choicerulename}{Choice}
+\newcommand{\eqrulename}{Eq}
+\newcommand{\skiprulename}{Skip}
+\newcommand{\semirulename}{Seq}
+\newcommand{\seqrulename}{Seq}
+
+% Types
+\newcommand{\boolrulename}{Bool}
+\newcommand{\sessionrulename}{Session} 
+\newcommand{\recrulename}{Rec}
+\newcommand{\idrulename}{Id}
+% \newcommand{\tvarrulename}{Var} % deprecated, use id
+\newcommand{\refrulename}{Ref}
+% \newcommand{\tsvarrulename}{TSVar}
+\newcommand{\construlename}{Const}
+\newcommand{\unitrulename}{Unit}
+\newcommand{\arrowrulename}{Arrow}
+\newcommand{\foprulename}{Op}
+\newcommand{\pairrulename}{Pair}
+% \newcommand{\vrecrulename}{Var-Rec}
+\newcommand{\indexrulename}{Index}
+\newcommand{\allrulename}{All}
+\newcommand{\quantrulename}{Quant}
+\newcommand{\tabsrulename}{TAbs}
+\newcommand{\abskrulename}{AbsK}
+\newcommand{\abssrulename}{Abs$\star$}
+\newcommand{\tapprulename}{TApp}
+\newcommand{\appsrulename}{App$\star$}
+\newcommand{\appkrulename}{AppK}
+\newcommand{\univrulename}{Univ}
+\newcommand{\existrulename}{Exist}
+
+% Values
+\newcommand{\truerulename}{True}
+\newcommand{\falserulename}{False}
+\newcommand{\varrulename}{Var}
+
+% Contexts
+\newcommand{\emptyrulename}{Empty}
+\newcommand{\bindrulename}{Bind}
+
+% Processes
+\newcommand{\inactrulename}{Inact}
+\newcommand{\recvrulename}{Recv}
+\newcommand{\sendrulename}{Send}
+\newcommand{\brarulename}{Bra}
+\newcommand{\selrulename}{Sel}
+\newcommand{\parrulename}{Par}
+\newcommand{\resrulename}{Res}
+\newcommand{\ifrulename}{If} 
+\newcommand{\structrulename}{Struct} % Structural congruence
+\newcommand{\pvarrulename}{Var}
+
+% Expressions
+\newcommand{\typingrulename}[1]{T-{#1}\xspace}
+\newcommand{\tconstr}{\typingrulename{Const}}
+\newcommand{\tvarr}{\typingrulename{Var}}
+\newcommand{\tuvarr}{\typingrulename{UnVar}}
+\newcommand{\tabsr}{\typingrulename{Abs}}
+\newcommand{\trecr}{\typingrulename{Rec}}
+\newcommand{\tappr}{\typingrulename{App}}
+\newcommand{\ttabsr}{\typingrulename{TAbs}}
+\newcommand{\ttappr}{\typingrulename{TApp}}
+\newcommand{\trecordr}{\typingrulename{Record}}
+\newcommand{\tprojr}{\typingrulename{Proj}}
+\newcommand{\tvariantr}{\typingrulename{Variant}}
+\newcommand{\tcaser}{\typingrulename{Case}}
+\newcommand{\tmatchr}{\typingrulename{Match}}
+\newcommand{\tunitprojr}{\typingrulename{Proj()}}
+\newcommand{\teqr}{\typingrulename{Eq}}
+\newcommand{\tweakr}{\typingrulename{Weakening}}
+\newcommand{\tcontrr}{\typingrulename{Contraction}}
+\newcommand{\tderr}{\typingrulename{Dereliction}}
+
+% Fixed points
+\newcommand{\fixrulename}{Fix}
+
+% RULE NAMES for the various judgements
+
+\newcommand{\rulename}[1]{\text{\small\sc #1}\xspace}
+
+% kinding rulenamae
+\newcommand{\kindrulename}[1]{\rulename{K-{#1}}}
+\newcommand{\pkindrulename}[1]{\rulename{PK-{#1}}}
+\newcommand{\kunit}{\kindrulename{\unitrulename}}
+\newcommand{\kconst}{\kindrulename{\construlename}}
+\newcommand{\pkconst}{\pkindrulename{\construlename}}
+\newcommand{\Karrow}{\kindrulename{\arrowrulename}}
+\newcommand{\kfop}{\kindrulename{\foprulename}}
+\newcommand{\kpair}{\kindrulename{\pairrulename}}
+\newcommand{\kvrec}{\kindrulename{\vrecrulename}}
+\newcommand{\kvar}{\kindrulename{\varrulename}}
+\newcommand{\pkvar}{\pkindrulename{\varrulename}}
+\newcommand{\kall}{\kindrulename{\allrulename}}
+\newcommand{\kquant}{\kindrulename{\quantrulename}}
+\newcommand{\ktabs}{\kindrulename{\tabsrulename}}
+\newcommand{\pktabs}{\pkindrulename{\tabsrulename}}
+\newcommand{\kabsk}{\kindrulename{\abskrulename}}
+\newcommand{\kabss}{\kindrulename{\abssrulename}}
+\newcommand{\ktapp}{\kindrulename{\tapprulename}}
+\newcommand{\pktapp}{\pkindrulename{\tapprulename}}
+\newcommand{\kappk}{\kindrulename{\appkrulename}}
+\newcommand{\kapps}{\kindrulename{\appsrulename}}
+\newcommand{\kskip}{\kindrulename{\skiprulename}}
+\newcommand{\kend}{\kindrulename{\Endrulename}}
+\newcommand{\kmsg}{\kindrulename{\msgrulename}}
+\newcommand{\kchoice}{\kindrulename{\choicerulename}}
+\newcommand{\ksemi}{\kindrulename{\semirulename}}
+\newcommand{\kseq}{\kindrulename{\seqrulename}}
+\newcommand{\kid}{\kindrulename{\idrulename}}
+% \newcommand{\kvar}{\kindrulename{\varrulename}} % deprecated, use id
+\newcommand{\kref}{\kindrulename{\refrulename}}
+\newcommand{\kuniv}{\kindrulename{\univrulename}}
+\newcommand{\kexist}{\kindrulename{\existrulename}}
+
+% subtyping rule names
+% \newcommand{\subtyperulename}[1]{\rulename{S-{#1}}}
+% \newcommand{\sEnd}{\subtyperulename{\Endrulename}}
+% \newcommand{\sinp}{\subtyperulename{\inrulename}}
+% \newcommand{\sout}{\subtyperulename{\outrulename}}
+% \newcommand{\sextc}{\subtyperulename{\extcrulename}}
+% \newcommand{\sintc}{\subtyperulename{\intcrulename}}
+% \newcommand{\sbool}{\subtyperulename{\boolrulename}}
+% \newcommand{\svarl}{\subtyperulename{\tvarrulename L}}
+% \newcommand{\svarr}{\subtyperulename{\tvarrulename R}}
+% \newcommand{\ssvarl}{\subtyperulename{\tsvarrulename L}}
+% \newcommand{\ssvarr}{\subtyperulename{\tsvarrulename R}}
+% \newcommand{\sfix}{\subtyperulename{\fixrulename}}
+% \newcommand{\sfixs}{\subtyperulename{\fixrulename S}}
+% \newcommand{\sses}{\subtyperulename{\sessionrulename}}
+%\newcommand{\sbtop}{\subtyperulename{Top}}
+% \newcommand{\squal}{\subtyperulename{Qual}}
+% \newcommand{\svarl}{\subtyperulename{\tvarrulename L}}
+% \newcommand{\svar}{\subtyperulename{\tvarrulename R}}
+
+% algorithmic subtyping rule names
+% \newcommand{\algsubtyperulename}[1]{\rulename{AS-{#1}}}
+% \newcommand{\asend}{\algsubtyperulename{\Endrulename}}
+% \newcommand{\asin}{\algsubtyperulename{\inrulename}}
+% \newcommand{\asout}{\algsubtyperulename{\outrulename}}
+% \newcommand{\asbra}{\algsubtyperulename{\extcrulename}}
+% \newcommand{\assel}{\algsubtyperulename{\intcrulename}}
+% \newcommand{\asbool}{\algsubtyperulename{\boolrulename}}
+% \newcommand{\asassump}{\algsubtyperulename{Assump}}
+% \newcommand{\aseql}{\algsubtyperulename{EqL}}
+% \newcommand{\aseqr}{\algsubtyperulename{EqR}}
+
+% duality rulenames
+\newcommand{\dualrulename}[1]{\rulename{D-{#1}}}
+\newcommand{\dend}{\dualrulename{\Endrulename}}
+\newcommand{\dmsg}{\dualrulename{\msgrulename}}
+\newcommand{\din}{\dualrulename{\inrulename}}
+\newcommand{\dout}{\dualrulename{\outrulename}}
+\newcommand{\dextc}{\dualrulename{\extcrulename}}
+\newcommand{\dintc}{\dualrulename{\intcrulename}}
+\newcommand{\dchoice}{\dualrulename{\choicerulename}}
+\newcommand{\didl}{\dualrulename{\idrulename L}}
+\newcommand{\didr}{\dualrulename{\idrulename R}}
+\newcommand{\dsidl}{\dualrulename{\tsidrulename L}}
+\newcommand{\dsidr}{\dualrulename{\tsidrulename R}}
+\newcommand{\dfix}{\dualrulename{\fixrulename}}
+\newcommand{\dfixs}{\dualrulename{\fixrulename S}}
+\newcommand{\deql}{\dualrulename{\eqrulename L}}
+\newcommand{\deqr}{\dualrulename{\eqrulename R}}
+% \newcommand{\dinu}{\dualrulename{\inrulenameU}}
+% \newcommand{\doutu}{\dualrulename{\outrulenameU}}
+% \newcommand{\dextu}{\dualrulename{\extcrulenameU}}
+% \newcommand{\dselu}{\dualrulename{\selrulenameU}}
+
+% value typing rulenames
+% \newcommand{\valuerulename}[1]{\rulename{V-{#1}}}
+% \newcommand{\ttrue}{\valuerulename{\truerulename}}
+% \newcommand{\tfalse}{\valuerulename{\falserulename}}
+% \newcommand{\tvar}{\valuerulename{\varrulename}}
+% \newcommand{\tsub}{\valuerulename{Sub}}
+% \newcommand{\tequiv}{\valuerulename{Eq}}
+% \newcommand{\ttid}{\valuerulename{\tidrulename}}
+
+% process identifier typing rulenames
+% \newcommand{\tpeqid}{\typerulename{\pidrulename}}
+% \newcommand{\tpequiv}{\typerulename{PEq}}
+
+% process typing rulenames
+\newcommand{\typerulename}[1]{\rulename{P-{#1}}}
+\newcommand{\tinact}{\typerulename{\inactrulename}}
+\newcommand{\trecv}{\typerulename{\recvrulename}}
+\newcommand{\tsend}{\typerulename{\sendrulename}}
+\newcommand{\tbra}{\typerulename{\brarulename}}
+\newcommand{\tsel}{\typerulename{\selrulename}}
+\newcommand{\tsels}{\typerulename{\selrulename S}} % simplified version,
+                                % taking advantage of subtyping
+\newcommand{\tpar}{\typerulename{\parrulename}}
+\newcommand{\tres}{\typerulename{\resrulename}}
+\newcommand{\tif}{\typerulename{\ifrulename}}
+\newcommand{\tequiv}{\typerulename{Eq}}
+\newcommand{\tweak}{\typerulename{Weak}}
+\newcommand{\tcontr}{\typerulename{Contr}}
+\newcommand{\tpvar}{\typerulename{\pvarrulename}}
+\newcommand{\tresc}{\typerulename{\resrulename C}}
+\newcommand{\tinactfat}{\typerulename{\inactrulename*}}
+\newcommand{\tfix}{\typerulename{Fix}}
+\newcommand{\tcequiv}{\typerulename{CEq}}
+\newcommand{\tz}{\typerulename{\zrulename}}
+\newcommand{\tsrule}{\typerulename{\srulename}}
+% \newcommand{\tinl}{\typerulename{InL}}
+% \newcommand{\tinu}{\typerulename{InU}}
+% \newcommand{\tinll}{\typerulename{InLL}}
+% \newcommand{\tinuu}{\typerulename{InUU}}
+% \newcommand{\tinlu}{\typerulename{InLU}}
+% \newcommand{\toutl}{\typerulename{\outrulenameL}}
+% \newcommand{\toutu}{\typerulename{\outrulenameU}}
+% \newcommand{\toutlu}{\typerulename{\outrulenameLU}}
+% \newcommand{\toutll}{\typerulename{\outrulenameLL}}
+
+% structural congruence rulenames
+\newcommand{\scongrulename}[1]{\rulename{S-{#1}}}
+\newcommand{\sccomm}{\scongrulename{Comm}}
+\newcommand{\scassoc}{\scongrulename{Assoc}}
+\newcommand{\scneutral}{\scongrulename{Neut}}
+\newcommand{\scswapc}{\scongrulename{SwapC}}
+\newcommand{\scswapb}{\scongrulename{SwapB}}
+\newcommand{\scscope}{\scongrulename{Scope}}
+\newcommand{\scgc}{\scongrulename{Collect}}
+\newcommand{\scidl}{\scongrulename{IdL}}
+% Equivalence
+\newcommand{\scsym}{\scongrulename{Sym}}
+\newcommand{\sctrans}{\scongrulename{Trans}}
+\newcommand{\screfl}{\scongrulename{Refl}}
+% Congruence
+\newcommand{\scinact}{\scongrulename{\inactrulename}}
+\newcommand{\scin}{\scongrulename{\inrulename}}
+\newcommand{\scout}{\scongrulename{\outrulename}}
+\newcommand{\scbra}{\scongrulename{\brarulename}}
+\newcommand{\scsel}{\scongrulename{\selrulename}}
+\newcommand{\scpar}{\scongrulename{\parrulename}}
+\newcommand{\scres}{\scongrulename{\resrulename}}
+\newcommand{\scif}{\scongrulename{\ifrulename}}
+\newcommand{\sczl}{\scongrulename{\zrulename L}}
+\newcommand{\scsl}{\scongrulename{\srulename L}}
+
+% reduction rulenames
+\newcommand{\reductionrulename}[1]{\rulename{R-{#1}}}
+\newcommand{\rchoice}{\reductionrulename{Choice}}
+\newcommand{\rcom}{\reductionrulename{Com}}
+\newcommand{\rcomc}{\reductionrulename{ComC}} % The coinductive version
+\newcommand{\rift}{\reductionrulename{\ifrulename T}}   % Cond-then
+\newcommand{\riff}{\reductionrulename{\ifrulename F}}
+\newcommand{\rres}{\reductionrulename{\resrulename}}
+\newcommand{\rpar}{\reductionrulename{\parrulename}}
+\newcommand{\rstruct}{\reductionrulename{\structrulename}}
+\newcommand{\rvar}{\reductionrulename{\pvarrulename}}
+\newcommand{\rrepl}{\reductionrulename{Repl}}
+\newcommand{\reqz}{\reductionrulename{0}}
+\newcommand{\reqn}{\reductionrulename{n}}
+
+% algorithmic type checking rule names
+% \newcommand{\algrulename}[1]{\rulename{A-{#1}}}
+% \newcommand{\atrue}{\algrulename{\truerulename}}
+% \newcommand{\afalse}{\algrulename{\falserulename}}
+% \newcommand{\alinvar}{\algrulename{Linvarrulename}}
+% \newcommand{\aunvar}{\algrulename{Unvarrulename}}
+% \newcommand{\aunfoldun}{\algrulename{UnfoldUn}}
+% \newcommand{\aunfoldlin}{\algrulename{UnfoldLin}}
+% \newcommand{\acheckval}{\algrulename{CheckVal}}
+% \newcommand{\aout}{\algrulename{\outrulename}}
+% \newcommand{\ain}{\algrulename{\inrulename}}
+% \newcommand{\ainact}{\algrulename{\inactrulename}}
+% \newcommand{\apar}{\algrulename{\parrulename}}
+% \newcommand{\aif}{\algrulename{\ifrulename}}
+% \newcommand{\ares}{\algrulename{\resrulename}}
+% \newcommand{\asel}{\algrulename{\selrulename}}
+% \newcommand{\abranch}{\algrulename{\brarulename}}
+% \newcommand{\aid}{\algrulename{Id}}
+% \newcommand{\aassump}{\algrulename{Assump}}
+
+% error rule names
+\newcommand{\errrulename}[1]{\rulename{E-{#1}}}
+\newcommand{\errcomin}{\errrulename{ComIn}}
+\newcommand{\errcomout}{\errrulename{ComOut}}
+\newcommand{\errcombra}{\errrulename{ComBra}}
+\newcommand{\errcomsel}{\errrulename{ComSel}}
+\newcommand{\errin}{\errrulename{\inrulename}}
+\newcommand{\errout}{\errrulename{\outrulename}}
+\newcommand{\errbra}{\errrulename{\brarulename}}
+\newcommand{\errsel}{\errrulename{\selrulename}}
+\newcommand{\errres}{\errrulename{\resrulename}}
+\newcommand{\errpar}{\errrulename{\parrulename}}
+\newcommand{\errif}{\errrulename{\ifrulename}}
+\newcommand{\errstruct}{\errrulename{\structrulename}}
+
+% type equivalence rulenames
+\newcommand{\typeequivrulename}[1]{\rulename{E-{#1}}}
+\newcommand{\eqend}{\typeequivrulename{\Endrulename}}
+\newcommand{\eqin}{\typeequivrulename{\inrulename}}
+\newcommand{\eqout}{\typeequivrulename{\outrulename}}
+\newcommand{\eqmsg}{\typeequivrulename{\msgrulename}}
+\newcommand{\eqextc}{\typeequivrulename{\extcrulename}}
+\newcommand{\eqintc}{\typeequivrulename{\intcrulename}}
+\newcommand{\eqchoice}{\typeequivrulename{\choicerulename}}
+% \newcommand{\eqbool}{\typeequivrulename{\boolrulename}}
+\newcommand{\eqsession}{\typeequivrulename{\sessionrulename}}
+\newcommand{\eqvar}{\typeequivrulename{\idrulename}}
+\newcommand{\eqvarl}{\typeequivrulename{\idrulename L}}
+\newcommand{\eqvarr}{\typeequivrulename{\idrulename R}}
+\newcommand{\eqsvarl}{\typeequivrulename{\tsvarrulename L}}
+\newcommand{\eqsvarr}{\typeequivrulename{\tsvarrulename R}}
+\newcommand{\eqfix}{\typeequivrulename{Fix}}
+\newcommand{\eqfixs}{\typeequivrulename{FixS}}
+\newcommand{\eqses}{\typeequivrulename{\sessionrulename}}
+\newcommand{\eqzl}{\typeequivrulename{\zrulename L}}
+\newcommand{\eqsl}{\typeequivrulename{\srulename L}}
+\newcommand{\eqnl}{\typeequivrulename{n}}
+\newcommand{\eqnr}{\typeequivrulename{nr}}
+\newcommand{\eqexp}{\typeequivrulename{Exp}}
+\newcommand{\eqnorm}{\typeequivrulename{Norm}}
+\newcommand{\eqnorml}{\typeequivrulename{NormL}}
+\newcommand{\eqnormr}{\typeequivrulename{NormR}}
+\newcommand{\eqrefl}{\typeequivrulename{Refl}}
+\newcommand{\eqsym}{\typeequivrulename{Sym}}
+\newcommand{\eqtrans}{\typeequivrulename{Trans}}
+\newcommand{\eqcons}{\typeequivrulename{Cons}}
+\newcommand{\eqabs}{\typeequivrulename{Abs}}
+\newcommand{\eqappcons}{\typeequivrulename{AppCons}}
+\newcommand{\eqappindex}{\typeequivrulename{AppIndex}}
+\newcommand{\eqappidl}{\typeequivrulename{AppIdL}}
+\newcommand{\eqappidr}{\typeequivrulename{AppIdR}}
+\newcommand{\eqappabsl}{\typeequivrulename{AppAbsL}}
+\newcommand{\eqappabsr}{\typeequivrulename{AppAbsR}}
+\newcommand{\eqappseql}{\typeequivrulename{AppSeqL}}
+\newcommand{\eqappseqr}{\typeequivrulename{AppSeqR}}
+\newcommand{\eqskip}{\typeequivrulename{\skiprulename}}
+\newcommand{\eqsemi}{\typeequivrulename{\semirulename}}
+\newcommand{\eqskipseql}{\typeequivrulename{SkipSeqL}}
+\newcommand{\eqskipseqr}{\typeequivrulename{SkipSeqR}}
+\newcommand{\eqendseql}{\typeequivrulename{EndSeqL}}
+\newcommand{\eqendseqr}{\typeequivrulename{EndSeqR}}
+\newcommand{\eqmsgseqonel}{\typeequivrulename{MsgSeq1L}}
+\newcommand{\eqmsgseqoner}{\typeequivrulename{MsgSeq1R}}
+\newcommand{\eqmsgseqtwo}{\typeequivrulename{MsgSeq2}}
+\newcommand{\eqoutseqonel}{\typeequivrulename{OutSeq1L}}
+\newcommand{\eqoutseqtwo}{\typeequivrulename{OutSeq2}}
+\newcommand{\eqchoiceseql}{\typeequivrulename{ChoiceSeqL}}
+\newcommand{\eqchoiceseqr}{\typeequivrulename{ChoiceSeqR}}
+\newcommand{\eqvarseql}{\typeequivrulename{IdSeqL}}
+\newcommand{\eqvarseqr}{\typeequivrulename{IdSeqR}}
+\newcommand{\eqseqseql}{\typeequivrulename{SeqSeqL}}
+\newcommand{\eqseqseqr}{\typeequivrulename{SeqSeqR}}
+\newcommand{\eqdistl}{\typeequivrulename{DistL}}
+
+\newcommand{\equnit}{\typeequivrulename{\unitrulename}}
+\newcommand{\eqfun}{\typeequivrulename{\arrowrulename}}
+\newcommand{\eqpair}{\typeequivrulename{\pairrulename}}
+\newcommand{\eqindex}{\typeequivrulename{\indexrulename}}
+\newcommand{\eqindexseqonel}{\typeequivrulename{{\indexrulename}Seq1L}}
+\newcommand{\eqindexseqoner}{\typeequivrulename{{\indexrulename}Seq1R}}
+\newcommand{\eqindexseqtwo}{\typeequivrulename{{\indexrulename}Seq2}}
+\newcommand{\eqidrec}{\typeequivrulename{VarRec}}
+% \newcommand{\eqvarrec}{\typeequivrulename{VarRec}} % deprecated, use id
+\newcommand{\eqall}{\typeequivrulename{\allrulename}}
+\newcommand{\eqtvarl}{\typeequivrulename{\tvarrulename L}}
+\newcommand{\eqquant}{\typeequivrulename{Quant}}
+\newcommand{\eqquantseqonel}{\typeequivrulename{QuantSeq1L}}
+\newcommand{\eqquantseqoner}{\typeequivrulename{QuantSeq1R}}
+\newcommand{\eqquantseqtwo}{\typeequivrulename{QuantSeq2}}
+
+% type formation rule names
+% session types
+\newcommand{\typeformrulename}[1]{\rulename{T-{#1}}}
+\newcommand{\stypeformrulename}[1]{\rulename{S-{#1}}}
+%\newcommand{\wend}{\stypeformrulename{\Endrulename}}
+\newcommand{\srskip}{\stypeformrulename{\skiprulename}}
+\newcommand{\srin}{\stypeformrulename{\inrulename}}
+\newcommand{\srout}{\stypeformrulename{\outrulename}}
+\newcommand{\srmsg}{\stypeformrulename{\msgrulename}}
+\newcommand{\srextc}{\stypeformrulename{\extcrulename}}
+\newcommand{\srintc}{\stypeformrulename{\intcrulename}}
+\newcommand{\srchoice}{\stypeformrulename{\choicerulename}}
+\newcommand{\srseq}{\stypeformrulename{\seqrulename}}
+\newcommand{\srvar}{\stypeformrulename{\tvarrulename}}
+%\newcommand{\wrec}{\typeformrulename{\recrulename}}
+\newcommand{\wz}{\typeformrulename{\zrulename}}
+\newcommand{\ws}{\typeformrulename{\srulename}}
+\newcommand{\srsemi}{\stypeformrulename{\semirulename}}
+
+% functional types
+\newcommand{\trunit}{\typeformrulename{\unitrulename}}
+\newcommand{\trfun}{\typeformrulename{\arrowrulename}}
+\newcommand{\trpair}{\typeformrulename{\pairrulename}}
+\newcommand{\trindex}{\typeformrulename{\indexrulename}}
+\newcommand{\trall}{\typeformrulename{\allrulename}}
+\newcommand{\trsession}{\typeformrulename{\sessionrulename}}
+\newcommand{\trvar}{\typeformrulename{\tvarrulename}}
+
+% \newcommand{\winu}{\typeformrulename{InU}}
+% \newcommand{\woutu}{\typeformrulename{OutU}}
+% \newcommand{\wbrau}{\typeformrulename{\brarulenameU}}
+% \newcommand{\wselu}{\typeformrulename{\selrulenameU}}
+
+% Te- Terminated Rule names 
+\newcommand{\termrulename}[1]{\rulename{$\checkmark$-{#1}}}
+\newcommand{\teskip}{\termrulename{\skiprulename}}
+\newcommand{\teend}{\termrulename{\skiprulename}}
+\newcommand{\tesemi}{\termrulename{\semirulename}}
+\newcommand{\teseq}{\termrulename{\seqrulename}}
+\newcommand{\teid}{\termrulename{\idrulename}}
+% \newcommand{\tevar}{\termrulename{\varrulename}} % deprecated, use \teid
+
+% Normalisation
+\newcommand{\normrulename}[1]{\rulename{$\Downarrow$-{#1}}}
+\newcommand{\nz}{\normrulename\zrulename}
+\newcommand{\ns}{\normrulename\srulename}
+
+% Embeding CFST -> Infinite
+\newcommand{\embedrulename}[1]{\rulename{Emb-{#1}}}
+\newcommand{\embskip}{\embedrulename{\skiprulename}}
+\newcommand{\embmsg}{\embedrulename{\msgrulename}}
+\newcommand{\embchoice}{\embedrulename{\choicerulename}}
+\newcommand{\embvar}{\embedrulename{\tvarrulename}}
+\newcommand{\embsemiskip}{\embedrulename{\semirulename\skiprulename}}
+\newcommand{\embsemimsg}{\embedrulename{\semirulename\msgrulename}}
+\newcommand{\embsemichoice}{\embedrulename{\semirulename\choicerulename}}
+\newcommand{\embsemivar}{\embedrulename{\semirulename\tvarrulename}}
+\newcommand{\embsemisemi}{\embedrulename{\semirulename\semirulename}}
+
+% context addition
+% \newcommand{\ctxaddrulename}[1]{\rulename{A-{#1}}}
+% \newcommand{\addempty}{\ctxaddrulename{\emptyrulename}}
+% \newcommand{\addnotin}{\ctxaddrulename{NIn}}
+% \newcommand{\addin}{\ctxaddrulename{In}}
+
+% context formation
+\newcommand{\ctxformrulename}[1]{\rulename{C-{#1}}}
+\newcommand{\cempty}{\ctxformrulename{\emptyrulename}}
+\newcommand{\cbind}{\ctxformrulename{\bindrulename}}
+
+% equational context formation
+\newcommand{\eqctxformrulename}[1]{\rulename{E-{#1}}}
+\newcommand{\ceqempty}{\eqctxformrulename{\emptyrulename}}
+\newcommand{\ceqbind}{\eqctxformrulename{\bindrulename}}
+
+% Closure formation
+\newcommand{\clsformrulename}[1]{\rulename{Cl-{#1}}}
+\newcommand{\clsempty}{\clsformrulename{\emptyrulename}}
+\newcommand{\clsbind}{\clsformrulename{\bindrulename}}
+
+% type identifiers in an equational context 
+\newcommand{\tidsrulename}[1]{\rulename{I-{#1}}}
+\newcommand{\tidsempty}{\tidsrulename{\emptyrulename}}
+\newcommand{\tidsleft}{\tidsrulename{L}}
+\newcommand{\tidsright}{\tidsrulename{R}}
+
+% un predicate
+\newcommand{\unrulename}[1]{\rulename{U-{#1}}}
+\newcommand{\ubool}{\unrulename{\boolrulename}}
+\newcommand{\uend}{\unrulename{\Endrulename}}
+
+% process and value formation rule names
+\newcommand{\procformrulename}[1]{\rulename{F-{#1}}}
+\newcommand{\pinact}{\procformrulename{\inactrulename}}
+\newcommand{\precv}{\procformrulename{\recvrulename}}
+\newcommand{\psend}{\procformrulename{\sendrulename}}
+\newcommand{\pbra}{\procformrulename{\brarulename}}
+\newcommand{\psel}{\procformrulename{\selrulename}}
+\newcommand{\ppar}{\procformrulename{\parrulename}}
+\newcommand{\pres}{\procformrulename{\resrulename}}
+\newcommand{\pif}{\procformrulename{\ifrulename}}
+\newcommand{\ppvar}{\procformrulename{\pvarrulename}}
+\newcommand{\pfix}{\procformrulename{Fix}}
+\newcommand{\vtrue}{\procformrulename{\truerulename}}
+\newcommand{\vfalse}{\procformrulename{\falserulename}}
+\newcommand{\vvar}{\procformrulename{\varrulename}}
+
+% process equality rule names
+\newcommand{\procequalityrulename}[1]{\rulename{PE-{#1}}}
+\newcommand{\peinact}{\procequalityrulename{\inactrulename}}
+\newcommand{\pein}{\procequalityrulename{\inrulename}}
+\newcommand{\peout}{\procequalityrulename{\outrulename}}
+\newcommand{\pebra}{\procequalityrulename{\brarulename}}
+\newcommand{\pesel}{\procequalityrulename{\selrulename}}
+\newcommand{\pepar}{\procequalityrulename{\parrulename}}
+\newcommand{\peres}{\procequalityrulename{\resrulename}}
+\newcommand{\peif}{\procequalityrulename{\ifrulename}}
+
+% process alpha-equivalence rule names
+\newcommand{\procalphaerulename}[1]{\rulename{A-{#1}}}
+\newcommand{\painact}{\procalphaerulename{\inactrulename}}
+\newcommand{\parecv}{\procalphaerulename{\recvrulename}}
+\newcommand{\pasend}{\procalphaerulename{\sendrulename}}
+\newcommand{\pabra}{\procalphaerulename{\brarulename}}
+\newcommand{\pasel}{\procalphaerulename{\selrulename}}
+\newcommand{\papar}{\procalphaerulename{\parrulename}}
+\newcommand{\pares}{\procalphaerulename{\resrulename}}
+\newcommand{\paif}{\procalphaerulename{\ifrulename}}
+
+% process and value substitution rule names
+\newcommand{\substrulename}[1]{\rulename{Sb-{#1}}}
+\newcommand{\sbinact}{\substrulename{\inactrulename}}
+\newcommand{\sbrecv}{\substrulename{\recvrulename}} % DEPRECATED
+\newcommand{\sbrecvo}{\substrulename{\recvrulename1}}
+\newcommand{\sbrecvt}{\substrulename{\recvrulename2}}
+\newcommand{\sbsend}{\substrulename{\sendrulename}}
+\newcommand{\sbbra}{\substrulename{\brarulename}}
+\newcommand{\sbsel}{\substrulename{\selrulename}}
+\newcommand{\sbpar}{\substrulename{\parrulename}}
+\newcommand{\sbres}{\substrulename{\resrulename}} % DEPRECATED
+\newcommand{\sbreso}{\substrulename{\resrulename1}}
+\newcommand{\sbrest}{\substrulename{\resrulename2}}
+\newcommand{\sbif}{\substrulename{\ifrulename}}
+\newcommand{\sbpvar}{\substrulename{\pvarrulename}}
+\newcommand{\sbtrue}{\substrulename{\truerulename}}
+\newcommand{\sbfalse}{\substrulename{\falserulename}}
+\newcommand{\sbvaro}{\substrulename{\varrulename1}}
+\newcommand{\sbvart}{\substrulename{\varrulename2}}
+
+% translation of equational session types into coinductive session types
+\newcommand{\transsrulename}[1]{\rulename{Tr-{#1}}}
+\newcommand{\tsEnd}{\transsrulename{\Endrulename}}
+\newcommand{\tsin}{\transsrulename{\inrulename}}
+\newcommand{\tsout}{\transsrulename{\outrulename}}
+\newcommand{\tsextc}{\transsrulename{\extcrulename}}
+\newcommand{\tsintc}{\transsrulename{\intcrulename}}
+\newcommand{\tsfix}{\transsrulename{\fixrulename}}
+
+% translation of inductive (equational and recursive) types into coinductive types
+\newcommand{\transtrulename}[1]{\rulename{Tr-{#1}}}
+\newcommand{\ttbool}{\transtrulename{\boolrulename}}
+\newcommand{\ttsession}{\transtrulename{\sessionrulename}}
+\newcommand{\tttvar}{\transtrulename{\tvarrulename}} % Trans Type - Type ID
+\newcommand{\ttrec}{\transtrulename{\recrulename}}
+
+% translation of equational processes into coinductive processes
+\newcommand{\transprulename}[1]{\rulename{Tr-{#1}}}
+\newcommand{\tpinact}{\transprulename{\inactrulename}}
+\newcommand{\tprecv}{\transprulename{\recvrulename}}
+\newcommand{\tpsend}{\transprulename{\sendrulename}}
+\newcommand{\tppar}{\transprulename{\parrulename}}
+\newcommand{\tpres}{\transprulename{\resrulename}}
+\newcommand{\tpif}{\transprulename{\ifrulename}}
+\newcommand{\tppvar}{\transprulename{\pvarrulename}}
+\newcommand{\tprepl}{\transprulename{Repl}}
+
+% translation of equational contexts into coinductive contexts
+\newcommand{\transcrulename}[1]{\rulename{Tr-{#1}}}
+\newcommand{\tcempty}{\transcrulename{\emptyrulename}}
+\newcommand{\tcentry}{\transcrulename{Entry}}
+
+% contractivity for types and for processes
+\newcommand{\contrcrulename}[1]{\rulename{C-{#1}}}
+% session types
+\newcommand{\cend}{\contrcrulename{\Endrulename}}
+\newcommand{\cskip}{\contrcrulename{\skiprulename}}
+\newcommand{\cin}{\contrcrulename{\inrulename}}
+\newcommand{\cout}{\contrcrulename{\outrulename}}
+\newcommand{\cextc}{\contrcrulename{\extcrulename}}
+\newcommand{\cintc}{\contrcrulename{\intcrulename}}
+\newcommand{\cchoice}{\contrcrulename{\choicerulename}}
+\newcommand{\cbool}{\contrcrulename{\boolrulename}}
+\newcommand{\cid}{\contrcrulename{\idrulename}}
+% \newcommand{\cvar}{\contrcrulename{\varrulename}} % deprecated, use id
+\newcommand{\ctz}{\contrcrulename{\zrulename}}
+\newcommand{\cts}{\contrcrulename{\srulename}}
+\newcommand{\csemid}{\contrcrulename{Semi1}}
+\newcommand{\csemind}{\contrcrulename{Semi2}}
+\newcommand{\cseqone}{\contrcrulename{Seq1}}
+\newcommand{\cseqtwo}{\contrcrulename{Seq2}}
+\newcommand{\cmsg}{\contrcrulename{\msgrulename}}
+\newcommand{\cother}{\contrcrulename{Other}}
+
+% functional types
+\newcommand{\cunit}{\contrcrulename{\unitrulename}}
+\newcommand{\cconst}{\contrcrulename{\construlename}}
+\newcommand{\carrow}{\contrcrulename{\arrowrulename}}
+\newcommand{\cfop}{\contrcrulename{\foprulename}}
+\newcommand{\cpair}{\contrcrulename{\pairrulename}}
+\newcommand{\cvrec}{\contrcrulename{\vrecrulename}}
+\newcommand{\cindex}{\contrcrulename{\indexrulename}}
+\newcommand{\call}{\contrcrulename{\allrulename}}
+\newcommand{\cquant}{\contrcrulename{\quantrulename}}
+\newcommand{\cRef}{\contrcrulename{\refrulename}}
+\newcommand{\cvarT}{\contrcrulename{\varrulename}}
+\newcommand{\cabs}{\contrcrulename{\absrulename}}
+\newcommand{\capp}{\contrcrulename{\apprulename}}
+\newcommand{\cappid}{\contrcrulename{AppId}}
+\newcommand{\cappcons}{\contrcrulename{AppCons}}
+\newcommand{\cappindex}{\contrcrulename{AppIndex}}
+\newcommand{\cappabs}{\contrcrulename{AppAbs}}
+
+% processes
+\newcommand{\cinact}{\contrcrulename{\inactrulename}}
+\newcommand{\crecv}{\contrcrulename{\recvrulename}}
+\newcommand{\csend}{\contrcrulename{\sendrulename}}
+\newcommand{\csel}{\contrcrulename{\selrulename}}
+\newcommand{\cbra}{\contrcrulename{\brarulename}}
+\newcommand{\cres}{\contrcrulename{\resrulename}}
+\newcommand{\cpar}{\contrcrulename{\parrulename}}
+\newcommand{\cif}{\contrcrulename{\ifrulename}}
+\newcommand{\cpvar}{\contrcrulename{\pvarrulename}}
+\newcommand{\cpz}{\contrcrulename{\zrulename}}
+\newcommand{\cps}{\contrcrulename{\srulename}}
+
+%% lambda reduction
+\newcommand{\redrulename}[1]{\rulename{R-{#1}}}
+\newcommand{\rmu}{\redrulename{$\mu$}}
+\newcommand{\rtappl}{\redrulename{TAppL}}
+\newcommand{\rseq}{\redrulename{Seq}}
+\newcommand{\rseqone}{\redrulename{Seq1}}
+\newcommand{\rseqtwo}{\redrulename{Seq2}}
+\newcommand{\rassoc}{\redrulename{Assoc}}
+\newcommand{\rbeta}{\redrulename{$\beta$}}
+\newcommand{\rabs}{\redrulename{Abs}}
+\newcommand{\rdin}{\redrulename{D$?$}}
+\newcommand{\rdout}{\redrulename{D$!$}}
+\newcommand{\rddual}{\redrulename{DDual}}
+\newcommand{\rddvar}{\redrulename{DDVar}}
+\newcommand{\rdextc}{\redrulename{D$\&$}}
+\newcommand{\rdintc}{\redrulename{D$\oplus$}}
+\newcommand{\rdsemi}{\redrulename{D$;$}}
+\newcommand{\rdskip}{\redrulename{DSkip}}
+\newcommand{\rdend}{\redrulename{DEnd}}
+\newcommand{\rdctx}{\redrulename{DCtx}}
+\newcommand{\rdwait}{\redrulename{DWait}}
+\newcommand{\rdclose}{\redrulename{DClose}}
+\newcommand{\rdforall}{\redrulename{D$\forall$}}
+\newcommand{\rdexists}{\redrulename{D$\exists$}}
+
+%% weak head normal form
+\newcommand{\whnfrulename}[1]{\rulename{W-{#1}}}
+\newcommand{\wconszero}{\whnfrulename{Const0}}
+\newcommand{\wconsone}{\whnfrulename{Const1}}
+\newcommand{\wvar}{\whnfrulename{Var}}
+\newcommand{\wabs}{\whnfrulename{Abs}}
+\newcommand{\wseq}{\whnfrulename{Seq}}
+\newcommand{\wseqone}{\whnfrulename{Seq1}}
+\newcommand{\wseqtwo}{\whnfrulename{Seq2}}
+\newcommand{\wdual}{\whnfrulename{Dual}}
+%% normalising
+\newcommand{\normalisationrulename}[1]{\rulename{N-{#1}}}
+\newcommand{\nwhnf}{\normalisationrulename{Whnf}}
+\newcommand{\nred}{\normalisationrulename{Red}}
+%% normalises
+\newcommand{\norm}{\rulename{Norm}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:

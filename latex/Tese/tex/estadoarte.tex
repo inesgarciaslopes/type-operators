@@ -1,0 +1,61 @@
+
+\chapter{Background and Related Work}
+
+\section{Type Systems}
+
+%Exploring sophisticated type systems and their seamless integration into programming languages is a thoroughly researched field. From System $\FMu$ \cite{GauthierP04} up to System $\FMuOmega$ \cite{DBLP:conf/popl/CaiGO16}, how far can we go until these systems are no longer suitable for compilers.
+
+Type systems are a fundamental tool in programming language theory, providing a framework to categorize and constrain the behavior of programs. They have evolved to become more expressive, moving from simple type assignments to more powerful systems that support polymorphism, recursion, and structured communication patterns.
+
+\todo{note about static vs dynamic type checking}
+
+System $F$, also called the polymorphic lambda calculus, was introduced by Jean-Yves Girard. It extends the simply typed lambda calculus with \textit{parametric polymorphism}, which allows functions to be written generically and applied to arguments of any type. [ref]
+The key addition in System $F$ is \textit{type abstraction} and \textit{type application}. \todo{definition of abstraction and application}
+
+\todo{note to syntax (maybe)}
+
+While System $F$ is a powerful system for expressing parametric polymorphism, it lacks a direct way to express recursive types, which are essential for defining more complex structures and functions that rely on self-reference. Recursive types are particularly important for defining data structures like lists, trees, and infinitely repeating processes.
+
+System $\FMu$ comes as an extension of System $F$ with the addition of \textit{recursion}, denoted by $\mu X.T$, which allows a type $\TT$ to refer to itself through the variable $X$. \todo{Simple example of a list of integers}
+
+By allowing recursion at the type level, System $\FMu$ significantly increases the expressiveness of the type system, making it capable of representing potentially infinite structures. However, now care must be taken to ensure that recursive functions terminate, which leads to type systems often incorporating additional rules or constraints to ensure \textit{termination}. \todo{exaplain termination}
+
+System $\FMuSemi$ builds on top of System $\FMu$ by incorporating \textit{session types}into the type system. This extension is designed to model structured communication between concurrent processes, ensuring that communication follows a well-defined protocol. 
+
+%Session types describe not only the type of data being exchanged but also the sequence in which messages are sent and received.
+\todo{note about equirecursion somewhere}
+\section{Session Types}
+
+Session types offer a formal way to describe communication protocols. They ensure that all participants in a communication process adhere to the agreed protocol, improving both safety and expressiveness. This concept emerged in the early 1990s from the fields of process calculi and type theory, particularly building upon Milner's work on the pi-calculus.[ref] Its main purpose was to bring type-level guarantees to communication protocols.
+
+In a programming language, \textit{types} describe the structure of data (e.g., integers, strings) and session types extend this idea to describe communication patterns. They define the sequence and type of messages exchanged during an interaction. \todo{simple example after introducing small syntax.}
+
+Communication involves two parties---a sender and a receiver---and for a protocol to function correctly, the session types of these parties must be dual. Duality is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server). For example, the session type $\OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\INn\Int$. Typically, duality is offered as a built in constructor \cite{DBLP:journals/corr/abs-2004-01322}. However, we believe duality should be internal, by means of a type operator, since in a polymorphic setting duality cannot be eliminated without the introduction of co-variables. 
+
+One of the key advantages of session types is that they enable \textit{type-safe communication}. This means that at compile time, the system can check whether the communication patterns follow the prescribed protocol, preventing errors like sending a message of a wrong type. Session types can also help ensure \textit{deadlock freedom}, meaning the system avoids situations where two parties wait indefinitely for each other to send or receive a message. This is particularly important in distributed and concurrent systems.
+
+\todo{challenges of session types which lead to the rise of cfst}
+
+\section{Context-free Session Types}
+
+\todo{definition of cfst}\\
+
+Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions.
+The recursive type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, where no further communication is possible, while the latter allows continuing the communication. 
+We want to move beyond context-free session types, namely, we are interested in abstracting the type that is received on the tree channel, by writing $\tabs{\beta}{\tkind}{\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\beta\Semi\ \alpha}}\Semi\Wait}$. Abstractions introduce higher-order kinds which lead to the introduction of type operators into our language.
+
+\section{FreeST}
+\todo{what is FreeST}\\
+FreeST \cite{AlmeidaMTV22}, a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Context-free session types, unlike regular session types, are not restricted to tail recursion, thus allowing the description of more sophisticated communication protocols.
+
+\todo{small freest program example. Could be streaming a tree}\\
+FreeST's current type equivalence algorithm, developed by Almeida et al. \cite{AlmeidaMV20} decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The next step is to extend the language to a higher-order setting where type equivalence is still decidable.
+
+
+\section{Type equivalence algorithms}
+
+
+
+\section{Programming languages with type operators}
+
+\LIMPA
