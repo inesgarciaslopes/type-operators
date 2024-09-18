@@ -28,15 +28,19 @@ System $\FMuSemi$ builds on top of System $\FMu$ by incorporating \textit{sessio
 
 Session types offer a formal way to describe communication protocols. They ensure that all participants in a communication process adhere to the agreed protocol, improving both safety and expressiveness. This concept emerged in the early 1990s from the fields of process calculi and type theory, particularly building upon Milner's work on the pi-calculus.[ref] Its main purpose was to bring type-level guarantees to communication protocols.
 
-In a programming language, \textit{types} describe the structure of data (e.g., integers, strings) and session types extend this idea to describe communication patterns. They define the sequence and type of messages exchanged during an interaction. \\
-\todo{introduce syntax, choice, recursion.}\\
-\todo{simple example.}
+In a programming language, \textit{types} describe the structure of data (e.g., integers, strings) and session types extend this idea to describe communication patterns. They define the order and type of messages exchanged during an interaction, through a communication channel. 
+For example, a process might want to send an integer, then receive an integer and finally terminate. This protocol can be described by sending, $!\TT$, and receiving, $?\TT$, operations. In $!\Int.?\Int.\End$, we first send an integer, followed by receiving an integer and finally terminate the session through the type $\End$---represents closing a communication channel. The order in which the messages (types) are sent is guaranteed through a sequential composition expressed by the $.$ operator.
 
-Communication involves two parties---a sender and a receiver---and for a protocol to function correctly, the session types of these parties must be dual. \textit{Duality} is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server). For example, the session type $\OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\INn\Int$.  
+Communication typically involves two parties---a sender and a receiver---and for a protocol to function correctly, the session types of these parties must be dual. \textit{Duality} is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server). For example, the session type $\OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\INn\Int$.  
+
+Some, more advanced, communication patterns involve branching, where a process might choose, from a set of choices, how to continue the communication. 
+
+\todo{type example}\\
+The previous type represents a protocol that offers two operations on integers: it checks whether an integer is even or odd, and it checks whether an integer is zero. Session types are able to express such protocols by offering choice operations---either internal, $+$, or external, $\&$---to the client, which in turn selects how to proceed with the communication.
 
 One of the key advantages of session types is that they enable \textit{type-safe communication}. This means that at compile time, the system can check whether the communication patterns follow the prescribed protocol, preventing errors like sending a message of a wrong type. Session types can also help ensure \textit{deadlock freedom}, meaning the system avoids situations where two parties wait indefinitely for each other to send or receive a message. This is particularly important in distributed and concurrent systems.
 
-Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
+Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. For instance, the type \todo{example showing tail recursion.}, represents ... until the session terminates. \todo{show we cannot have recursion at any given point of the sequencial composition.} The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
 
 \todo{mention fmu and fmu. can be represented by finite-state automata somewhere.}
 \section{Context-free Session Types}
