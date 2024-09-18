@@ -1,0 +1,104 @@
+
+\chapter{Background and Related Work}
+
+\section{Type Systems}
+
+%Exploring sophisticated type systems and their seamless integration into programming languages is a thoroughly researched field. From System $\FMu$ \cite{GauthierP04} up to System $\FMuOmega$ \cite{DBLP:conf/popl/CaiGO16}, how far can we go until these systems are no longer suitable for compilers.
+
+Type systems are a fundamental tool in programming language theory, providing a framework to categorize and constrain the behavior of programs, while types define the kind of data a program manipulates, e.g., integers, booleans, strings. 
+
+Type systems manage a program's data types through type checking, which can be classified as either static---occurs at compile time, where the types of all variables and expressions are known and checked before the program runs---or dynamic---occurs at run-time, where the types are checked as the program executes. 
+
+Over the course of time, type systems have evolved to become more expressive, moving from simple type assignments to more powerful systems that support polymorphism, recursion, and structured communication patterns.
+
+System $F$, also called the polymorphic lambda calculus, extends the simply typed lambda calculus with \textit{parametric polymorphism}, which allows functions to be written generically and applied to arguments of any type. [ref] In the simply typed lambda calculus, every function has a concrete type. For instance, a function that operates on integers has the type $Int \xrightarrow{} Int$. However, in order to express a function that operates on a lists of arbitrary types, we would need a separate function for each of the types in the list. To overcome this limitation, System $F$ allowed functions to be polymorphic. For example, the identity function, written $\lambda X. \lambda x:X. x$, returns its argument unchanged, working uniformly for any type---when instantiated to $\Int$, the result is the identity function on integers, when applied to $Bool$, the result is the identity function on booleans. This is possible through the introduction of type \textit{abstractions}---functions are parameterized by types---and type \textit{applications}---types are passed as arguments to functions.
+
+While System $F$ is a powerful system for expressing parametric polymorphism, it lacks a direct way to express recursive types, which are essential for defining more complex structures and functions that rely on self-reference. Recursive types are particularly important for defining data structures like lists, trees, and infinitely repeating processes.
+
+System $\FMu$ comes as an extension of System $F$ with the addition of \textit{recursion}, denoted by $\mu X.T$, which allows a type $\TT$ to refer to itself through the variable $X$. \\
+\todo{Simple example of a list of integers}
+
+By allowing recursion at the type level, System $\FMu$ significantly increases the expressiveness of the type system, making it capable of representing potentially infinite structures. However, now care must be taken to ensure that recursive functions terminate, which leads to type systems often incorporating additional rules or constraints to ensure \textit{termination}. Without guarantees of termination, recursive types could lead to non-terminating computations, i.e., infinite recursions, which can make programs unreliable.  
+
+\todo{note about grammar, pushdown automata, corresponding to the system.}
+
+System $\FMuSemi$ builds on top of System $\FMu$ by incorporating \textit{session types}into the type system. This extension is designed to model structured communication between concurrent processes, ensuring that communication follows a well-defined protocol. 
+
+\section{Session Types}
+
+Session types offer a formal way to describe communication protocols. They ensure that all participants in a communication process adhere to the agreed protocol, improving both safety and expressiveness. This concept emerged in the early 1990s from the fields of process calculi and type theory, particularly building upon Milner's work on the pi-calculus.[ref] Its main purpose was to bring type-level guarantees to communication protocols.
+
+In a programming language, \textit{types} describe the structure of data (e.g., integers, strings) and session types extend this idea to describe communication patterns. They define the sequence and type of messages exchanged during an interaction. \\
+\todo{introduce syntax, choice, recursion.}\\
+\todo{simple example.}
+
+Communication involves two parties---a sender and a receiver---and for a protocol to function correctly, the session types of these parties must be dual. \textit{Duality} is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server). For example, the session type $\OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\INn\Int$.  
+
+One of the key advantages of session types is that they enable \textit{type-safe communication}. This means that at compile time, the system can check whether the communication patterns follow the prescribed protocol, preventing errors like sending a message of a wrong type. Session types can also help ensure \textit{deadlock freedom}, meaning the system avoids situations where two parties wait indefinitely for each other to send or receive a message. This is particularly important in distributed and concurrent systems.
+
+Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
+
+\todo{mention fmu and fmu. can be represented by finite-state automata somewhere.}
+\section{Context-free Session Types}
+
+Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions.
+
+\todo{since cfst resemble cfgrammars, they are as expressive as simple grammar.}\\
+
+
+The recursive type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, where no further communication is possible, while the latter allows continuing the communication. 
+We want to move beyond context-free session types, namely, we are interested in abstracting the type that is received on the tree channel, by writing $\tabs{\beta}{\tkind}{\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\beta\Semi\ \alpha}}\Semi\Wait}$. Abstractions introduce higher-order kinds which lead to the introduction of type operators into our language.
+
+\section{FreeST}
+\todo{what is FreeST}\\
+FreeST \cite{AlmeidaMTV22}, a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Context-free session types, unlike regular session types, are not restricted to tail recursion, thus allowing the description of more sophisticated communication protocols.
+
+\todo{small freest program example. Could be streaming a tree}\\
+FreeST's current type equivalence algorithm, developed by Almeida et al. \cite{AlmeidaMV20} decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The next step is to extend the language to a higher-order setting where type equivalence is still decidable.
+
+\todo{note about equirecursion somewhere}
+
+\section{Type equivalence algorithms}
+
+
+
+\section{Programming languages with type operators}
+
+\todo{intro.}
+
+A type system is described as higher-order if it supports \textit{type-level functions}, i.e., if it acts upon types and produce even more complex types. Such systems are often realized through mechanisms such as type classes in Haskell or implicits in Scala.[ref]
+
+\lstinline{data List a = Empty | Cons a (List a)}
+
+This Haskell code represents a \lstinline{List}---a type constructor that takes a type \lstinline{a} and returns a new type \lstinline{List a}---which represents a list of elements of type \lstinline{a}. Therefore, the type \lstinline{List} operates on types, that means, when type \lstinline{a} is replaced by another type (let us say $\Int$) the constructor returns \lstinline{List Int}.
+
+\todo{introduce kinds briefly.}
+While type constructors take (concrete) types as inputs, higher-order kinded types operate one level further. They are type operators which take type constructors themselves as inputs. 
+
+%The kind of a type can be either a $\skind$, refering to a concrete type such as $\Int$ or $String$, a kind * -> * which represents a type constructor like a $List$ or the monad $Maybe$. 
+
+A \textit{functor}, a type class where types can be mapped over, would be an example of a higher-order kinded type.
+
+\lstinline{class Functor f where fmap :: (a -> b) -> f a -> f b}
+
+In this example, the method \lstinline{fmap} takes two arguments, a function and a functor type \lstinline{f a}, and returns a new type \lstinline{f b} from mapping the first argument to each value in \lstinline{f a}.
+
+Type classes, in Haskell, enable polymorphism by defining a set of operations that can be implemented for various types. A \textit{type class} is a higher-order abstraction that operates on types rather than values.
+
+\lstinline{class Eq a where (==) :: a -> a -> Bool}
+
+The example above represents \lstinline{Eq}, a type class that defines equality for any type \lstinline{a}. Type classes emerged from the need to deal with ad-hoc polymorphism, also known as overloading, providing a flexible structure to manage polymorphic operations. 
+\textit{Ad-hoc polymorphism} refers to the ability of a function or operator to behave differently based on the type of its arguments, that means a function can have different implementations based on the types of its parameters and the compiler will choose the correct implementation based on the types of arguments passed.
+\todo{general example of + operator.} While, \textit{Parametric polymorphism} refers to the ability of a function or a data type to be written generically so that it can handle values of any type, without type-specific implementations.
+
+\todo{comparison between oCaml and Haskell.}
+
+Scala’s implicits notion have a similar function to haskell's type classes, where the compiler ensures the correctness of these operations based on resolving these implicit types. The code provided below is the equivalent type class \lstinline{Eq} implemented in Scala: \todo{scala code.}
+
+\todo{Benefits of higher-order systems and type operators.}
+
+\todo{mention the higher-order version of the sytems are as expressive as pushdown automata.}
+
+\todo{mention limitation of myu kind possibly}
+
+\LIMPA
