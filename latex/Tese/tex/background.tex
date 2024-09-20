@@ -3,7 +3,7 @@
 
 \section{Type Systems}
 
-%Exploring sophisticated type systems and their seamless integration into programming languages is a thoroughly researched field. From System $\FMu$ \cite{GauthierP04} up to System $\FMuOmega$ \cite{DBLP:conf/popl/CaiGO16}, how far can we go until these systems are no longer suitable for compilers.
+%Exploring sophisticated type systems and their seamless integration into programming languages is a thoroughly researched field. From System $\FMu$  up to System $\FMuOmega$ , how far can we go until these systems are no longer suitable for compilers.
 
 Type systems are a fundamental tool in programming language theory, providing a framework to categorize and constrain the behavior of programs, while types define the kind of data a program manipulates, e.g., integers, booleans, strings. 
 
@@ -20,7 +20,7 @@ System $\FMu$ comes as an extension of System $F$ with the addition of \textit{r
 
 By allowing recursion at the type level, System $\FMu$ significantly increases the expressiveness of the type system, making it capable of representing potentially infinite structures. However, now care must be taken to ensure that recursive functions terminate, which leads to type systems often incorporating additional rules or constraints to ensure \textit{termination}. Without guarantees of termination, recursive types could lead to non-terminating computations, i.e., infinite recursions, which can make programs unreliable.  
 
-\todo{note about grammar, pushdown automata, corresponding to the system.}
+%\todo{note about grammar, pushdown automata, corresponding to the system.}
 
 System $\FMuSemi$ builds on top of System $\FMu$ by incorporating \textit{session types}into the type system. This extension is designed to model structured communication between concurrent processes, ensuring that communication follows a well-defined protocol. 
 
@@ -42,33 +42,56 @@ One of the key advantages of session types is that they enable \textit{type-safe
 
 Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. For instance, the type \todo{example showing tail recursion.}, represents ... until the session terminates. \todo{show we cannot have recursion at any given point of the sequencial composition.} The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
 
-\todo{mention fmu and fmu. can be represented by finite-state automata somewhere.}
+%\todo{mention fmu and fmu. can be represented by finite-state automata somewhere.}
 \section{Context-free Session Types}
 
-Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions.
+Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions. The recursive type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. 
 
-\todo{since cfst resemble cfgrammars, they are as expressive as simple grammar.}\\
+It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, $\typec{?}$ standing for either $\Wait$ or its' dual $\Close$, where no further communication is possible, while the latter allows continuing the communication where its' dual is himself.
 
+Context-free session types are more expressive than their regular counterparts, covering a wider range of communication protocols and being representable by \textit{context-free grammars}.
+Grammars can be specified by tuples of the form $(\mathcal{T, N}, X, \mathcal{R})$, where: 
+\begin{enumerate}
+    \item $\mathcal{T}$ is a finite set of terminal symbols such as $a, b, c$; 
+    \item $\mathcal{N}$ is a finite set of non-terminal symbols, $X, Y, Z$;
+    \item $X$ is the starting symbol. $X$ must be an element of $\mathcal{N}$, $X\in\mathcal{N}$;
+    \item $\mathcal{R}$ is a finite set of productions, where $P \subseteq N \times (T \cup N)^*$. 
+\end{enumerate}
+A production rule in $\mathcal{R}$ is written as $X \rightarrow \sigma$: the left side of the arrow must be a non-terminal, $X\in\mathcal{N}$, while the right side must be a word, such that $\sigma\in(\mathcal{N}\cup\mathcal{T})^*$. Also, $\sigma$ can be the empty word.
 
-The recursive type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, where no further communication is possible, while the latter allows continuing the communication. 
-We want to move beyond context-free session types, namely, we are interested in abstracting the type that is received on the tree channel, by writing $\tabs{\beta}{\tkind}{\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\beta\Semi\ \alpha}}\Semi\Wait}$. Abstractions introduce higher-order kinds which lead to the introduction of type operators into our language.
+We are particularly interested in simple grammars in Greibach normal form [ref]. Grammars are in \textit{Greibach normal form} if production rules take form as $X \rightarrow a\gamma$, where $X\in\mathcal{N}$, $a\in\mathcal{T}$ and $\gamma\in\mathcal{N}^*$. Grammars in GNF are \emph{simple} when for every non-terminal and terminal symbol there is at most one production $X \rightarrow a\gamma$ [ref].
+
+\todo{conclude to freeST.}
 
 \section{FreeST}
-\todo{what is FreeST}\\
-FreeST \cite{AlmeidaMTV22}, a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Context-free session types, unlike regular session types, are not restricted to tail recursion, thus allowing the description of more sophisticated communication protocols.
+FreeST [ref], a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types.
 
 \todo{small freest program example. Could be streaming a tree}\\
-FreeST's current type equivalence algorithm, developed by Almeida et al. \cite{AlmeidaMV20} decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The next step is to extend the language to a higher-order setting where type equivalence is still decidable.
 
-\todo{note about equirecursion somewhere}
+\todo{note about equirecursion somewhere, recursive type and its unfold are semantically equivalent.}
 
 \section{Type equivalence algorithms}
+Algorithms for deciding the equivalence of types are intricately tied to the computational power and expressiveness of the underlying type system: the more expressive the type system is, the more sophisticated the algorithm will be.
 
+\todo{expressiveness of system f: define a small syntax and then the computational model.}\\
+\todo{expressiveness of system fmu: define a small syntax and then the computational model.}\\
+\todo{system fmu; define small syntax.}\\
 
+Two session types are considered equivalent if they describe exactly the same communica- tion protocol, even if they are not identical syntactically. Thiemann and Vasconcelos proved that type equivalence of context-free session types is decidable [ref] by reducing the problem to the verification of bisimulation for Basic Process Algebra (BPA). It is also known the proof of equivalence between grammars in GNF and BPA processes. With these results,  Almeida et al. [ref] decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The algorithm is divided in three phases:
+\begin{itemize}
+    \item Translating types into simple grammars;
+    \item Pruning unreachable symbols;
+    \item Exploring a decision tree: two types are equivalent if during this phase we are able to find an empty node; otherwise,
+    the types are not equivalent.
+\end{itemize}
+
+Almeida's algorithm is an essential part of checking if two types are equivalence in FreeST. 
+
+As mentioned in previous chapters, we are interested in a \textit{higher order} type system that features, polymorphism, equirecursion, and context-free session types. In later chapters we'll dwelve into the decidability of such type system, but for now you must believe it can be modeled by a simple grammar.
+
+\todo{figure: systems and their equivalence computational models.}
 
 \section{Programming languages with type operators}
-
-\todo{intro.}
 
 A type system is described as higher-order if it supports \textit{type-level functions}, i.e., if it acts upon types and produce even more complex types. Such systems are often realized through mechanisms such as type classes in Haskell or implicits in Scala.[ref]
 
