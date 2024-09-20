@@ -73,11 +73,49 @@ FreeST [ref], a concurrent functional programming language based on system $F^{\
 \section{Type equivalence algorithms}
 Algorithms for deciding the equivalence of types are intricately tied to the computational power and expressiveness of the underlying type system: the more expressive the type system is, the more sophisticated the algorithm will be.
 
-\todo{expressiveness of system f: define a small syntax and then the computational model.}\\
-\todo{expressiveness of system fmu: define a small syntax and then the computational model.}\\
-\todo{system fmu; define small syntax.}\\
+\todo{note type checking in system f is undecidable.}
+%If we go back to System $F$, two types are considered equivalent if they can be rewritten into the same form using alpha-equivalence (renaming of bound variables) and beta-reduction (applying type abstractions).
 
-Two session types are considered equivalent if they describe exactly the same communica- tion protocol, even if they are not identical syntactically. Thiemann and Vasconcelos proved that type equivalence of context-free session types is decidable [ref] by reducing the problem to the verification of bisimulation for Basic Process Algebra (BPA). It is also known the proof of equivalence between grammars in GNF and BPA processes. With these results,  Almeida et al. [ref] decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The algorithm is divided in three phases:
+\begin{figure}[h]
+  \begin{align*}
+    \typec T \grmeq & \function TT
+    %\grmor \tbananas{l_i}{T_i} 
+    % \grmor \Unit 
+    \grmor  \foralltinfix\alpha\kind T 
+    \grmor \typec{\alpha}
+    \grmor \tmuinfix{\alpha}{\kind}{T} 
+  \end{align*}
+\end{figure}
+
+The syntax above inherites from System $F$ variable names $\typec\alpha$, type quantification 
+$\foralltinfix\alpha\kind T$ and functions $\function TU$. With the addition of recursion $\tmuinfix{\alpha}{\kind}{T}$, we arrive at System $\FMu$. In said system, two types are equivalent if they are unfolded versions of each other. For example, the type $\mu\alpha.\alpha$ is equivalent to $\alpha(\mu\alpha.\alpha)$.[ref] 
+
+
+\begin{figure}[h]
+  \begin{align*}
+  \typec T \grmeq & (\FMu)
+    \grmor \tabs\alpha\kind T
+    \grmor \tapp TT 
+  \end{align*}
+\end{figure}
+
+With the introduction of type abstractions $\tabs\alpha\kind T$ and applications $\tapp TT $, we arrive at a higher-order version, denoted with $\omega$, of System $\FMu$. System $\FMu$'s computational power is akin to finite-state automata. \todo{definition finite-state automata.}[ref] However, if we raise such system to a higher-order version of itself, its' computational power would be at least as expressive as deterministic pushdown automata for which known equivalence algorithms are
+notoriously impractical.  [ref]
+
+%Building upon System $\FMu$, introducing (regular) session types with send/receive operations, choices, and $\End$ type, we arrive at System $\FMuDot$. 
+
+\begin{figure}[h]
+  \begin{align*}
+    \typec T \grmeq & (\FMu)
+    \grmor{} \MSGn T
+    \grmor{} \tchoice{l_i}{T_i}
+    \grmor \End
+    \grmor{} \semit TT 
+    \grmor \Skip
+  \end{align*}
+\end{figure}
+
+Building upon System $\FMu$, introducing context-free session types with sequential composition and type $\Skip$, we arrive at System $\FMuSemi$. Two session types are considered equivalent if they describe exactly the same communication protocol, even if they are not identical syntactically. Thiemann and Vasconcelos proved that type equivalence of context-free session types is decidable [ref] by reducing the problem to the verification of bisimulation for Basic Process Algebra (BPA). It is also known the proof of equivalence between grammars in GNF and BPA processes. With these results,  Almeida et al. [ref] decides the equivalence of context-free session types by reducing the problem to the bisimilarity of simple grammars. The algorithm is divided in three phases:
 \begin{itemize}
     \item Translating types into simple grammars;
     \item Pruning unreachable symbols;
@@ -85,11 +123,9 @@ Two session types are considered equivalent if they describe exactly the same co
     the types are not equivalent.
 \end{itemize}
 
-Almeida's algorithm is an essential part of checking if two types are equivalence in FreeST. 
+An higher-order version of this system, $\FMuSemiOmega$, would still be as expressive as deterministic pushdown automata. However, Costa et al. [ref] proved that, for a small subset of the language where recursion is limited to kind $*$, type equivalence is still representable by simple grammars. Combining this notorious notion and Almeida's algorithm to check if two types are equivalent, we are able to elevate FreeST's type system to a higher-order setting.
 
-As mentioned in previous chapters, we are interested in a \textit{higher order} type system that features, polymorphism, equirecursion, and context-free session types. In later chapters we'll dwelve into the decidability of such type system, but for now you must believe it can be modeled by a simple grammar.
-
-\todo{figure: systems and their equivalence computational models.}
+\todo{figure: systems and their computational models.}
 
 \section{Programming languages with type operators}
 
