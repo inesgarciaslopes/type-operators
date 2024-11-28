@@ -11,28 +11,27 @@ Type systems manage a program's data types through type checking, which can be c
 
 Over the course of time, type systems have evolved to become more expressive, moving from simple type assignments to more powerful systems that support polymorphism, recursion, and structured communication patterns.
 
-System $F$, also called the polymorphic lambda calculus, extends the simply typed lambda calculus with \textit{parametric polymorphism}, which allows functions to be written generically and applied to arguments of any type. [ref] In the simply typed lambda calculus, every function has a concrete type. For instance, a function that operates on integers has the type $Int \xrightarrow{} Int$. However, in order to express a function that operates on a lists of arbitrary types, we would need a separate function for each of the types in the list. To overcome this limitation, System $F$ allowed functions to be polymorphic. For example, the identity function, written $\lambda X. \lambda x:X. x$, returns its argument unchanged, working uniformly for any type---when instantiated to $\Int$, the result is the identity function on integers, when applied to $Bool$, the result is the identity function on booleans. This is possible through the introduction of type \textit{abstractions}---functions are parameterized by types---and type \textit{applications}---types are passed as arguments to functions.
+System $F$, also called the polymorphic lambda calculus, extends the simply typed lambda calculus with \textit{parametric polymorphism}, which allows functions to be written generically and applied to arguments of any type. [ref] In the simply typed lambda calculus, every function has a concrete type. For instance, a function that operates on integers has the type $\function \Int \Int$. However, in order to express a function that operates on a lists of arbitrary types, we would need a separate function for each of the types in the list. To overcome this limitation, System $F$ allowed functions to be polymorphic. For example, the identity function, written $\lambda X. \lambda x:X. x$, returns its argument unchanged, working uniformly for any type---and when instantiated to $\Int$, the result is the identity function on integers, whereas when applied to $Bool$, the result is the identity function on booleans. This is possible through the introduction of type \textit{abstractions}---functions are parameterized by types---and type \textit{applications}---types are passed as arguments to functions.
 
 While System $F$ is a powerful system for expressing parametric polymorphism, it lacks a direct way to express recursive types, which are essential for defining more complex structures and functions that rely on self-reference. Recursive types are particularly important for defining data structures like lists, trees, and infinitely repeating processes.
 
-System $\FMu$ comes as an extension of System $F$ with the addition of \textit{recursion}, denoted by $\mu X.T$, which allows a type $\TT$ to refer to itself through the variable $X$. \\
-
-%\todo{Simple example of a list of integers}
+System $\FMu$ comes as an extension of System $F$ with the addition of \textit{recursion}, denoted by $\mu X.T$, which allows a type $\TT$ to refer to itself through the variable $X$. When adding recursion, type systems must choose how to approach recursive types: a type can be either \textit{equirecursive} or \textit{isorecursive}.
+The difference lies on the relation between the type and its' (one-step) unfold. Are $\mu X.T$ and its' unfold ,$T. \mu X.T$, the same type? Equirecursive types say yes. They represent the same infinite tree and therefore are interchangeable when type checking. However, implementing such type checking algorithms requires additional work and attention to guarantee termination. On the other hand, isorecursive types say they are different. Therefore, they are not interchangeable but only isomorphic. 
 
 By allowing recursion at the type level, System $\FMu$ significantly increases the expressiveness of the type system, making it capable of representing potentially infinite structures. However, now care must be taken to ensure that recursive functions terminate, which leads to type systems often incorporating additional rules or constraints to ensure \textit{termination}. Without guarantees of termination, recursive types could lead to non-terminating computations, i.e., infinite recursions, which can make programs unreliable.  
 
 %\todo{note about grammar, pushdown automata, corresponding to the system.}
 
-System $\FMuSemi$ builds on top of System $\FMu$ by incorporating \textit{session types}into the type system. This extension is designed to model structured communication between concurrent processes, ensuring that communication follows a well-defined protocol. 
+System $\FMuSemi$ builds on top of System $\FMu$ by incorporating \textit{session types} into the type system. This extension is designed to model structured communication between concurrent processes, ensuring that communication follows a well-defined protocol. 
 
 \section{Session Types}
 
 Session types offer a formal way to describe communication protocols. They ensure that all participants in a communication process adhere to the agreed protocol, improving both safety and expressiveness. This concept emerged in the early 1990s from the fields of process calculi and type theory, particularly building upon Milner's work on the pi-calculus.[ref] Its main purpose was to bring type-level guarantees to communication protocols.
 
 In a programming language, \textit{types} describe the structure of data (e.g., integers, strings) and session types extend this idea to describe communication patterns. They define the order and type of messages exchanged during an interaction, through a communication channel. 
-For example, a process might want to send an integer, then receive an integer and finally terminate. This protocol can be described by sending, $!\TT$, and receiving, $?\TT$, operations. In $!\Int.?\Int.\End$, we first send an integer, followed by receiving an integer and finally terminate the session through the type $\End$---represents closing a communication channel. The order in which the messages (types) are sent is guaranteed through a sequential composition expressed by the $.$ operator.
+The following simple protocol is finite: a process might want to send an integer, then receive an integer and finally terminate. This protocol can be described by the session types $S = !\Int.?\Int.\End$---we first send an integer, followed by receiving an integer and finally terminate the session through the type $\End$, which closes the communication channel. The order in which the messages (types) are sent is guaranteed through a sequential composition expressed by the $.$ operator.
 
-Communication typically involves two parties---a sender and a receiver---and for a protocol to function correctly, the session types of these parties must be dual. \textit{Duality} is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server). For example, the session type $\OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\INn\Int$.  
+Communication typically involves two parties---a sender and a receiver---and for a protocol to function correctly, the session types of these parties must be dual. \textit{Duality} is the relationship between two session types that allows them to correctly engage in a protocol. For any session type describing one side of the communication (let us say the client), there is a dual session type that describes the other side (the server).  For example, the session type $S = \OUTn\Int$ describes sending an integer and its dual session type is to receive an integer, $\dual{S} = \INn\Int$.  
 
 Some, more advanced, communication patterns involve branching, where a process might choose, from a set of choices, how to continue the communication. 
 
@@ -40,16 +39,85 @@ $\intchoice\rchannel{isEven}{!Int.?Bool.End}{isZero}{!Int.?Bool.End}$
 
 The previous type represents a protocol (from the client perspective) that offers two operations on integers: it checks whether an integer is even or odd, and it checks whether an integer is zero. Session types are able to express such protocols by offering choice operations---either internal, $\&$, or external, $+$---to the client, which in turn selects how to proceed with the communication: if the client wants to check if an integer is even, it must select the branch $isEven$.
 
-One of the key advantages of session types is that they enable \textit{type-safe communication}. This means that at compile time, the system can check whether the communication patterns follow the prescribed protocol, preventing errors like sending a message of a wrong type. Session types can also help ensure \textit{deadlock freedom}, meaning the system avoids situations where two parties wait indefinitely for each other to send or receive a message. This is particularly important in distributed and concurrent systems.
 
-Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. For instance, the type \todo{example showing tail recursion.}, represents ... until the session terminates. \todo{show we cannot have recursion at any given point of the sequencial composition.} The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
+
+One of the key advantages of session types is that they enable \textit{type-safe communication}. This means that at compile time, the system can check whether the communication patterns follow the prescribed protocol, preventing errors like sending a message of a wrong type. Session types can also help ensure \textit{deadlock freedom}, meaning the system avoids situations where two parties wait indefinitely for each other to send or receive a message.
+
+
+Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. For instance, the type $ \typec{\mu S} .\OUTn\TT.\typec{S}$, represents adding $\OUTn\TT$ to the tail $\OUTn\TT\OUTn\TT\OUTn\TT...\typec{\mu S}.\OUTn\TT.\typec{S}$ continuously until the session terminates. 
+
+\todo{talk about: "The equivalence of session types is the equivalence of binary trees." }
+
+The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
 
 %\todo{mention fmu and fmu. can be represented by finite-state automata somewhere.}
 \section{Context-free Session Types}
 
-Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions. The recursive type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. 
+Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions. For instance, one might choose to write $S;!T$ or $!T;S;!T$ where recursion is found in the head or middle of the type.  
 
-It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, $\typec{?}$ standing for either $\Wait$ or its' dual $\Close$, where no further communication is possible, while the latter allows continuing the communication where its' dual is himself.
+\todo{contexto para paragrafo.}
+
+For example, types $\Skip\Semi\TT$ and $\TT$ are equivalent but the same is not true for the equivalence of the trees they represent. 
+
+\begin{center}
+\begin{tikzpicture}
+    \matrix (m) [matrix of math nodes, nodes in empty cells,
+                 row sep=2em, column sep=3em,
+                 nodes={anchor=center}]
+    {
+        & \Semi & \\
+        \Skip & & \typec{T} \\
+    };
+
+    \draw[->] (m-1-2) -- (m-2-1); % \; to skip
+    \draw[->] (m-1-2) -- (m-2-3); % \; to T
+\end{tikzpicture}
+\end{center}
+
+Also, one could naively think the problem lies solely on the neutral element $\Skip$ but such saying is not true: $\TT\Semi(\typec{U}\Semi\typec{V})$ and $(\TT\Semi\typec{U})\Semi\typec{V}$ are equivalent, but their trees are not. 
+
+\begin{center}
+\begin{tikzpicture}
+    \matrix (m) [matrix of math nodes, nodes in empty cells,
+                 row sep=2em, column sep=3em,
+                 nodes={anchor=center}]
+    {
+        & \Semi && \\
+        \typec{T} & & \Semi &\\
+        & \typec{U} & & \typec{U}\\
+    };
+
+    \draw[->] (m-1-2) -- (m-2-1); 
+    \draw[->] (m-1-2) -- (m-2-3); 
+    \draw[->] (m-2-3) -- (m-3-2); 
+    \draw[->] (m-2-3) -- (m-3-4); 
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}
+    \matrix (m) [matrix of math nodes, nodes in empty cells,
+                 row sep=2em, column sep=3em,
+                 nodes={anchor=center}]
+    {
+        &&  \Semi  \\
+        & \Semi & & \typec{V}\\
+        \typec{T} &&  \typec{U}\\
+    };
+
+    \draw[->] (m-1-3) -- (m-2-2); 
+    \draw[->] (m-1-3) -- (m-2-4); 
+    \draw[->] (m-2-2) -- (m-3-1); 
+    \draw[->] (m-2-2) -- (m-3-3); 
+
+\end{tikzpicture}
+\end{center}
+
+\todo{put the trees side by side and add caption.}
+
+%The recursive type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. 
+
+%It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, $\typec{?}$ standing for either $\Wait$ or its' dual $\Close$, where no further communication is possible, while the latter allows continuing the communication where its' dual is himself.
 
 Context-free session types are more expressive than their regular counterparts, covering a wider range of communication protocols and being representable by \textit{context-free grammars}.
 Grammars can be specified by tuples of the form $(\mathcal{T, N}, X, \mathcal{R})$, where: 
@@ -59,18 +127,73 @@ Grammars can be specified by tuples of the form $(\mathcal{T, N}, X, \mathcal{R}
     \item $X$ is the starting symbol. $X$ must be an element of $\mathcal{N}$, $X\in\mathcal{N}$;
     \item $\mathcal{R}$ is a finite set of productions, where $P \subseteq N \times (T \cup N)^*$. 
 \end{enumerate}
-A production rule in $\mathcal{R}$ is written as $X \rightarrow \sigma$: the left side of the arrow must be a non-terminal, $X\in\mathcal{N}$, while the right side must be a word, such that $\sigma\in(\mathcal{N}\cup\mathcal{T})^*$. Also, $\sigma$ can be the empty word.
+A production rule in $\mathcal{R}$ is written as $X \rightarrow \sigma$: the left side of the arrow must be a non-terminal, $X\in\mathcal{N}$, while the right side must be a word, such that $\sigma\in(\mathcal{N}\cup\mathcal{T})^*$. Also, $\sigma$ can be the empty word. We are particularly interested in simple grammars in Greibach normal form [ref]. Grammars are in \textit{Greibach normal form} if production rules take form as $X \rightarrow a\gamma$, where $X\in\mathcal{N}$, $a\in\mathcal{T}$ and $\gamma\in\mathcal{N}^*$. Grammars in GNF are \emph{simple} when for every non-terminal and terminal symbol there is at most one production $X \rightarrow a\gamma$ [ref].
 
-We are particularly interested in simple grammars in Greibach normal form [ref]. Grammars are in \textit{Greibach normal form} if production rules take form as $X \rightarrow a\gamma$, where $X\in\mathcal{N}$, $a\in\mathcal{T}$ and $\gamma\in\mathcal{N}^*$. Grammars in GNF are \emph{simple} when for every non-terminal and terminal symbol there is at most one production $X \rightarrow a\gamma$ [ref].
+These type systems prove interesting to implement since they closely represent programs. Therefore, we want to incorporate these type systems into programming languages.
 
-\todo{conclude to freeST.}
+\section{The FreeST Programming Language}
+FreeST [ref], a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Resembling Haskell's syntax, FreeST offers primitives to create channels and communicate trough them.
 
-\section{FreeST}
-FreeST [ref], a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types.
+Typically in programming languages, a value can be used as many times as needed. However, FreeST uses a linear type system: a resource may be used exactly once---represented by $1$---or unrestrictely, meaning a resource can be used zero or more times---represented by a $*$. Session type channels are linear and must be used exactly once. Therefore, linear programming languages help ensure the channels protocols are fulfilled. 
 
-\todo{note about equirecursion somewhere, recursive type and its unfold are semantically equivalent.}
+It is also important to note that these channels are heterogeneous: $\OUTn\Int\Semi\INn\Int$ is undoubtedly a session type, while $\Bool\rightarrow\Bool$ is a functional type but what about the polymorphic variable $\alpha$? 
+The answer relies on FreeST's kinding system. Kinds are pairs composed of a multiplicity and a base kind. Multiplicities control the number of times a value may be used in a given context, making FreeST a linear programming language, and a base kind distinguishs functional types, $\TT$, from session types, $\typec{S}$. Multiplicities and base kinds have an ordering relation denoted by the following lattice. 
 
-We use FreeST's syntax freely for the following example.
+\begin{center}
+    \begin{tikzpicture}
+    % Define matrix
+        \matrix (m) [matrix of math nodes, row sep=3em, column sep=3em]
+        {
+            & \typec{1T} \\
+            \typec{*T} && \typec{1S} \\
+            & \typec{*S} \\
+        };
+        % Draw arrows
+        \draw[->] (m-1-2) -- (m-2-1) node[midway, above] {};
+        \draw[->] (m-2-1) -- (m-3-2) node[near end, below] {};
+        \draw[->] (m-1-2) -- (m-2-3) node[midway, above] {};
+        \draw[->] (m-2-3) -- (m-3-2) node[near end, below] {};
+    \end{tikzpicture}
+\end{center}
+
+%By default, types are of kind *T in FreeST (the most common type in programming).
+
+We use FreeST's syntax freely for the following example for serialisation of a binary tree.
+
+\begin{lstlisting}
+data Tree = Leaf | Node Int Tree Tree
+
+type TreeChannel = oplus{Leaf: Skip ,Node: !Int; TreeChannel; TreeChannel}
+
+write: foralla. Tree -> TreeChannel;a -> a
+write t c = 
+    case t of { 
+        Leaf -> select Leaf c, 
+        Node x t1 t2 -> select Node c & 
+                        send x &  
+                        write t1 & 
+                        write t2
+}
+
+treeSum: foralla. dualof TreeChannel; a -> (Int, a) 
+treeSum c = 
+    match c with { 
+        Leaf c -> (0, c), 
+        Node c -> let (x, c) = receive c in
+                  let (sl , c) = treeSum c in
+                  let (sr, c) = treeSum c in
+                  (x + sl + sr , c)
+}
+
+\end{lstlisting}
+
+\lstinline{Tree} is a binary tree data type that can be either: a \lstinline{Leaf} (empty node), or a \lstinline{Node} containing an integer value and two subtrees (left and right). \lstinline{TreeChannel} defines a communication protocol type that represents how a tree will be transmitted: if the label \lstinline{Leaf} is selected no communication occurs, but the channel is still open to further communication; if the label \lstinline{Node} is selected then the content of the node is sent, followed by the left subtree and right subtree. 
+
+Then we can implement a function that serializes a tree over a channel: this function takes a \lstinline{Tree} argument and a channel and either selects a Leaf, or selects a Node, sends an integer value and recursively writes the left and right subtree. If we want to sum all the values in a Tree, we can read from a TreeChannel and compute the sum of all the nodes in a Tree. 
+
+%We can see how context-free session types come into play in this example, as the first occurence of TreeChannel on the code would not be possible with only regular session types.
+
+\todo{more examples: mathserver, and the following example.}
 
 \begin{lstlisting}
 type Stream a = &{Done: Skip, 
@@ -161,7 +284,7 @@ main =
 
 
 
-\section{Type equivalence algorithms}
+\section{Algorithms for Type Equivalence}
 Algorithms for deciding the equivalence of types are intricately tied to the computational power and expressiveness of the underlying type system: the more expressive the type system is, the more sophisticated the algorithm will be.
 
 %\todo{note type checking in system f is undecidable.}
@@ -220,7 +343,7 @@ An higher-order version of this system, $\FMuSemiOmega$, would still be as expre
 
 %\input{tex/fig-systems.tex}
 
-\section{Programming languages with type operators}
+\section{Type Operators}
 
 A type system is described as higher-order if it supports \textit{type-level functions}, i.e., if it acts upon types and produce even more complex types. Such systems are often realized through mechanisms such as type classes in Haskell or implicits in Scala.[ref]
 
@@ -228,8 +351,10 @@ A type system is described as higher-order if it supports \textit{type-level fun
 
 This Haskell code represents a \lstinline{List}---a type constructor that takes a type \lstinline{a} and returns a new type \lstinline{List a}---which represents a list of elements of type \lstinline{a}. Therefore, the type \lstinline{List} operates on types, that means, when type \lstinline{a} is replaced by another type (let us say $\Int$) the constructor returns \lstinline{List Int}. While type constructors take (concrete) types as inputs, higher-order kinded types operate one level further. They are type operators which take type constructors themselves as inputs. 
 
+%\todo{show ghci :k []}
 %The kind of a type can be either a $\skind$, refering to a concrete type such as $\Int$ or $String$, a kind * -> * which represents a type constructor like a $List$ or the monad $Maybe$. 
 
+%\todo{show ghci :k Maybe}\\
 A \textit{functor}, a type class where types can be mapped over, would be an example of a higher-order kinded type.
 
 \lstinline{class Functor f where fmap :: (a -> b) -> f a -> f b}
@@ -250,7 +375,112 @@ A common ad-hoc polymorphism example would be addition through the $+$ operator.
 
 In contrast, Haskell chooses to offer overloading of its' $+$ operator through the use of type classes. This operator works for both integer and floating-point addition or any type that is an instance of the $Num$ type class.
 
-Scala’s implicits notion have a similar function to haskell's type classes, where the compiler ensures the correctness of these operations based on resolving these implicit types. The code provided below is the equivalent type class \lstinline{Eq} implemented in Scala: \todo{scala code.}
+Scala’s implicits notion have a similar function to haskell's type classes, where the compiler ensures the correctness of these operations based on resolving these implicit types. %The code provided below is the equivalent type class \lstinline{Eq} implemented in Scala: \todo{scala code.}
+
+\todo{talk also about oCaml and Java.}
+
+A list is an ordered sequence of elements. 
+\begin{lstlisting}
+    # [1; 2; 3];;
+    - : int list = [1; 2; 3]
+\end{lstlisting}
+This list has three elements, seperated by $(;)$ and its type is \lstinline{int list}.
+
+\begin{lstlisting}
+    # [];;
+    - : 'a list = []
+\end{lstlisting}
+Notice how the empty list has type \lstinline{'a list}? We don't know the actual type of the element \lstinline{a}, since the list is empty.
+
+Let's write a function that calculates the length of a list. Keeping in mind that this must work for any type of list. 
+
+\begin{lstlisting}
+    # let rec length l =
+        match l with
+        | [] -> 0
+        | _ :: t -> 1 + length t;;
+\end{lstlisting}
+
+Here's what happens when we run the function \lstinline{length} with the two lists from the previous example.
+
+\begin{lstlisting}
+    # length [1; 2; 3];;
+    - : int = 3
+    # length [[]];;
+    - : int = 1
+\end{lstlisting}
+
+What is the type of function \lstinline{length}? How does it work for both an \lstinline{int list} and \lstinline{'a list}?
+
+\begin{lstlisting}
+    val length : 'a list -> int = <fun>
+\end{lstlisting}
+
+\lstinline{length} takes a list of type \lstinline{'a list} where the variable \lstinline{a} can be instantiated with anything. Then, in the code, the pattern \lstinline{ _ :: t} discards the head of the list as its' type is not relevant to the implementation of the function. This is a simple example of a polymorphic function.
+
+We might wish to apply a function to each element in a list, yielding a new one. We shall write a function map which is given another function as its argument - such a function is called "higher-order":
+
+\begin{lstlisting}
+    # let rec map f l =
+        match l with
+        | [] -> []
+        | h :: t -> f h :: map f t;;
+    val map : ('a -> 'b) -> 'a list -> 'b list = <fun>
+\end{lstlisting}
+
+Notice the type of the function f in parentheses as part of the whole type. This map function, given a function of type 'a -> 'b and a list of 'as, will build a list of 'b's. Sometimes 'a and 'b might be the same type, of course. Here are two examples showing the map function in use:
+
+\begin{lstlisting}
+    # map (fun x -> x * 2) [1; 2; 3];;
+    - : int list = [2; 4; 6]
+    # map total [[1; 2]; [3; 4]; [5; 6]];;
+    - : int list = [3; 7; 11]
+\end{lstlisting}
+
+\todo{list has a standard module in ocaml with several useful functions.}
+\todo{difference between ML modules and haskell type classes -> paper.}
+
+Type classes in Haskell and modules in OCaml represent two distinct approaches to program abstraction and component organization. 
+
+Type classes in Haskell primarily serve \textit{ad-hoc polymorphism}. They enable you to define behavior that can work across multiple types while maintaining type safety. 
+In contrast, OCaml's module system focuses on explicit program structuring and strong data abstraction. 
+
+\begin{lstlisting}
+class Show a where
+    show :: a -> String
+
+instance Show Int where
+    show = Data.Text.pack . show
+\end{lstlisting}
+
+\begin{lstlisting}
+module type SHOW = sig
+    type t
+    val show : t -> string
+end
+
+module IntShow : SHOW with type t = int = struct
+    type t = int
+    let show = string_of_int
+end
+\end{lstlisting}
+
+The key differences between the two approaches reside in instance resolution and multiple implementations. While Haskell automatically resolves instances based on types (since type classes are restricted to a singleton instance), oCaml requires explicit module application because it supports multiple possible implementations.
+
+\begin{lstlisting}
+    main = print $ show (42 :: Int) --haskell
+    let () = print_endline (IntShow.show 42) --oCaml
+\end{lstlisting}
+\todo{caption: Type classes Vs. Modules: instance resolution}
+
+The trade-off between these approaches focuses on either convenience or explicit control, with each system optimizing for different use cases and programming styles. Nevertheless, an harmonious approach combining type classes and modules was provided by Robert Harper et al. \todo{ref: Modular Type Classes}.
+
+\todo{relation between type classes and generics in Java.}
+\todo{show phil wadler graphic about type classes constraints and interfaces.}
+
+%Haskell's type classes primarily serve ad hoc polymorphism, allowing functions to work across multiple types through implicit instance resolution and automatic constraint inference. This approach emphasizes convenience and concise code through its automatic instance generation and type-directed dispatch, though it comes with the limitation of allowing only one instance per type. The implicit nature of type classes makes them particularly well-suited for generic programming patterns where behavior needs to vary by type, but this same implicitness can make program flow harder to follow in more complex scenarios.
+
+%In contrast, OCaml's module system focuses on explicit program structuring and strong data abstraction. Modules use signatures to specify interfaces, functors for abstraction over module implementations, and structures to provide concrete implementations. This explicit approach requires more verbose code but offers greater flexibility in terms of multiple implementations, fine-grained control over abstraction boundaries, and clearer program structure. The module system excels at organizing large-scale programs and maintaining clear boundaries between components, though it lacks the convenient implicit resolution that makes Haskell's type classes so effective for ad hoc polymorphism. The trade-off between these approaches reflects a fundamental tension in programming language design between implicit convenience and explicit control, with each system optimizing for different use cases and programming styles.
 
 %\todo{Benefits of higher-order systems and type operators.}
 

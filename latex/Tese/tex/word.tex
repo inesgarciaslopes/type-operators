@@ -1,0 +1,52 @@
+% !TeX root = samplepaper.tex
+\begin{figure}[t]
+    \declrel{}{$\word(\typec{T})$}
+    \begin{align*}
+        \word (\TT) = \begin{cases}
+                        \word'(\TT) & \iswhnf \TT\\
+                        \emptyword & \normalred T\Skip\\
+                        \Ynt, \R := \R \cup \{\gltsred Y a {\gamma\delta} \mid
+                        % \tsymc a, \nsymc \gamma : 
+                        \gltsred Z a {\gamma}\} & \normalred TU \neq \Skip, \word(\UT) = \Znt \ntdelta
+                    \end{cases}
+    \end{align*}
+  \begin{align*}
+    \word'(\talpha\ \typec{T_1}\typec{\ldots}\typec{T_m}) &= \Ynt, \R := \R \cup \{\gltsred Y{\alpha_0}{\emptyword}, \gltsred Y{\alpha_j}{\wordb{\typec{T_j}}\bot}\} 
+    \\
+    \word'(\Skip) &= \emptyword
+    \\
+    \word'(\End_{\typec{\sharp}}) &=  \Ynt, \R := \R \cup \{\gltsred Y{\tsymc{\Endl}}{\bot}\}
+%    \\
+%    \word'(\Close) &= \Ynt, \R := \R \cup \{\gltsred Y\Closel{\bot}\}
+    \\
+    \word'(\tlambda{\alpha}\kind T) &= \Ynt, \R := \R \cup \{\gltsred Y {\lambda\alpha\colon\kind}{\wordb{\TT}}\}
+    \\
+    \word'(\tiota) &= \Ynt, \R := \R \cup \{\gltsred Y\iota\emptyword\} \quad
+                     \text{where } \typec{\iota}\neq \Skip,\End_{\typec{\sharp}}
+    \\
+    \word'(\typec{\iota\ T_1\cdots T_m}) &= \Ynt, \R := \R \cup \{\gltsred Y{\iota_j}{\wordb{\typec{T_j}}}\} \quad \text{where }\typec{\iota} = \function{}{}, \typec{\choice\{\overline{l_i}\}}, \typec{\varrecs{\overline{l_i}}}
+    \\
+    \word'(\MSGn\TT) &= \Ynt, \R := \R \cup \{\gltsred Y{\tsymc{\sharp_1}}{\wordb{\TT}\bot}, \gltsred Y{\sharp_2}{\emptyword}\}
+    \\
+    \word'(\quant\kind\TT) &= \Ynt, \R := \R \cup \{\gltsred Y{\tsymc{\lquant\kind}}{\wordb{\TT}\bot}
+%    , \gltsred Y{\lquant\kind_2}{\emptyword}
+    \}
+    \\
+    \word'(\Semi\ \TT) &= \Ynt, \R := \R \cup \{\gltsred Y{;_1}{\wordb{\TT}}\}
+    \\
+    \word'(\semit \TT \UT) &= \word(\TT)\word(\UT)
+    \\
+    \word'(\tdual{(\talpha\ \typec{T_1}\typec{\ldots}\typec{T_m})}) &= \Ynt, \R := \R \cup \{\gltsred Y{\Duall_1}{\wordb{\talpha\ \typec{T_1}\typec{\ldots}\typec{T_m}}}, \gltsred Y{\Duall_2}\emptyword\}
+  \end{align*}
+  $\Ynt$ is a fresh non-terminal symbol in all cases,\\ 
+  $\nsymc \epsilon$ is the empty word,\\
+  $\nsymc \bot$ is a non-terminal symbol with no productions.
+  \caption{Function word($\TT$).}
+  \label{fig:word}
+\end{figure}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "42-CR"
+%%% End:

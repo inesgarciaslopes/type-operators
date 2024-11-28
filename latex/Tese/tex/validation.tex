@@ -1,19 +1,94 @@
 \chapter{Validation}
 
-\section{Quickcheck}
+\todo{p. ligação}
+\todo{talk about testing structure}
 
-The current FreeST compiler features an algorithm for checking the bisimilarity
-of simple grammars, which we use for testing. The testing process takes a suite
-of randomly generated types---a small subset of FreeST's types, based on the
-syntax presented in fig:syntax-types---leveraging the Quickcheck
-library~ DBLP:conf/icfp/ClaessenH00 to ensure these types have specific
-properties. Formal proofs regarding decidability of type formation
-and equivalence can be found elsewhere DBLP:conf/esop/PocasCMV23.
-\section{Properties and testing}
 
-An arbitrary type generator is defined using the \lstinline{Arbitrary} typeclass, employing the \lstinline{frequency} function to generate type operators with specific probabilities. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \lstinline{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. For better statistics we ensure proper distribution of type constructors. The list of properties can be found in tab:properties. A total of 200.000 tests were made for each property.
+\begin{description}[wide=0pt, leftmargin=1.5em, itemsep=0.2em]
+  \item[test]
+    \begin{description}[wide=0pt, leftmargin=1.5em, itemsep=0.2em]
+      \item[\textgreater] QuickCheck
+      \item[\textgreater] UnitTests
+      \item[\textcolor{purple}{Spec.hs}]
+      \item[\textcolor{purple}{UnitSpec.hs}]
+    \end{description}
+\end{description}
+
+%The current FreeST compiler features an algorithm for checking the bisimilarity of simple grammars, which we use for testing. The testing process takes a suite of randomly generated types---a small subset of FreeST's types, based on the syntax presented in fig:syntax-typesleveraging the Quickcheck library~ DBLP:conf/icfp/ClaessenH00 to ensure these types have specific properties. Formal proofs regarding decidability of type formation and equivalence can be found elsewhere DBLP:conf/esop/PocasCMV23.
+
+\section{Unit Testing}
+\todo{sub-section: on how to compile/run :units}
+
+\section{Property Testing}
+
+An arbitrary type generator is defined using the \lstinline{Arbitrary} typeclass, employing the \lstinline{frequency} function to generate type operators with specific probabilities. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \lstinline{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. For better statistics we ensure proper distribution of type constructors. A total of 200.000 tests were made for each property.
 
 Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3.
+
+
+\begin{lstlisting}
+    prop_distribution :: Type -> Type  -> Property
+\end{lstlisting}
+
+\begin{lstlisting}
+    prop_rename :: Type -> Bool
+\end{lstlisting}
+
+The number of nodes in $\TT$ is the same as the number of nodes in \lstinline{rename} of $\TT$. 
+
+\todo{example of renaming an abstraction (tree).}
+
+\begin{lstlisting}
+    prop_rename_idempotent :: Type -> Property
+\end{lstlisting}
+
+Rename is an idempotent function, that is, if we rename a renamed type $\TT$, it is equal to applying the function rename once. 
+
+\todo{show example in practice.}
+
+\begin{lstlisting}
+    prop_reduction_preserves_renaming :: Type -> Property
+\end{lstlisting}
+
+This property verifies that if a type $\TT$ is equal to its' rename and $\TT$ reduces to another type $\typec{U}$, then the rename of $\typec{U}$ is the same as $\typec{U}$. 
+
+\todo{example.}
+
+\begin{lstlisting}
+    prop_renaming_preserves_alpha_congruence :: Type -> Type -> Property
+\end{lstlisting}
+
+This means that if the rename of type $\TT$ and $\typec{U}$ is the same, then $\TT$ and $\typec{U}$ are alpha-congruent.
+This mean that they differ only in the names of bound-variables. 
+
+\todo{example.} The opposite is also true: if $\TT$ and $\typec{U}$ are alpha-congruent, then there renames must be equal.
+
+\begin{lstlisting}
+    prop_whnf_does_not_reduce :: Type -> Property
+\end{lstlisting}
+
+This property checks the theorem []: If $\TT$ is in weak head normal form then it does not reduce further. 
+
+\todo{example.} The opposite states that is $\TT$ reduces, then it has not reach a weak head normal form.
+
+\begin{lstlisting}
+    prop_preservation :: Type -> Property
+\end{lstlisting}
+
+
+
+\begin{lstlisting}
+    prop_bisimilar :: Type -> Property
+\end{lstlisting}
+
+\todo{explain + example}
+
+\todo{update properties in table 5.1}
+
+
+\todo{how to run :test}
+\todo{show results from table 5.1}
+\input{Tese/tex/quickcheck}
 
 While randomly generated types facilitate a robust analysis, certain properties,
 such as the type-formation preservation property and bisimilarity of simple
@@ -25,6 +100,7 @@ $\istype{} T \kind$ and $\betared{T}{U}$, and Quickcheck ends up discarding
 2.000.000 tests for the last two properties. To achieve better results, more
 complex generators, tailored to specific properties, would be required. Such
 generators are often challenging to design and implement.
+
 
 
 \LIMPA

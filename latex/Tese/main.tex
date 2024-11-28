@@ -14,16 +14,19 @@
 \usepackage{xcolor}
 \usepackage{xspace}
 \usepackage{amsmath,amsfonts,amssymb}
+\usepackage{enumitem}
 
 
 \usepackage[utf8]{inputenc}
 % Quem tiver problemas com os acentos, trocar utf8 por latin1
 
-\usepackage[portuguese,english]{babel}
+\usepackage[english]{babel}
 \usepackage{times}
 
+\usepackage{mathpartir}
 \usepackage{graphicx}
-
+\usepackage{tikz}
+\usetikzlibrary{matrix, arrows}
 % Indice remissivo
 \usepackage{makeidx}
 \makeindex
@@ -66,7 +69,7 @@
 
 %Orientador e CoOrientador *sem* titulos (e.g. Prof. Doutor)
 \newcommand{\Orientador}{Vasco T. Vasconcelos}
-\newcommand{\PCoOrientador}{Diana Costa} %se nao se aplicar, nao importa o que aqui esteja
+\newcommand{\PCoOrientador}{Diana Costa}
 
 \newcommand{\PEIAnoLectivo}{2023/2024}
 \newcommand{\PEIAno}{\Large{2024}}

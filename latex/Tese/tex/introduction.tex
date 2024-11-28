@@ -34,7 +34,16 @@ Se houver fundamentação adequada, os relatórios de trabalho poderão ser escr
 
 Tendo sido aceite a escrita em Inglês do relatório de trabalho, este deverá conter um resumo adicional em Português de, pelo menos, 1200 palavras.
 
-\section{Background and Motivation}
+\section{Motivation}
+
+Traditional session types have proven particularly useful in the specification of protocols of diﬀerent natures, provided that they
+can be characterized by regular languages. Traditional session types are restricted to tail recursion—this specificity is not just a
+feature, it is rather a limitation: there are numerous protocols whose traces cannot be characterized by regular languages. Context-
+free session types liberate session types from tail recursion [44]. In the context-free world, clients can send integer trees on channels
+in a type-safe way, without requiring the exchange of additional channels:
+The increase in the expressivity of types comes at a price: checking
+type equivalence becomes a challenge. Thiemann and Vasconcelos proved that type equivalence is decidable for context-free session
+types[44], but a practical type equivalence algorithm was only provided a few years later by Almeida et al. [4].
 
 \section{Objectives}
 

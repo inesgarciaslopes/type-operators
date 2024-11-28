@@ -1,0 +1,24 @@
+% !TeX root = main.tex
+
+\begin{figure}[!t]
+  \declrel{Type formation}{$\istype \Delta T \kind$}
+  \begin{mathpar}
+    \infer[\kconst]{}{\istype \Delta \iota {\kind_\iota}}
+    \quad
+    \infer[\kvar]{\tbind\alpha\kind\in{\Delta}}
+    {\istype \Delta \alpha \kind}
+    \quad
+    \infer[\ktabs]{\istype {\Delta+\tbind\alpha \kind} {T} {\kind'}}
+    {\istype \Delta {\tabs\alpha \kind \TT} {\karrow \kind {\kind'}}}
+    \quad
+    \inferrule[\ktapp]{\istype \Delta {T} {\karrow \kind {\kind'}} \;\;\, \istype \Delta U \kind \;\;\, \isnormalised {\tapp TU}}
+    {\istype \Delta {\tapp T U} {\kind'}}
+  \end{mathpar}
+  \caption{Type formation.}
+  \label{fig:type-formation}
+\end{figure}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:

@@ -1,0 +1,33 @@
+\renewcommand{\arraystretch}{1.2}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{@{\hskip 0.1in}p{0.25\linewidth}@{\hskip 0.1in} @{\hskip 0.1in}p{0.05\linewidth}@{\hskip 0.1in} @{\hskip 0.1in}p{0.46\linewidth}}
+    % \begin{tabular}{| @{\hskip 0.1in}p{0.3\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.10\linewidth}@{\hskip 0.1in} | @{\hskip 0.1in}p{0.45\linewidth}|}
+        \hline
+        \textbf{Module name} & \RaggedLeft \textbf{LoC} & \textbf{Description}\\
+        \hline
+        Syntax & \RaggedLeft 118 & Defines the \lstinline|Type| data constructor as well as the higher-order kind system, based on \cref*{fig:syntax-types}.\\
+        % \hline
+        Substitution & \RaggedLeft 50 & Implements capture-avoiding substitution on types.\\
+        % \hline
+        Normalisation & \RaggedLeft 80 & Reduces types to weak head normal form, i.e., until no further reduction is possible.\\
+        % \hline
+        TypeFormation & \RaggedLeft 58 & Implements the type checking algorithm.\\
+        % \hline
+        Rename & \RaggedLeft 30 & Renames bound variables in a type by the smallest possible variable available, i.e., the first which is not free in the type.\\
+        % \hline
+        WeakHeadNormalForm & \RaggedLeft 86 & Checks whether a type is in weak head normal form.\\
+        % \hline
+        Grammar & \RaggedLeft 74 & Defines the \lstinline|Grammar| data constructor, based on the definition found in \cref*{sec:deciding-type-equivalence}.\\
+        % \hline
+        TypeToGrammar & \RaggedLeft 179 & Implements the function $\word$, that converts types into simple grammars.\\
+        \hline
+    \end{tabular}
+    \caption{Haskell modules.}
+    \label{tab:modules}
+\end{table}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "42-CR"
+%%% End:

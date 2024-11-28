@@ -1,8 +1,110 @@
-\chapter{Implementation in FreeST}
+\chapter{Type Operators in FreeST: Implementation}
 
-          Evidentemente, o fenômeno da Internet ainda não demonstrou convincentemente como vai participar na mudança das múltiplas direções do ponto de transcendência do sentido enunciativo. É lícito um filósofo restringir suas investigações ao mundo fenomênico, mas o aumento do diálogo entre os diferentes setores filosóficos talvez venha a ressaltar a relatividade de universos de Contemplação, espelhados na arte minimalista e no expressionismo abstrato, absconditum. Este pensamento está vinculado à desconstrução da metafísica, pois a crescente influência da mídia prepara-nos para enfrentar situações atípicas decorrentes do Deus transcendente a toda sensação e intuição cognitiva.
+\input{./tex/modules.tex}
 
-          Correlativamente, por meio de suas teoria das pulsões, Freud mostra que a necessidade de renovação conceitual maximiza as possibilidades por conta das três instâncias de oposição centrais. Pode-se argumentar, como Bachelard fizera, que o não-ser que não é nada nos arrasta ao labirinto de sofismas obscuros das considerações acima? Nada se pode dizer, pois sobre o que não se pode falar, deve-se calar. Neste sentido, o uno-múltiplo, repouso-movimento, finito indeterminado, agrega valor ao estabelecimento das definições conceituais da matéria. Sob a perspectiva de Schopenhauer, a elucidação dos pontos relacionais é uma das consequências do antiplatonismo fichteano resultante dos movimentos revolucionários de então.
+\todo{either table 4.1 here as an overview/introduction or at the end as a summary.}
 
-          Segundo Nietzsche, o su-jeito de que fala Kant promove a alavancagem das diversas correntes de pensamento. 
+\section{Types}
+
+\begin{lstlisting}
+module Syntax (Type(..), LabelMap, Polarity(..), Sort(..), View(..), Variable, Kind(..), BaseKind(..), dual) where
+\end{lstlisting}
+
+A \lstinline{LabelMap} consists on a map where the keys are Variables, i.e integers, and the values are Types.
+
+A \lstinline{Polarity} defines whether a type has an output ($\OUTn$) functionality or input ($\INn$). 
+
+A \lstinline{View} defines whether a choice is considered to be internal () or external ().
+
+A \lstinline{Sort} defines whether a type is a record or a variant.
+
+A \lstinline{BaseKind} can be either a session kind or a functional kind. 
+
+The datatype \lstinline{Kind} tells us a kind can be a proper-kind, i.e a basekind, or constructed by an arrow, $k -> k$.
+
+\todo{define used haskell syntax carefully}
+
+\section{Reduction and Weak Head Normal Form}
+
+\begin{lstlisting}
+module WeakHeadNormalForm (isVar, head, isConstant, args, iswhnf) where
+\end{lstlisting}
+
+\begin{lstlisting}
+    iswhnf :: Type -> Bool
+\end{lstlisting}
+
+\lstinline{iswhnf} takes a type and returns if it is in weak head normal form, according to the rules in fig.[]. This function depends on the functions isVar, isConstant, head, neck and depth, that we export with the module, as well as functions that verifiy the pre-conditions of each rule present in fig. [].
+
+\begin{lstlisting}
+module Normalisation (norm, weaknorm, red) where
+\end{lstlisting}
+
+\begin{lstlisting}
+    norm :: Type -> Bool
+    weaknorm :: MuSet -> Type -> Maybe Type
+\end{lstlisting}
+
+\lstinline{norm} returns true if a type normalises to a weak head normal form, otherwise returns false.
+
+\lstinline{weaknorm} takes two arguments, a set (containing only mu types) and a type, returns the monadic Maybe of a type---Nothing if the type does not reduce to a weak head normal form, Just if the type reduces.
+
+\todo{probably take this code out but explain carefully each step.}
+\begin{lstlisting}
+weaknorm :: MuSet -> Type -> Maybe Type
+weaknorm visited t = 
+  case reduceBSD t of
+    Just t' -> weaknorm visited t'
+    Nothing -> case t of
+      (App (Rec _) _) -> weaknorm' visited t
+      (App (App Semi u@(App (Rec _) _)) _) -> weaknorm' visited u
+      (App Dual u@(App (Rec _) _)) -> weaknorm' visited u
+      (App (App Semi (App Dual u@(App (Rec _) _))) _) -> weaknorm' visited u
+      _ -> Just t
+  where
+    weaknorm' s t
+      | t `Set.member` s = Nothing -- been here before
+      | otherwise = 
+        case reduceMu t of
+          Just t' -> weaknorm (Set.insert t s) t'
+          Nothing -> Just t
+\end{lstlisting}
+
+\begin{lstlisting}
+module Rename (rename) where
+\end{lstlisting}
+
+\todo{talk about example that changed rename. }
+\begin{lstlisting}
+module Substitution (substitution, freeVars) where
+
+\end{lstlisting}
+\section{Type Formation}
+
+\begin{lstlisting}
+module TypeFormation (synthetise, preSynthetise -- tests only) where
+
+\end{lstlisting}
+
+\begin{lstlisting}
+    synthetise :: KindingCtx -> Type -> Maybe Kind
+\end{lstlisting}
+
+synthetise takes a kinding context (a map Variable-Kind) a type and returns if the type is well-formed. It consists on two steps: first we check if the type is pre-kinded, where we invoce function \lstinline{preSynthetise}; then we check if T normalises. 
+
+\todo{take figure where the rules are written and overlay in a darker grey which part represents each phase of synthetising a type.}
+\todo{Another take would be do to a diagram: Is T a type? }
+
+\subsection{Decidability of type formation}
+\subsection{Restrictions to Recursion}
+\todo{we keep a set of visited mu types, so we know when to terminate the algorithm.}
+
+\section{Type equivalence + Decidability of type equivalence}
+\begin{lstlisting}
+module Grammar ( Grammar(..), Word, Label, Productions, Transitions) where
+\end{lstlisting}
+
+\begin{lstlisting}
+module TypeToGrammar (word, convertToGrammar) where
+\end{lstlisting}
 \LIMPA
