@@ -33,7 +33,7 @@
 \section{Adding Context-free Session Types}
 \section{Adding Type Operators}
 
-\input{Tese/tex/kinds-types}
+\input{./tex/kinds-types.tex}
 
 In programming languages, terms are categorized by types, which in turn may be categorized by kinds. In our system, a \emph{kind} $\kind$ is either a base kind $\kast$---which is either a session or a functional kind, $\skind$ or $\tkind$, respectively---or a higher-order kind  $\karrow \kind \kindp$. A \emph{proper type} refers to a type that has a base kind. In contrast, \emph{type operators} act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. This is the core of our work. Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order kinds.
 
@@ -41,7 +41,7 @@ A type is either a type constructor $\tiota$, a type variable $\talpha$, an abst
 
 
 \section{Reduction and Weak Head Normal Form}
-\input{Tese/tex/type-reduction}
+\input{./tex/type-reduction.tex}
 
 \todo{paragrafo de ligação.}
 Not all types are of interest---for example $\tapp{\Dual}{\forallt{\skind}{\tabs{\alpha}{\skind}{\alpha}}}$ since the dual operator makes no sense being applied to a functional type. Before we can discuss type formation, we must define the weak head normal form of a type; we do so by defining a system of reduction rules in. This system is that of Poças et al. made confluent by adding the proviso that $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \rseqtwo and \rdctx. \emph{Confluence} states that, if there are two distinct reductions for a given type, $\afunction{T}{U}$ and $\afunction{T}{V}$, then both paths will eventually converge into the same final reduced type $\typec{W}$. Our variant features a single reduction path, thus confluence immediately follows.
@@ -68,7 +68,7 @@ The rules for type formation in \cref{fig:type-formation} involve determining if
 Poças et al.~\cite{DBLP:conf/esop/PocasCMV23} propose a two-step solution to this problem.
 The first stage is the introduction of the concept of \emph{pre-kinding}. We denote this as $\prekind \Delta T \kind$, that is, $\typec{T}$ is pre-kinded with kind $\kind$ under the kinding context $\Delta$. The rules for pre-kinding are in \cref{fig:pre-kinding}. They differ from the rules for type formation in that, in rule \pktapp, there is no verification of the normalisation of $\TT\UT$. Pre-kinding excludes some (but not all) types that do not normalise, as is the case of $\typec{(\tlambda{\alpha}{\kind}{\alpha \alpha})(\tlambda{\alpha}{\kind}{\alpha \alpha})}$ in \cref{fig:ex-pre-kinding}.
 
-\input{Tese/tex/pre-kinding}
+\input{./tex/pre-kinding.tex}
 
 \begin{figure}[t]
 	\begin{equation*}

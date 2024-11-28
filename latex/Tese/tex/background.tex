@@ -377,8 +377,7 @@ In contrast, Haskell chooses to offer overloading of its' $+$ operator through t
 
 Scala’s implicits notion have a similar function to haskell's type classes, where the compiler ensures the correctness of these operations based on resolving these implicit types. %The code provided below is the equivalent type class \lstinline{Eq} implemented in Scala: \todo{scala code.}
 
-\todo{talk also about oCaml and Java.}
-
+\todo{introduce ocaml}
 A list is an ordered sequence of elements. 
 \begin{lstlisting}
     # [1; 2; 3];;
@@ -418,7 +417,7 @@ What is the type of function \lstinline{length}? How does it work for both an \l
 
 \lstinline{length} takes a list of type \lstinline{'a list} where the variable \lstinline{a} can be instantiated with anything. Then, in the code, the pattern \lstinline{ _ :: t} discards the head of the list as its' type is not relevant to the implementation of the function. This is a simple example of a polymorphic function.
 
-We might wish to apply a function to each element in a list, yielding a new one. We shall write a function map which is given another function as its argument - such a function is called "higher-order":
+We might wish to apply a function to each element in a list, yielding a new one.
 
 \begin{lstlisting}
     # let rec map f l =
@@ -428,21 +427,14 @@ We might wish to apply a function to each element in a list, yielding a new one.
     val map : ('a -> 'b) -> 'a list -> 'b list = <fun>
 \end{lstlisting}
 
-Notice the type of the function f in parentheses as part of the whole type. This map function, given a function of type 'a -> 'b and a list of 'as, will build a list of 'b's. Sometimes 'a and 'b might be the same type, of course. Here are two examples showing the map function in use:
+This map function, given a function of type $'a -> 'b$ and a list of $'a$, will build a list of $'b$. This is an example of a higher-order function. 
 
-\begin{lstlisting}
-    # map (fun x -> x * 2) [1; 2; 3];;
-    - : int list = [2; 4; 6]
-    # map total [[1; 2]; [3; 4]; [5; 6]];;
-    - : int list = [3; 7; 11]
-\end{lstlisting}
+%\begin{lstlisting}# map (fun x -> x * 2) [1; 2; 3];;- : int list = [2; 4; 6]\end{lstlisting}
 
-\todo{list has a standard module in ocaml with several useful functions.}
-\todo{difference between ML modules and haskell type classes -> paper.}
+%\todo{list has a standard module in ocaml with several useful functions.}
+\todo{p. context}
 
-Type classes in Haskell and modules in OCaml represent two distinct approaches to program abstraction and component organization. 
-
-Type classes in Haskell primarily serve \textit{ad-hoc polymorphism}. They enable you to define behavior that can work across multiple types while maintaining type safety. 
+Type classes in Haskell and modules in OCaml represent two distinct approaches to program abstraction and component organization. Type classes in Haskell primarily serve \textit{ad-hoc polymorphism}. They enable you to define behavior that can work across multiple types while maintaining type safety. 
 In contrast, OCaml's module system focuses on explicit program structuring and strong data abstraction. 
 
 \begin{lstlisting}
@@ -464,6 +456,7 @@ module IntShow : SHOW with type t = int = struct
     let show = string_of_int
 end
 \end{lstlisting}
+\todo{caption: Type classes Vs. Modules: Show}
 
 The key differences between the two approaches reside in instance resolution and multiple implementations. While Haskell automatically resolves instances based on types (since type classes are restricted to a singleton instance), oCaml requires explicit module application because it supports multiple possible implementations.
 
@@ -475,17 +468,22 @@ The key differences between the two approaches reside in instance resolution and
 
 The trade-off between these approaches focuses on either convenience or explicit control, with each system optimizing for different use cases and programming styles. Nevertheless, an harmonious approach combining type classes and modules was provided by Robert Harper et al. \todo{ref: Modular Type Classes}.
 
-\todo{relation between type classes and generics in Java.}
+\todo{p. context}
+
+Type classes went on to influence how Generics work in Java. 
+\begin{lstlisting}
+public static <T extends Comparable<T>> T min (T x, T y) {
+    if (x.compare(y) < 0) 
+        x; 
+    else 
+        y; }
+
+min :: Ord a => a -> a -> a
+min x y  = if x < y then x else y       
+\end{lstlisting}
+If $\TT$ extends the interface \lstinline|Comparable<T>|, which is parameterized over the same type variable, is equivalent to say a type variable belongs to a type class in haskell.
+
+Function min is only valid if $a$ belongs to type class $Ord$, because the operation $<$ is only defined for types of $Ord$ instance.
 \todo{show phil wadler graphic about type classes constraints and interfaces.}
-
-%Haskell's type classes primarily serve ad hoc polymorphism, allowing functions to work across multiple types through implicit instance resolution and automatic constraint inference. This approach emphasizes convenience and concise code through its automatic instance generation and type-directed dispatch, though it comes with the limitation of allowing only one instance per type. The implicit nature of type classes makes them particularly well-suited for generic programming patterns where behavior needs to vary by type, but this same implicitness can make program flow harder to follow in more complex scenarios.
-
-%In contrast, OCaml's module system focuses on explicit program structuring and strong data abstraction. Modules use signatures to specify interfaces, functors for abstraction over module implementations, and structures to provide concrete implementations. This explicit approach requires more verbose code but offers greater flexibility in terms of multiple implementations, fine-grained control over abstraction boundaries, and clearer program structure. The module system excels at organizing large-scale programs and maintaining clear boundaries between components, though it lacks the convenient implicit resolution that makes Haskell's type classes so effective for ad hoc polymorphism. The trade-off between these approaches reflects a fundamental tension in programming language design between implicit convenience and explicit control, with each system optimizing for different use cases and programming styles.
-
-%\todo{Benefits of higher-order systems and type operators.}
-
-%\todo{mention the higher-order version of the sytems are as expressive as pushdown automata.}
-
-%\todo{mention limitation of myu kind possibly}
 
 \LIMPA
