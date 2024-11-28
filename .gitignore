@@ -1,7 +1,0 @@
-.stack-work/
-.vscode/
-*.cabal
-dist
-dist-*
-.DS_Store
-*~
