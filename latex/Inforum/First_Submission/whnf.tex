@@ -1,0 +1,25 @@
+% !TeX root = samplepaper.tex
+\begin{figure}
+	\declrel{Weak head normal form }{$\iswhnf T$}
+	\begin{mathpar}
+  \inferrule[w-const0]{}{\iswhnf{\tiota}}
+  \and
+  \inferrule*[lab=w-const1]{\tiota \neq \Semi\ , \tmu{\kind}\ ,\Dual \\ m \geq 1  }{\iswhnf{\tapp{\tiota}{T_1...T_m}}}
+  \and
+  \inferrule[w-seq1]{}{\iswhnf{\tapp{\Semi}{T}}}
+  \and
+  \inferrule*[lab=w-seq2]{\iswhnf{T_1} \\ \typec{T_1} \neq \seqcomp{U}{V}\ , \Skip \\ m \geq 2 }{\iswhnf{\tapp{\Semi}{T_1...T_m}}}
+  \and
+  \inferrule*[lab=w-var]{\mathtt\mathit m \geq 0  }{\iswhnf{\tapp{\talpha}{T_1...T_m}}}
+  \and 
+  \inferrule[w-abs]{}{\iswhnf{\tabs{\talpha}{\kind}{\typec{T}}}}
+  \and
+  \inferrule*[lab=w-dual]{\iswhnf{T_1} \\ \mathtt\mathit m \geq 2 \\ \typec{T_1} \neq \quant\kind, \Skip, \Wait, \Close, \Sharp\typec{U},\seqcomp{U}{V}, \typec{\odot}{\trecord{l_i}{U_i}}, \tappdual{(\tapp{\talpha}{U_1...U_m})}}{\iswhnf{\tapp{\Dual}{T_1...T_m}}}
+	\end{mathpar}
+	\caption{Weak head normal form.}
+    \label{fig:whnf}
+\end{figure}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "samplepaper"
+%%% End:

@@ -1,0 +1,22 @@
+% !TeX root = samplepaper.tex
+\begin{figure}[t]
+  \declrel{Type renaming}{$\rename_S(\TT)$}
+  \begin{align*}
+    \rename_S(\typec\iota)&=\typec\iota
+    \\
+    \rename_S(\typec\alpha)&=\typec\alpha
+    \\
+    \rename_S(\tabs{\alpha}{\kind}{T}) &=
+    \tabs{\upsilon}{\kind}{{\blk{\rename_S(}}T\subs\upsilon\alpha})
+    \quad\text{where } \typec{\upsilon} = \first(S\cup\fv(\tabs{\talpha}{\kind}{T}))
+    \\
+    \rename_S(\tapp{T}{U}) &= \rename_{S\cup\fv(\UT)}(\TT)\rename_S(\UT)
+  \end{align*}
+  \caption{Type renaming.}
+  \label{fig:rename}
+\end{figure}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "samplepaper"
+%%% End:

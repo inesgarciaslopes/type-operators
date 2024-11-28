@@ -1,0 +1,24 @@
+\begin{figure}
+    %\centering
+    \begin{center}
+    \begin{tikzpicture}
+    % Define matrix
+        \matrix (m) [matrix of math nodes, row sep=3em, column sep=3em]
+        {
+            \tabs{\talpha}{\kind}{\typec{T}} & \tabs{\tbeta}{\kind}{\typec{U}} \\
+            \tabs{\typec{v_1}}{\kind}{\typec{T}\subs{v_1}{\talpha}} & \tabs{\typec{v_1}}{\kind}{\typec{U}\subs{v_1}{\tbeta}} \\
+            %\typec{v_1} & \typec{v_1}\\
+        };
+        % Draw arrows
+        \draw[->] (m-1-1) -- (m-2-1) node[midway, left] {$\rename_S(\tabs{\alpha}{\kind}{T})$};
+        \draw[->] (m-1-2) -- (m-2-2) node[midway, right] {$\rename_S(\tabs{\alpha}{\kind}{T})$};
+        %\draw[->] (m-2-1) -- (m-3-1) node[midway, above] {};
+        %\draw[->] (m-2-2) -- (m-3-2) node[midway, above] {};
+    \end{tikzpicture}
+\end{center}
+    \caption{Checking if two type abstractions are equivalent.}
+    \label{fig:ex-renaming}
+\end{figure}
+
+
+

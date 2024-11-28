@@ -1,0 +1,219 @@
+%
+% Modelo para relatório da disciplina de Projecto de Engenharia Informatica
+% do MEI.
+%
+% Incorpora elementos impostos pelo Regulamento de Estudos Pos-Graduados da
+% Universidade de Lisboa (Deliberacao 1506/2006 - Diario da República, 2.a série 
+% - n.o 209 - 30 de Outubro de 2006)
+%
+\documentclass[11pt,openright,twoside,runningheads,dvipsnames]{report}
+
+\usepackage{stmaryrd} % \fatsemi among others
+\usepackage{listings}
+\lstset{language=Haskell}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{amsmath,amsfonts,amssymb}
+
+
+\usepackage[utf8]{inputenc}
+% Quem tiver problemas com os acentos, trocar utf8 por latin1
+
+\usepackage[portuguese,english]{babel}
+\usepackage{times}
+
+\usepackage{graphicx}
+
+% Indice remissivo
+\usepackage{makeidx}
+\makeindex
+
+% Glossario
+\usepackage{glossaries}
+\makeglossaries
+
+
+% Package para cabecalhos
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\fancyhf{} %
+\lhead{\nouppercase {\leftmark}} %
+\rhead{\nouppercase {\bf \thepage}}
+\renewcommand{\headrulewidth}{0.1pt}
+
+% Comando para inserir pagina em branco (inserida na numeracao, mas sem
+% numero impresso) para quando e' preciso obrigar um capitulo a comecar
+% do lado direito (pagina impar)
+\newcommand{\LIMPA}{
+\newpage
+\mbox{}
+\thispagestyle{empty}
+}
+
+% Igual, mas insere pagina com numero impresso (normalmente nao se usa)
+\newcommand{\LIMPAC}{
+\newpage
+\mbox{}
+\thispagestyle{plain}
+}
+
+%
+% ALTERAR AQUI AS INFORMACOES RELATIVAS AO PROJECTO
+%
+\newcommand{\TITULO}{INTEGRATING TYPE OPERATORS INTO THE FREEST PROGRAMMING LANGUAGE}
+\newcommand{\Autor}{Paula Inês Garcias Lopes}
+
+%Orientador e CoOrientador *sem* titulos (e.g. Prof. Doutor)
+\newcommand{\Orientador}{Vasco T. Vasconcelos}
+\newcommand{\PCoOrientador}{Diana Costa} %se nao se aplicar, nao importa o que aqui esteja
+
+\newcommand{\PEIAnoLectivo}{2023/2024}
+\newcommand{\PEIAno}{\Large{2024}}
+
+% Comentar/descomentar conforme conveniente
+\newcommand{\PEITIPO}{DISSERTA\c{C}\~{A}O }
+%\newcommand{\PEITIPO}{TRABALHO DE PROJETO }
+
+% Comentar/descomentar conforme conveniente
+%\newcommand{\PEIIdiomaTese}{\selectlanguage{portuguese}}
+\newcommand{\PEIIdiomaTese}{\selectlanguage{english}}
+
+% Comentar/descomentar conforme conveniente
+%\newcommand{\MDesignacao}{Designação do Mestrado}
+\newcommand{\MDesignacao}{Mestrado em Engenharia Informática}
+%\newcommand{\MDesignacao}{Mestrado em Informática}
+%\newcommand{\MDesignacao}{Mestrado em Segurança Informática}
+%\newcommand{\MDesignacao}{Mestrado em Ciências de Dados}
+
+
+% Comentar/descomentar conforme conveniente
+\newcommand{\MEspecializacao}{Designação da Especialização / Perfil, se aplicável}
+%\newcommand{\MEspecializacao}{Sistemas de Informação}
+%\newcommand{\MEspecializacao}{Interacção e Conhecimento}
+%\newcommand{\MEspecializacao}{Engenharia de Software }
+
+\usepackage{ifpdf}
+\ifpdf
+\pdfinfo {
+	/Author (\Autor)
+	/Title (\TITULO)
+	/Subject (\MEspecializacao)
+	/Keywords ()
+	/CreationDate (D:20230825)
+}
+\fi
+
+\usepackage[dvips]{geometry}
+\geometry{a4paper=true,portrait=true,left=3cm,right=3cm,top=2.5cm,bottom=3.5cm}
+
+\title{\PEITITULO}
+\author{\PEIAutor}
+%\date{\today}
+
+\usepackage[bookmarks,unicode,colorlinks=true]{hyperref}
+% \usepackage{hyperref}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+\usepackage[capitalize]{cleveref}
+\makeatletter
+   \def\@citecolor{blue}%
+   \def\@urlcolor{blue}%
+   \def\@linkcolor{blue}%
+\def\UrlFont{\rmfamily}
+\def\orcidID#1{\smash{\href{http://orcid.org/#1}{\protect\raisebox{-1.25pt}{\protect\includegraphics{orcid_color.eps}}}}}
+\makeatother
+
+\input{./tex/macros-2.tex}
+\input{./tex/macros-rulenames.tex}
+\begin{document}
+
+%Capa e pagina de rosto
+\include{./tex/capa}
+
+% Agradecimentos
+\include{./tex/agradecimentos}
+
+% Pagina do resumo em portugues
+\include{./tex/resumo_pt}
+
+% Pagina do resumo em ingles
+\include{./tex/resumo_ing}
+
+\pagestyle{plain}
+
+\PEIIdiomaTese
+
+% Indice
+\tableofcontents
+
+\LIMPA
+
+%Lista de figuras
+\listoffigures
+
+\addcontentsline {toc} {chapter} {Lista de Figuras}
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+
+%Lista de tabelas
+\listoftables
+
+\addcontentsline {toc} {chapter} {Lista de Tabelas}
+\newpage
+\thispagestyle{empty} \mbox{}
+\newpage
+
+% ----------------------------------------------------------------------
+% Inicio conteudo
+\pagestyle{fancy}
+\cleardoublepage
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+
+\include{./tex/introduction}
+\include{./tex/background}
+\include{./tex/system}
+\include{./tex/implementation}
+\include{./tex/validation}
+\include{./tex/conclusion}
+
+% Fim do conteudo
+% ----------------------------------------------------------------------
+
+% Glossario
+
+\LIMPA
+
+%
+% Para actualizar o glossario, e' preciso correr o script ./fazindice
+% e voltar a gerar o PDF
+%
+\include{./tex/acronimos}
+\renewcommand{\glossaryname}{Abreviaturas}
+%\setglossary{glodelim={\noexpand}}
+%\setglossary{glsnumformat=ignore}
+\printglossary
+\addcontentsline {toc} {chapter} {Abreviaturas}
+
+% Bibliografia
+
+\LIMPA
+\nocite{*}
+%\bibliographystyle{plain}
+%\bibliography{./tex/bibliografia}
+%\addcontentsline {toc} {chapter} {Bibliografia}
+
+% Indice remissivo
+\LIMPA
+\printindex
+\addcontentsline {toc} {chapter} {\'{I}ndice}
+
+% Inicio apendices
+\appendix
+
+\include{./tex/apendices}
+\end{document}
