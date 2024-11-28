@@ -1,0 +1,6 @@
+.stack-work/
+*.cabal
+dist
+dist-*
+.DS_Store
+*~
