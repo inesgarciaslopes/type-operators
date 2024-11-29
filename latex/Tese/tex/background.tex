@@ -46,11 +46,10 @@ One of the key advantages of session types is that they enable \textit{type-safe
 
 Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. For instance, the type $ \typec{\mu S} .\OUTn\TT.\typec{S}$, represents adding $\OUTn\TT$ to the tail $\OUTn\TT\OUTn\TT\OUTn\TT...\typec{\mu S}.\OUTn\TT.\typec{S}$ continuously until the session terminates. 
 
-\todo{talk about: "The equivalence of session types is the equivalence of binary trees." }
+\todo{How to connect to "The equivalence of session types is the equivalence of binary trees." }
 
 The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
 
-%\todo{mention fmu and fmu. can be represented by finite-state automata somewhere.}
 \section{Context-free Session Types}
 
 Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions. For instance, one might choose to write $S;!T$ or $!T;S;!T$ where recursion is found in the head or middle of the type.  
@@ -156,7 +155,6 @@ The answer relies on FreeST's kinding system. Kinds are pairs composed of a mult
     \end{tikzpicture}
 \end{center}
 
-%By default, types are of kind *T in FreeST (the most common type in programming).
 
 We use FreeST's syntax freely for the following example for serialisation of a binary tree.
 
@@ -191,97 +189,8 @@ treeSum c =
 
 Then we can implement a function that serializes a tree over a channel: this function takes a \lstinline{Tree} argument and a channel and either selects a Leaf, or selects a Node, sends an integer value and recursively writes the left and right subtree. If we want to sum all the values in a Tree, we can read from a TreeChannel and compute the sum of all the nodes in a Tree. 
 
-%We can see how context-free session types come into play in this example, as the first occurence of TreeChannel on the code would not be possible with only regular session types.
-
-\todo{more examples: mathserver, and the following example.}
-
-\begin{lstlisting}
-type Stream a = &{Done: Skip, 
-                  More: ?a; Stream a}
-\end{lstlisting}
-
-Type \lstinline|Stream| offers two choices: \lstinline|Done| which terminates the communication and \lstinline|More|, that reads a value \lstinline|?a| and iterates.
-This type can be used as a parameter for a fold channel type.
-
-\begin{lstlisting}
-type Fold a b =  ?(b -> a -> b); ?b;
-                    Stream a; !b; Close
-\end{lstlisting}
-\vspace{3mm}
-
-The type \lstinline|Fold| first receives a folding function followed by the starting element and the elements to fold. We denote the elements we want to fold as a stream, using type \lstinline|Stream|. Then, we send the output of the fold as \lstinline|!b| and close the channel.
-
-Let us look at a function that consumes a \lstinline|Fold| channel.
-
-\begin{lstlisting}
-foldServer : foralla.forallb. Fold a b -> Unit
-foldServer c = 
-    let (f,c) = receive c in 
-    let (e,c) = receive c in 
-    let (r,c) = foldS @a @b f e c in
-    c |> send r |> close
-               
-foldS : foralla.forallb. (b -> a -> b) -> b 
-            -> Stream a; !b; End 
-            -> (b, !b;Close)
-foldS f e (Done c) = (e,c)
-foldS f e (More c) = 
-    let (x, c) = receive c in
-    foldS @a @b f (f e x) c
-\end{lstlisting}
-\vspace{3mm}
-The first function, \lstinline|foldServer|, consumes the first two arguments of the type \lstinline|Fold| channel, that is, receives the folding function and the starting elements, sends the result and terminates the communication by closing the channel. \lstinline|foldS| consumes the stream of elements to fold until the branch \lstinline|Done| is selected. Then, we send the pair \lstinline|(e,c)|, \lstinline|e| being the output and \lstinline|c| the continuation channel.
-Note that \lstinline{x |> f} stands for the inverse function application, that is \lstinline{x |> f |> g = g (f x)}.
-
-Now we need a client for \lstinline|foldServer|. 
-
-\begin{lstlisting}
-type TreeC a = &{Leaf: Skip, 
-                 Node: TreeC a;?a;TreeC a}
-\end{lstlisting}
-\vspace{3mm}
-
-The type \lstinline|TreeC| offers two choices: \lstinline|Leaf| which terminates the communication and \lstinline|Node|, that receives the left side sub-tree, the root element of that node as \lstinline|?a| and the right side sub-tree.
-A channel that receives trees in a serialized format would have the following type \lstinline|TreeChannel a = TreeC a;Close|.
-
-Next we want to transform our trees from channels to streams. We can write a \lstinline|flatten| function that receives a \lstinline|TreeChannel| and a \lstinline|Stream| and outputs the unused part of the stream.
-
-\begin{lstlisting}
-flatten: foralla.forallc. TreeChannel a ->
-                (Dual Stream a);c -> c
-\end{lstlisting}
-\vspace{3mm}
-
-We can finally write our client. This client receives a \lstinline|TreeChannel|, the dual of a \lstinline|Fold| channel and outputs \textbf{\lstinline|True|}, if all the elements in the tree channel are non negative, or false otherwise.
-
-\begin{lstlisting}
-allPositive: TreeChannel Int ->
-             Dual (Fold Int Bool) 1-> Bool
-allPositive t c = 
-    let c = send (lambdax:Bool.lambday:Int. x 
-                    && y > 0 ) c in
-    let c = send True c in
-    let c = flatten @Int @?Bool;Wait t c in
-    let (x,c) = receive c in
-    wait c; x
-\end{lstlisting}
-\vspace{3mm}
-
-First the client sends the folding function, $\lambda x\colon \textbf{\lstinline|Bool|}.\lambda y\colon\textbf{\lstinline|Int|}.\\ 
-x\ \&\&\ y\textgreater 0 $, followed by the starting element  \textbf{\lstinline|True|}. Then we call function \lstinline|flatten|. Next, the client receives the output of the \lstinline|Fold| channel, consumes it and waits for the channel to close, $wait c;\ x$.
-Note that syntax $flatten\ @Int\ @?Bool;Wait$ stands for term-level type application. 
-
-We can then run both our server and client, like so:
-\begin{lstlisting}
-main : Bool
-main = 
-    let tr = forkWith @(TreeC Int) @() 
-                      produce in
-    let fw = forkWith @Dual (Fold Int Bool) 
-                      @() foldServer in
-    allPositive tr fw
-\end{lstlisting}
-
+\todo{p. to connect to next section}
+\todo{more examples: mathserver?}
 
 
 \section{Algorithms for Type Equivalence}
@@ -345,21 +254,38 @@ An higher-order version of this system, $\FMuSemiOmega$, would still be as expre
 
 \section{Type Operators}
 
-A type system is described as higher-order if it supports \textit{type-level functions}, i.e., if it acts upon types and produce even more complex types. Such systems are often realized through mechanisms such as type classes in Haskell or implicits in Scala.[ref]
+A type system is described as higher-order if it supports \textit{type-level functions}. Such systems are often realized through mechanisms such as type classes in Haskell or implicits in Scala.
 
-\lstinline{data List a = Empty | Cons a (List a)}
+Let's start by looking at kinds: what is a kind? Kinds are essentially the types of types. If we look at values such as $'Hi', True$, their associated types would be $String$ and $Bool$. Nowadays, most programming languages have a third universe that governs over types. We can look at them as types one level up: kinds. If we ask GHCi the kind signature of the types $String$ and $Bool$, we get:
 
-This Haskell code represents a \lstinline{List}---a type constructor that takes a type \lstinline{a} and returns a new type \lstinline{List a}---which represents a list of elements of type \lstinline{a}. Therefore, the type \lstinline{List} operates on types, that means, when type \lstinline{a} is replaced by another type (let us say $\Int$) the constructor returns \lstinline{List Int}. While type constructors take (concrete) types as inputs, higher-order kinded types operate one level further. They are type operators which take type constructors themselves as inputs. 
+\begin{lstlisting}
+    ghci> :k String
+    String :: *
+    ghci> :k Bool
+    Bool :: *
+\end{lstlisting}
 
-%\todo{show ghci :k []}
-%The kind of a type can be either a $\skind$, refering to a concrete type such as $\Int$ or $String$, a kind * -> * which represents a type constructor like a $List$ or the monad $Maybe$. 
+Kind $\kast$ is the kind of all \textit{proper types}. What about the kind of a complex type such as the Haskell data type \lstinline|Maybe|? This type is defined in Haskell as:
 
-%\todo{show ghci :k Maybe}\\
-A \textit{functor}, a type class where types can be mapped over, would be an example of a higher-order kinded type.
+\begin{lstlisting}
+data Maybe a = Nothing | Just a
+\end{lstlisting}
 
-\lstinline{class Functor f where fmap :: (a -> b) -> f a -> f b}
+\lstinline|Maybe| is a type operator, that given a type \lstinline|a| of kind $\kast$ creates another type \lstinline|Maybe a|---either Nothing or just the element \lstinline|a|---of kind $\kast$. Therefore, \lstinline|Maybe| has kind $\karrow{\kast}{\kast}$. When applied to $String$ and $Bool$, \lstinline|Maybe a| returns a concrete type \lstinline|Maybe String| and \lstinline|Maybe Bool| respectively.
 
-In this example, the method \lstinline{fmap} takes two arguments, a function and a functor type \lstinline{f a}, and returns a new type \lstinline{f b} from mapping the first argument to each value in \lstinline{f a}.
+\begin{lstlisting}
+    ghci> :k Maybe
+    Maybe :: * -> *
+    ghci> :k Maybe String
+    Maybe String :: *
+    ghci> :k Maybe Bool
+    Maybe Bool :: *
+\end{lstlisting}
+Another example of a type operator is the constructor \lstinline|List|. 
+
+\lstinline{data List a = Empty | Cons a (List a)}\\
+\lstinline{List} represents a type operator that takes a type \lstinline{a} and returns a new type \lstinline{List a}, which represents a list of elements of type \lstinline{a}. Therefore, the type \lstinline{List} operates on types, that means, when type \lstinline{a} is replaced by another type (let us say $\Int$) the constructor returns \lstinline{List Int}. The kind of \lstinline|List| is also $\karrow\kast\kast$. What about types that take type operators as arguments and return another type? A \textit{functor}, a type class where types can be mapped over, would be an example of a higher-order kinded type. The kind of a Functor is $\karrow{(\karrow\kast\kast)} {Constraint}$, which means Functor takes a type operator like \lstinline|Maybe| and returns a $constraint$ kind. %Constraint is the kind of class constraints – it covers anything that can appear on the left side of the arrow when defining a type.
+
 
 Type classes, in Haskell, enable polymorphism by defining a set of operations that can be implemented for various types. A \textit{type class} is a higher-order abstraction that operates on types rather than values.
 
@@ -367,72 +293,15 @@ Type classes, in Haskell, enable polymorphism by defining a set of operations th
 
 The example above represents \lstinline{Eq}, a type class that defines equality for any type \lstinline{a}. Type classes emerged from the need to deal with ad-hoc polymorphism, also known as overloading, providing a flexible structure to manage polymorphic operations. 
 \textit{Ad-hoc polymorphism} refers to the ability of a function or operator to behave differently based on the type of its arguments, that means a function can have different implementations based on the types of its parameters and the compiler will choose the correct implementation based on the types of arguments passed.
-While, \textit{Parametric polymorphism} refers to the ability of a function or a data type to be written generically so that it can handle values of any type, without type-specific implementations. For instance, in Haskell, the identity function can be written as, \lstinline{id :: a -> a id x = x}, where given any input \lstinline{x}, returns the same type. This function works generically as it does not matter which type \lstinline{x} has.
+While, \textit{Parametric polymorphism} refers to the ability of a function or a data type to be written generically so that it can handle values of any type, without type-specific implementations. For instance, in Haskell, the identity function can be written as, \lstinline{id x = x}, where given any input \lstinline{x}, returns the same type. This function works generically as it does not matter which type \lstinline{x} has. In fact, the type signature of the identity function is \lstinline|id :: a -> a|.
 
 %\todo{comparison between oCaml and Haskell.}
 
-A common ad-hoc polymorphism example would be addition through the $+$ operator. In oCaml, the $+$ operator does not allow overloading, that is, it only works to perform the addition of integer values. To perform addition of floating-point numbers a seperate operator must be used---the $+.$ operator.
+A common ad-hoc polymorphism example would be addition through the $+$ operator. In oCaml, the $+$ operator does not allow overloading, that is, it only works to perform the addition of integer values. To perform addition of floating-point numbers a seperate operator must be used---the $+.$ operator. In contrast, Haskell chooses to offer overloading of its' $+$ operator through the use of type classes. This operator works for both integer and floating-point addition or any type that is an instance of the $Num$ type class.
 
-In contrast, Haskell chooses to offer overloading of its' $+$ operator through the use of type classes. This operator works for both integer and floating-point addition or any type that is an instance of the $Num$ type class.
+%Scala’s implicits notion have a similar function to haskell's type classes, where the compiler ensures the correctness of these operations based on resolving these implicit types. %The code provided below is the equivalent type class \lstinline{Eq} implemented in Scala: \todo{scala code.}
 
-Scala’s implicits notion have a similar function to haskell's type classes, where the compiler ensures the correctness of these operations based on resolving these implicit types. %The code provided below is the equivalent type class \lstinline{Eq} implemented in Scala: \todo{scala code.}
-
-\todo{introduce ocaml}
-A list is an ordered sequence of elements. 
-\begin{lstlisting}
-    # [1; 2; 3];;
-    - : int list = [1; 2; 3]
-\end{lstlisting}
-This list has three elements, seperated by $(;)$ and its type is \lstinline{int list}.
-
-\begin{lstlisting}
-    # [];;
-    - : 'a list = []
-\end{lstlisting}
-Notice how the empty list has type \lstinline{'a list}? We don't know the actual type of the element \lstinline{a}, since the list is empty.
-
-Let's write a function that calculates the length of a list. Keeping in mind that this must work for any type of list. 
-
-\begin{lstlisting}
-    # let rec length l =
-        match l with
-        | [] -> 0
-        | _ :: t -> 1 + length t;;
-\end{lstlisting}
-
-Here's what happens when we run the function \lstinline{length} with the two lists from the previous example.
-
-\begin{lstlisting}
-    # length [1; 2; 3];;
-    - : int = 3
-    # length [[]];;
-    - : int = 1
-\end{lstlisting}
-
-What is the type of function \lstinline{length}? How does it work for both an \lstinline{int list} and \lstinline{'a list}?
-
-\begin{lstlisting}
-    val length : 'a list -> int = <fun>
-\end{lstlisting}
-
-\lstinline{length} takes a list of type \lstinline{'a list} where the variable \lstinline{a} can be instantiated with anything. Then, in the code, the pattern \lstinline{ _ :: t} discards the head of the list as its' type is not relevant to the implementation of the function. This is a simple example of a polymorphic function.
-
-We might wish to apply a function to each element in a list, yielding a new one.
-
-\begin{lstlisting}
-    # let rec map f l =
-        match l with
-        | [] -> []
-        | h :: t -> f h :: map f t;;
-    val map : ('a -> 'b) -> 'a list -> 'b list = <fun>
-\end{lstlisting}
-
-This map function, given a function of type $'a -> 'b$ and a list of $'a$, will build a list of $'b$. This is an example of a higher-order function. 
-
-%\begin{lstlisting}# map (fun x -> x * 2) [1; 2; 3];;- : int list = [2; 4; 6]\end{lstlisting}
-
-%\todo{list has a standard module in ocaml with several useful functions.}
-\todo{p. context}
+\todo{p. context + introduce ocaml}
 
 Type classes in Haskell and modules in OCaml represent two distinct approaches to program abstraction and component organization. Type classes in Haskell primarily serve \textit{ad-hoc polymorphism}. They enable you to define behavior that can work across multiple types while maintaining type safety. 
 In contrast, OCaml's module system focuses on explicit program structuring and strong data abstraction. 
@@ -442,9 +311,10 @@ class Show a where
     show :: a -> String
 
 instance Show Int where
-    show = Data.Text.pack . show
+    show = Prelude.show
 \end{lstlisting}
 
+The code above represents a type class \lstinline|Show| for a type \lstinline|a|, where the \lstinline|show| method converts a type \lstinline|a| into a String. The equivalent code in OCaml, would look like this:
 \begin{lstlisting}
 module type SHOW = sig
     type t
@@ -466,24 +336,32 @@ The key differences between the two approaches reside in instance resolution and
 \end{lstlisting}
 \todo{caption: Type classes Vs. Modules: instance resolution}
 
-The trade-off between these approaches focuses on either convenience or explicit control, with each system optimizing for different use cases and programming styles. Nevertheless, an harmonious approach combining type classes and modules was provided by Robert Harper et al. \todo{ref: Modular Type Classes}.
+The trade-off between these approaches focuses on either convenience or explicit control. Nevertheless, an harmonious approach combining type classes and modules was provided by Robert Harper et al. \todo{ref: Modular Type Classes}.
 
 \todo{p. context}
 
-Type classes went on to influence how Generics work in Java. 
+Type classes went on to influence how Generics work in Java. Generics are an interface or class that takes a number of type parameters, which are written within angle brackets, that must be declared when we create a new instance of the said class.
+
 \begin{lstlisting}
-public static <T extends Comparable<T>> T min (T x, T y) {
-    if (x.compare(y) < 0) 
-        x; 
-    else 
-        y; }
-
-min :: Ord a => a -> a -> a
-min x y  = if x < y then x else y       
+    List<String> words = new ArrayList<String>();
+    words.add('Hello ');
+    words.add('world!');
+    String s = words.get(0)+words.get(1);
+    assert s.equals('Hello world!');
 \end{lstlisting}
-If $\TT$ extends the interface \lstinline|Comparable<T>|, which is parameterized over the same type variable, is equivalent to say a type variable belongs to a type class in haskell.
 
-Function min is only valid if $a$ belongs to type class $Ord$, because the operation $<$ is only defined for types of $Ord$ instance.
-\todo{show phil wadler graphic about type classes constraints and interfaces.}
+This code declares a list of Strings called \lstinline|words|---an instance of \lstinline|ArrayList|---and adds two strings to the list. Then, we chek if the declared \lstinline|String s| is the same as the concatenation of the two strings in \lstinline|words|.
+We can see that \lstinline|ArrayList<E>| implements the interface \lstinline|List<E>| and we instantiate the type parameter \lstinline|E| with \lstinline|String|. Without Generics, we would ommit the type parameters and explicitly cast the type whenever needed. In this case, we need to know that the elements of this list are of type \lstinline|String| and cast when extracting the elements from the list, \lstinline|(String)words.get(0)|.
+\begin{lstlisting}
+    List words = new ArrayList();
+    words.add("Hello ");
+    words.add("world!");
+    String s = ((String)words.get(0))+((String)words.get(1)) 
+    assert s.equals("Hello world!");
+\end{lstlisting}
+
+\todo{this is possible because of type erasure.}
+
+\todo{show wadler's graphic about type classes constraints and interfaces. (maybe)}
 
 \LIMPA
