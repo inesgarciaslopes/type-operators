@@ -19,6 +19,9 @@
 \section{Unit Testing}
 \todo{sub-section: on how to compile/run :units}
 
+\todo{a regra do dual só estava definida para m >=2, logo muitos testes não eram apanhados.}
+\todo{motivação para testes unitários.}
+\todo{e nos records e labels? Não podiamos ter todas as labels a S ou só T. Logo descartamos a ideia das 4 setas.}
 \section{Property Testing}
 
 An arbitrary type generator is defined using the \lstinline{Arbitrary} typeclass, employing the \lstinline{frequency} function to generate type operators with specific probabilities. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \lstinline{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. For better statistics we ensure proper distribution of type constructors. A total of 200.000 tests were made for each property.

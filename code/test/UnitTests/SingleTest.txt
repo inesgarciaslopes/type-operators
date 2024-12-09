@@ -20,6 +20,23 @@ True
 
 \1:S. (\2:S. (\3:S. rec@S (\4:S. (1;4;2);3)))
 \1:S. (\1:S. (\1:S. rec@S (\2:S. (1;2;1);1)))
+False
+
+Dual (Dual 1)
+1
 True
+
+Dual (Dual (1 2))
+1 2
+True
+
+Dual (Dual (1 (2 3)))
+1 (2 3)
+True
+
+Dual (Dual ((1 2) 3))
+(1 2) 3
+True
+
 
 -- stack test :SystemFOmegaMuSemi-test-units --ta "-m SingleTest"

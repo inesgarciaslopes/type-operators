@@ -81,6 +81,9 @@ module Substitution (substitution, freeVars) where
 \end{lstlisting}
 \section{Type Formation}
 
+\todo{Os kinds de arrow têm de estar totalmente aplicados, se não, não conseguimos distinguir se temos S -> T, T -> T, S -> S. }
+\todo{Esta escolha foi feita porque não temos sub-typing.}
+
 \begin{lstlisting}
 module TypeFormation (synthetise, preSynthetise -- tests only) where
 

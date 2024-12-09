@@ -98,7 +98,9 @@ Type :: { Type }
   | TypeApp                     { $1 }
 
 TypeApp :: { Type }
-  : TypeApp TypePrimary { App $1 $2 }
+  : TypeApp TypePrimary { App $1 $2 } --quero () do lado esquerdo tb
+  | TypePrimary TypePrimary {App $1 $2}
+  | TypePrimary TypeApp {App $1 $2}
   | TypePrimary { $1 }
 
 Polarity :: { Polarity }

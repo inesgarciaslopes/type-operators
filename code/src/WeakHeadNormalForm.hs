@@ -74,7 +74,7 @@ preDual (End _) = True
 preDual (Message _ _) = True
 preDual (App (App Semi _) _) = True
 preDual (Choice _ _) = True
-preDual (App Dual (App (Var _) _)) = True
+preDual (App Dual t) | isVar (head t) = True
 preDual _ = False
 
 iswhnf :: Type -> Bool
