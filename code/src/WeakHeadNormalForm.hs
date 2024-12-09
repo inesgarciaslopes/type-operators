@@ -85,4 +85,4 @@ iswhnf t =
   || isConstant (head t) && not (preConst1 (head t)) && depth t >= 1 -- W-CONST1
   || isSemi (head t) && iswhnf (neck t) && not (preSeq2 (neck t)) && depth t >= 2 -- W-SEQ2
   || isVar (head t) && depth t >= 0  -- W-VAR
-  || isDual (head t) && iswhnf (neck t) && not (preDual (neck t)) && depth t >= 2 -- W-DUAL
+  || isDual (head t) && iswhnf (neck t) && not (preDual (neck t)) && depth t >= 0 -- W-DUAL

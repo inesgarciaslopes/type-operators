@@ -35,7 +35,7 @@
   
 		\infer[\rdctx]{\lambdared TU \\ \typec{T} \neq \typec{T_1;T_2}}{\lambdared{\tapp \Dual T}{\tapp \Dual U}}
 		
-		\infer[\rddvar]{}{\lambdared{\tapp {\Dual} {(\tapp \Dual (\alpha\ \TT_1\ldots \TT_m))}}{\alpha\ \TT_1\ldots \TT_m}}
+		\infer[\rddvar]{m \geq 0}{\lambdared{\tapp {\Dual} {(\tapp \Dual (\alpha\ \TT_1\ldots \TT_m))}}{\alpha\ \TT_1\ldots \TT_m}}
 %
 %        \infer[\rdexists]{}{\lambdared{\tapp {\Dual}{(\texists{\kind} \TT)}}{}}{\tforall{\kind} \TT}
 %

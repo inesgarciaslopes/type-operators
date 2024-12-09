@@ -28,47 +28,129 @@
 
 
 
-\section{System F}\label{sec:system}
-\section{Adding Recursion}
-\section{Adding Context-free Session Types}
+\section{From System F to $F^{\mu\\;}$}\label{sec:system}
 
+\todo{fix syntax above and incorporate in text below.}
+
+The regular recursive type
+$\tmuinfix{\alpha}{\skind}{\extchoice\records{\donel\colon\End,\morel\colon?\Int;\alpha}}$
+describes an integer \emph{stream}, offering a choice between $\donel$---where the channel will close due to type $\End$---and $\morel$---where an integer
+value will be received, followed by the rest of the stream.
+
+\todo{p. ligação}
+
+%
+% Example of higher-order channel
+% instead of streaming trees of integers, it
+% streams trees \emph{of channels} that send a boolean value:
+% $\tmuinfix{\alpha}{\skind}{\&\{\leafl: \Skip, \nodel:
+%   \alpha;?(\OUT\Bool\End);\alpha\}}\typec;\End$.
+%
+
+%A goal of this paper is the integration of higher-order context-free session types into system $\FMuOmega$. We want to be able to abstract the type that is received on a tree channel, which is now possible by writing $\tabs \alpha \tkind{\tmuinfix{\beta}{\skind}{\&\{\leafl: \Skip, \nodel: \beta;?\alpha;\beta\}}}\typec;\End$, where $\tkind$ is the kind of functional types.
+
+The next step of construction leads us to context-free session types, culminating in a type system denoted by $\FMuSemi$. We'll be needing a new construct for
+sequential composition $\semit TU$, and a new type $\Skip$, acting as the
+neutral element of sequential composition.%~\cite{DBLP:conf/icfp/ThiemannV16}. 
+%The message constructors are now unary ($\INn T$ and $\OUTn T$) rather than binary.
+Now we can write a type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ which describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, where no further communication is possible, while the latter allows continuing the communication. 
+We want to move beyond context-free session types, namely, we are interested in abstracting the type that is received on the tree channel, by writing $\tabs{\beta}{\tkind}{\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\beta\Semi\ \alpha}}\Semi\Wait}$. Abstractions introduce higher-order kinds which lead to the introduction of type operators into our language.
+
+%\begin{equation*}
+%\streamt = \tabs\alpha\tkind{(\tmuinfix{\beta}{\skind}{\extchoice\records{\donel\colon\End,\morel\colon\IN\alpha\beta}})}
+%\end{equation*}
+%where $\typec \alpha$ can be instantiated with the desired type; 
+%in particular, $\tapp \streamt \Int$ would be equivalent to the aforementioned $\intstreamt$.
 
 \section{Adding Type Operators}
 
 
 \input{./tex/kinds-types.tex}
 
+\todo{rewrite this part.}
 In programming languages, terms are categorized by types, which in turn may be categorized by kinds. In our system, a \emph{kind} $\kind$ is either a base kind $\kast$---which is either a session or a functional kind, $\skind$ or $\tkind$, respectively---or a higher-order kind  $\karrow \kind \kindp$. A \emph{proper type} refers to a type that has a base kind. In contrast, \emph{type operators} act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. This is the core of our work. Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order kinds.
 
-A type is either a type constructor $\tiota$, a type variable $\talpha$, an abstraction $\tabs{\talpha}{\kind}{\typec{T}}$ or an application $\tapp{\typec{T}}{\typec{T}}$. A detailed list of types and constructors is in. Observe that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\kind (\tlambda{\alpha}{\kind}{T})}$ and similarly for $\tquantinfix\alpha\kind \TT$.
 
+A type is either a type constructor $\tiota$, a type variable $\talpha$, an abstraction $\tabs{\talpha}{\kind}{\typec{T}}$ or an application $\tapp{\typec{T}}{\typec{T}}$. 
 
-\section{Reduction and Weak Head Normal Form}
+\todo{talk about each individual type operator.}
+
+Observe that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\kind (\tlambda{\alpha}{\kind}{T})}$ and similarly for $\tquantinfix\alpha\kind \TT$.
+
+\paragraph{Substitution.}
+Some type operators act over variables and with them comes the problem to decide, for example, if $\typec{\forall\alpha.T}$ and $\typec{\forall\alpha.T}$ are equivalent, $\typec{\forall\alpha.T}\simeq\typec{\forall\alpha.T}$.
+In order to solve this problem, we need a notion of substitution. In lambda calculus \cite{Church1936AnUP}, substitution replaces all free occurrences of a variable in a expression with another expression, written as $[\typec{x} \rightarrow \typec{E_1}]\typec{E_2}$. We use this concept as well as the notion of free variables, $\typec{\fv (x)}$, later when describing our work.
+
+\section{Reduction and Normal Form}
 \input{./tex/type-reduction.tex}
-
+\input{./tex/whnf.tex}
 \todo{paragrafo de ligação.}
-Not all types are of interest---for example $\tapp{\Dual}{\forallt{\skind}{\tabs{\alpha}{\skind}{\alpha}}}$ since the dual operator makes no sense being applied to a functional type. Before we can discuss type formation, we must define the weak head normal form of a type; we do so by defining a system of reduction rules in. This system is that of Poças et al. made confluent by adding the proviso that $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \rseqtwo and \rdctx. \emph{Confluence} states that, if there are two distinct reductions for a given type, $\afunction{T}{U}$ and $\afunction{T}{V}$, then both paths will eventually converge into the same final reduced type $\typec{W}$. Our variant features a single reduction path, thus confluence immediately follows.
+
+Not all types are of interest---for example $\tapp{\Dual}{\forallt{\skind}{\tabs{\alpha}{\skind}{\alpha}}}$ since the dual operator makes no sense being applied to a functional type. We'll tackle this concern later on in section x. For now, let's define the weak head normal form of a type; \todo{we do this so by defining a system of reduction rules in \cref*{fig:reduction}. Include also whnf rules.}. This system is that of Poças et al.[] made confluent by adding the proviso that $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \rseqtwo and \rdctx. 
+
+\textbf{(Confluence) } If $\afunction{T}{U}$ and $\afunction{T}{V}$, then $\afunctionstar{U}{W}$ and $\afunctionstar{V}{W}$.\\
+\emph{Confluence} states that, if there are two distinct reductions for a given type, $\afunction{T}{U}$ and $\afunction{T}{V}$, then both paths will eventually converge into the same final reduced type $\typec{W}$. One may visualize this property in the following latice:
+
+\begin{center}
+    \begin{tikzpicture}
+    % Define matrix
+        \matrix (m) [matrix of math nodes, row sep=3em, column sep=3em]
+        {
+            & \typec{T} \\
+            \typec{U} && \typec{V} \\
+            & \typec{W} \\
+        };
+        % Draw arrows
+        \draw[->] (m-1-2) -- (m-2-1) node[midway, above] {};
+        \draw[->, dashed] (m-2-1) -- (m-3-2) node[near end, below] {$*$};
+        \draw[->] (m-1-2) -- (m-2-3) node[midway, above] {};
+        \draw[->, dashed] (m-2-3) -- (m-3-2) node[near end, below] {$*$};
+    \end{tikzpicture}
+\end{center}
+For example, the type $\tappdual{(\seqcomp{\Skip}{T})}$ has two possible reductions: one via rule \srule{r-dctx} and another by applying rule \srule{r-d} first, followed by \srule{r-seq2} and then \srule{r-seq1}.
+
+\begin{align*}
+  \tappdual{(\seqcomp{\Skip}{T})} & \rightarrow \tappdual{T}  & \srule{r-dctx}\\
+  \\
+  \tappdual{(\seqcomp{\Skip}{T})} & \rightarrow \seqcomp{\tappdual{\Skip}}{\tappdual{T}} & \srule{r-d}\\
+  & \rightarrow \seqcomp{\Skip}{\tappdual{T}} & \srule{r-seq2}\\
+  & \rightarrow \tappdual{T} & \srule{r-seq1}
+\end{align*}
+
+This does not break confluence. But, without the proviso, we found that some types would not preserve the property of confluence. For example, the type $\tappdual{(\seqcomp{(\seqcomp{T}{U})}{V})}$ has two possible reductions: one via rule \srule{r-dctx} and then rule \srule{r-d} and other by applying rule \srule{r-d} first, followed by \srule{r-seq2} and then \srule{r-assoc}.
+
+\begin{align*}
+  \tappdual{(\seqcomp{(\seqcomp{T}{U})}{V})} & \rightarrow \tappdual{(\seqcomp{T}{(\seqcomp{U}{V})})} & \srule{r-dctx}\\
+  & \rightarrow \seqcomp{\tappdual{T}}{\tappdual{(\seqcomp{U}{V}})} & \srule{r-d}\\
+  \\
+  \tappdual{(\seqcomp{(\seqcomp{T}{U})}{V})} & \rightarrow \seqcomp{\tappdual{(\seqcomp{T}{U})}}{\tappdual{V}} & \srule{r-d}\\
+  & \rightarrow \seqcomp{(\seqcomp{\tappdual{T}}{\tappdual{U}})}{\tappdual{V}} & \srule{r-seq2}\\
+  & \rightarrow \seqcomp{\tappdual{T}}{(\seqcomp{\tappdual{U}}{\tappdual{V}})} & \srule{r-assoc}
+\end{align*}
+In this case, the two reductions do not converge into the same type since neither will $\tappdual{(\seqcomp{U}{V})}$ or $\seqcomp{\tappdual{U}}{\tappdual{V}}$ reduce any further. We found this true for types whose head is a sequential composition. Then, we decided to add the predicate $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \srule{r-seq2} and \srule{r-dctx} to express this limitation. Arriving at the system expressed by \cref*{fig:reduction}, our variant features a single reduction path, thus confluence immediately follows.
+
+\begin{align*}
+  \tappdual{(\seqcomp{(\seqcomp{T}{U})}{V})} & \rightarrow \seqcomp{\tappdual{(\seqcomp{T}{U})}}{\tappdual{V}} & \srule{r-d}\\
+  & \rightarrow \seqcomp{(\seqcomp{\tappdual{T}}{\tappdual{U}})}{\tappdual{V}} & \srule{r-seq2}\\
+  & \rightarrow \seqcomp{\tappdual{T}}{(\seqcomp{\tappdual{U}}{\tappdual{V}})} & \srule{r-assoc}\\
+\end{align*}
+
 %With respect to Po\c{c}as et al. , we promoted polymorphism to kind $\skind$, which entails the introduction of the existential type $\texists \kind$, dual of $\tforall \kind$, and the corresponding reduction rules.
 
-
-
-A type is in \emph{normal form}, denoted $\iswhnf{T}$, if it has been completely reduced, \textit{i.e.}, no further reductions are possible. In other words, $\iswhnf{T}$ iff $\typec{T} \nrightarrow$. Then we can say that type $\typec{T}$ \emph{normalises} to type $\typec{U}$, written $\isnorm{T}{U}$, if $\iswhnf{U}$ and $\typec{U}$ is reached from $\typec{T}$ in a finite number of reduction steps. The predicate $\isnormalised{T}$ means that $\isnorm{T}{U}$ for some $\typec{U}$.
-Note that not all types normalise, \ie some have an infinite sequence of reductions, such as $\TT = \typec{(\lambda x. xx)(\lambda x. xx)} \longrightarrow \typec{(\lambda x. xx)\subs{(\lambda x. xx)} {x}} = \TT \longrightarrow \typec{\cdots}$---which is stuck in a loop of reductions to itself via the application of rule \rbeta---and $\UT = \typec{\tmu\skind (\tlambda{\alpha}{\skind}{\alpha;\Skip})} \rightarrow (\tlambda{\alpha}{\skind}{\alpha;\Skip})\UT \rightarrow \typec{U;\Skip} \rightarrow_2 \typec{U;\Skip;\Skip} \rightarrow \typec{\cdots}$---which successively applies rules \rmu, \rbeta in combination with \rseqtwo, resulting in the unending addition of a trailing $\Skip$.
+The notion of normal form comes from the lambda calculus. This lets us know when an expression is fully evaluated. We say a type is in \emph{normal form}, denoted $\iswhnf{T}$, if it has been completely reduced, \textit{i.e.}, no further reductions are possible. In other words, $\iswhnf{T}$ iff $\typec{T} \nrightarrow$. Then we can say that type $\typec{T}$ \emph{normalises} to type $\typec{U}$, written $\isnorm{T}{U}$, if $\iswhnf{U}$ and $\typec{U}$ is reached from $\typec{T}$ in a finite number of reduction steps. The predicate $\isnormalised{T}$ means that $\isnorm{T}{U}$ for some $\typec{U}$.
+Note that not all types normalise, \ie some have an infinite sequence of reductions, such as $\TT = \typec{(\lambda x. xx)(\lambda x. xx)} \longrightarrow \typec{(\lambda x. xx)\subs{(\lambda x. xx)} {x}} = \TT \longrightarrow \typec{\cdots}$---which is stuck in a loop of reductions to itself via the application of rule \rbeta---and $\UT = \typec{\tmu\skind (\tlambda{\alpha}{\skind}{\alpha;\Skip})} \rightarrow (\tlambda{\alpha}{\skind}{\alpha;\Skip})\UT \rightarrow \typec{U;\Skip} \rightarrow_2 \typec{U;\Skip;\Skip} \rightarrow \typec{\cdots}$---which successively applies rules \rmu and \rbeta in combination with \rseqtwo, resulting in the unending addition of a trailing $\Skip$.
 
 \section{Type Formation}
 
-Finally, we introduce \emph{well-formed types}. We use $\judgementrelctx{\Delta}{\typec{T}}{\colon}{\kind}$ to denote that $\typec{T}$ is a \emph{well-formed type} with kind $\kind$ under the kinding context $\Delta$, a map from type variables to kinds. 
-The kinds of constants can be found in. A variable $\talpha$ has kind $\kind$ if $\tbind\alpha\kind\in{\Delta}$. An abstraction $\tabs\alpha \kind \TT$ has kind $\karrow \kind {\kind'}$ if $\TT$ is well-formed. Note that $\Delta + \tbind\talpha\kind$ in rule \ktabs represents updating the kind of the type variable $\talpha$ to a new kind $\kind$ in the context $\Delta$ if $\tbind\talpha\kindp\in\Delta$ for some $\kindp$, or storing the kind of $\talpha$ in the context $\Delta$ if otherwise. Finally, rule \ktapp states that an application $\tapp T U$ is well-formed if $\TT$ and $\UT$ are types and $\tapp TU$ normalises, that is, $\isnormalised {\tapp TU}$.
+Finally, we introduce \emph{well-formed types}. We use $\judgementrelctx{\Delta}{\typec{T}}{\colon}{\kind}$ to denote that $\typec{T}$ is a \emph{well-formed type} with kind $\kind$ under the kinding context $\Delta$, a map from type variables to kinds. A type variable $\talpha$ has kind $\kind$ if $\tbind\alpha\kind\in{\Delta}$. An abstraction $\tabs\alpha \kind \TT$ has kind $\karrow \kind {\kind'}$ if $\TT$ is well-formed. Note that $\Delta + \tbind\talpha\kind$ in rule \ktabs represents updating the kind of the type variable $\talpha$ to a new kind $\kind$ in the context $\Delta$ if $\tbind\talpha\kindp\in\Delta$ for some $\kindp$, or storing the kind of $\talpha$ in the context $\Delta$ if otherwise. Finally, rule \ktapp states that an application $\tapp T U$ is well-formed if $\TT$ and $\UT$ are types and $\tapp TU$ normalises, that is, $\isnormalised {\tapp TU}$.
 
 \input{./tex/type-formation.tex}
-
-\todo{problem: not all types normalise. paragrafo de ligação}
 
 \subsection{Decidability of type formation}
 %We prove decidability of type formation, imposing a restriction to kind * for recursive types, also adopted by Poças et al.
 
-The rules for type formation in \cref{fig:type-formation} involve determining if an application type $\TT\UT$ normalises.
-Poças et al.~\cite{DBLP:conf/esop/PocasCMV23} propose a two-step solution to this problem.
+The rule \ktapp for type formation in \cref{fig:type-formation} involve determining if an application type $\TT\UT$ normalises. However, we just saw that some types do not normalise and we do not want an algorithm that does not terminate. 
+Poças et al.~\cite{DBLP:conf/esop/PocasCMV23} proposes a two-step solution to this problem.
 The first stage is the introduction of the concept of \emph{pre-kinding}. We denote this as $\prekind \Delta T \kind$, that is, $\typec{T}$ is pre-kinded with kind $\kind$ under the kinding context $\Delta$. The rules for pre-kinding are in \cref{fig:pre-kinding}. They differ from the rules for type formation in that, in rule \pktapp, there is no verification of the normalisation of $\TT\UT$. Pre-kinding excludes some (but not all) types that do not normalise, as is the case of $\typec{(\tlambda{\alpha}{\kind}{\alpha \alpha})(\tlambda{\alpha}{\kind}{\alpha \alpha})}$ in \cref{fig:ex-pre-kinding}.
 
 \input{./tex/pre-kinding.tex}
@@ -115,6 +197,8 @@ When dealing with normalisation, we separate the treatment of recursive types fr
 In particular, we divide the reduction rules in two groups: $\muarrow$ refers to reductions that use the $\rmu$ rule and $\lseqarrow$ refers to reductions that never invoke the $\rmu$ rule. Thus, $\betaarrow\ =\ \lseqarrow\cup\muarrow$. We may now lift this notion to normalisation, denoted by $\lseqnormalred TU$ and $\munormalred TU$ respectively.
 
 In order to check if a type $\TT$ is well-formed, we first determine if $\prekind{} T \kind$ for some $\kind$. If $\TT$ fails to be pre-kinded, it is not kinded either. Otherwise, we check whether $\istype{} T \kind$, which involves determining if the application types within $\TT$ normalise. 
+
+\todo{why was it necessary to check all application types ? example.}
 
 \subsection{Restrictions to Recursion}
 The approach to determine if a type normalises seeks infinite reduction sequences. In the case of recursive types, such sequences would have a finite number of $\beta$-reductions between two $\mu$-reductions.

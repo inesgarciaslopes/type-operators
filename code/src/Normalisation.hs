@@ -19,7 +19,7 @@ reduceBSD (App Dual Skip) = Just Skip -- R-DSKIP
 reduceBSD (App Dual (End p))= Just (End (dual p)) -- R-DEnd
 reduceBSD (App Dual (Message p k)) = Just (Message (dual p) k)
 reduceBSD (App Dual (Quantifier p k1 k2)) = Just (Quantifier (dual p) k1 k2) -- Dual (Forall T) -> Exists T && Dual (Exists) -> Forall
-reduceBSD (App Dual (App Dual w@(App (App (Var _) _) _))) = Just w -- R-DDVAR
+reduceBSD (App Dual (App Dual w@(App (App (Var _) _) _))) = Just w -- R-DDVAR, Modify this
 reduceBSD (App (Abs x _ t) u) = -- r-beta
     Just (substitution t u x)
 reduceBSD (App Dual (Choice v m))= Just (Choice (dual v) m')

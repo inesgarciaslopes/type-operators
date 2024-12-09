@@ -9,6 +9,9 @@ Type systems are a fundamental tool in programming language theory, providing a 
 
 Type systems manage a program's data types through type checking, which can be classified as either static---occurs at compile time, where the types of all variables and expressions are known and checked before the program runs---or dynamic---occurs at run-time, where the types are checked as the program executes. 
 
+\todo{p. ligação}
+Type equivalence establishes the criteria by which two types are equivalent within a programming language. In presence of polymorphism, type equivalence enables functions to work with different types as long as it can determine whether two types are interchangeable without causing runtime erros or unexpected behavior. Type equivalence can be viewed as structural---where types are equivalent if they share the same structure---or nominal---where types are only equivalent if they share the same name.
+
 Over the course of time, type systems have evolved to become more expressive, moving from simple type assignments to more powerful systems that support polymorphism, recursion, and structured communication patterns.
 
 System $F$, also called the polymorphic lambda calculus, extends the simply typed lambda calculus with \textit{parametric polymorphism}, which allows functions to be written generically and applied to arguments of any type. [ref] In the simply typed lambda calculus, every function has a concrete type. For instance, a function that operates on integers has the type $\function \Int \Int$. However, in order to express a function that operates on a lists of arbitrary types, we would need a separate function for each of the types in the list. To overcome this limitation, System $F$ allowed functions to be polymorphic. For example, the identity function, written $\lambda X. \lambda x:X. x$, returns its argument unchanged, working uniformly for any type---and when instantiated to $\Int$, the result is the identity function on integers, whereas when applied to $Bool$, the result is the identity function on booleans. This is possible through the introduction of type \textit{abstractions}---functions are parameterized by types---and type \textit{applications}---types are passed as arguments to functions.
@@ -43,19 +46,17 @@ The previous type represents a protocol (from the client perspective) that offer
 
 One of the key advantages of session types is that they enable \textit{type-safe communication}. This means that at compile time, the system can check whether the communication patterns follow the prescribed protocol, preventing errors like sending a message of a wrong type. Session types can also help ensure \textit{deadlock freedom}, meaning the system avoids situations where two parties wait indefinitely for each other to send or receive a message.
 
+Type equivalence in session types is the equivalence of binary trees. \todo{elaborate.}
 
 Session types also have limitations---they are tail recursive---not being able to describe expressive types that refer to themselves at any given point of a sequential composition rather than at the end. For instance, the type $ \typec{\mu S} .\OUTn\TT.\typec{S}$, represents adding $\OUTn\TT$ to the tail $\OUTn\TT\OUTn\TT\OUTn\TT...\typec{\mu S}.\OUTn\TT.\typec{S}$ continuously until the session terminates. 
-
-\todo{How to connect to "The equivalence of session types is the equivalence of binary trees." }
 
 The lack of expressiveness with the increasing complexity of communication protocols in modern systems lead us to context-free session types.
 
 \section{Context-free Session Types}
 
-Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions. For instance, one might choose to write $S;!T$ or $!T;S;!T$ where recursion is found in the head or middle of the type.  
+Context-free session types break free from tail recursion by introducing the sequential composition operator $\Semi$ and the type $\Skip$---neutral element of sequential composition---which represents a protocol with no actions. For instance, one might choose to write $S;!T$ or $!T;S;!T$ where recursion is found in the head or middle of the type. 
 
-\todo{contexto para paragrafo.}
-
+With context-free session types, the lema/theorem about tree equality is not true.
 For example, types $\Skip\Semi\TT$ and $\TT$ are equivalent but the same is not true for the equivalence of the trees they represent. 
 
 \begin{center}
@@ -284,7 +285,30 @@ data Maybe a = Nothing | Just a
 Another example of a type operator is the constructor \lstinline|List|. 
 
 \lstinline{data List a = Empty | Cons a (List a)}\\
-\lstinline{List} represents a type operator that takes a type \lstinline{a} and returns a new type \lstinline{List a}, which represents a list of elements of type \lstinline{a}. Therefore, the type \lstinline{List} operates on types, that means, when type \lstinline{a} is replaced by another type (let us say $\Int$) the constructor returns \lstinline{List Int}. The kind of \lstinline|List| is also $\karrow\kast\kast$. What about types that take type operators as arguments and return another type? A \textit{functor}, a type class where types can be mapped over, would be an example of a higher-order kinded type. The kind of a Functor is $\karrow{(\karrow\kast\kast)} {Constraint}$, which means Functor takes a type operator like \lstinline|Maybe| and returns a $constraint$ kind. %Constraint is the kind of class constraints – it covers anything that can appear on the left side of the arrow when defining a type.
+\lstinline{List} represents a type operator that takes a type \lstinline{a} and returns a new type \lstinline{List a}, which represents a list of elements of type \lstinline{a}. Therefore, the type \lstinline{List} operates on types, that means, when type \lstinline{a} is replaced by another type (let us say $\Int$) the constructor returns \lstinline{List Int}. The kind of \lstinline|List| is also $\karrow\kast\kast$. 
+
+\todo{caption: relation between kinds, types and values.}
+
+\begin{center}
+    \begin{tikzpicture}
+    % Define matrix
+        \matrix (m) [matrix of math nodes, row sep=3em, column sep=1em]
+        {
+            kinds && \kast && \karrow{\kast}{\kast}\\
+            types & String & Bool & Maybe String & Maybe \\
+            values & 'Hi' & True\\
+        };
+        % Draw arrows
+        \draw[-] (m-1-3) -- (m-2-2) node[midway, left] {};
+        \draw[-] (m-1-3) -- (m-2-3) node[midway, left] {};
+        \draw[-] (m-1-3) -- (m-2-4) node[midway, left] {};
+        \draw[-] (m-1-5) -- (m-2-5) node[midway, right] {};
+        \draw[-] (m-2-2) -- (m-3-2) node[midway, left] {};
+        \draw[-] (m-2-3) -- (m-3-3) node[midway, right] {};
+    \end{tikzpicture}
+\end{center}
+
+What about types that take type operators as arguments and return another type? A \textit{functor}, a type class where types can be mapped over, would be an example of a higher-order kinded type. The kind of a Functor is $\karrow{(\karrow\kast\kast)} {Constraint}$, which means Functor takes a type operator like \lstinline|Maybe| and returns a $constraint$ kind. %Constraint is the kind of class constraints – it covers anything that can appear on the left side of the arrow when defining a type.
 
 
 Type classes, in Haskell, enable polymorphism by defining a set of operations that can be implemented for various types. A \textit{type class} is a higher-order abstraction that operates on types rather than values.
@@ -354,10 +378,10 @@ This code declares a list of Strings called \lstinline|words|---an instance of \
 We can see that \lstinline|ArrayList<E>| implements the interface \lstinline|List<E>| and we instantiate the type parameter \lstinline|E| with \lstinline|String|. Without Generics, we would ommit the type parameters and explicitly cast the type whenever needed. In this case, we need to know that the elements of this list are of type \lstinline|String| and cast when extracting the elements from the list, \lstinline|(String)words.get(0)|.
 \begin{lstlisting}
     List words = new ArrayList();
-    words.add("Hello ");
-    words.add("world!");
+    words.add('Hello ');
+    words.add('world!');
     String s = ((String)words.get(0))+((String)words.get(1)) 
-    assert s.equals("Hello world!");
+    assert s.equals(Hello world!');
 \end{lstlisting}
 
 \todo{this is possible because of type erasure.}
