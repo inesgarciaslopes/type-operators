@@ -2,41 +2,19 @@
 
 \todo{What will we talk about in this chapter?}
 
-\begin{align*}
-  \typec T \grmeq & \function TT
-  \grmor \tbananas{l_i}{T_i} 
-  % \grmor \Unit 
-  \grmor  \foralltinfix\alpha\kind T 
-  \grmor \tmuinfix{\alpha}{\kind}{T} 
-  \grmor \typec{\alpha}
-  && (\FMu)
-  \\
-  \typec T \grmeq & (\FMu)
-  \grmor{} \MSGn T
-  \grmor{} \tchoice{l_i}{T_i}
-  \grmor \End
-  \grmor{} \semit TT 
-  \grmor \Skip
-  && (\FMuSemi)
-  \\
-  \typec T \grmeq & (\FMuSemi)
-  \grmor \tabs\alpha\kind T
-  \grmor \tapp TT && (\FMuSemiOmega)
-\end{align*}
-
 \section{From System F to $\FMuSemi$}\label{sec:system}
 
 Let $\alpha$,$\beta$ range over a countable set of type variables. The types of System F are given by the grammar:
 \begin{align*}
   \typec T \grmeq & \typec{\alpha}
   \grmor \function TT
-  \grmor \foralltinfix\alpha\kind T 
+  \grmor \foralltinfix\alpha\tkind T 
   && (\FMu)
 \end{align*}
 
-A type of the form $\function TT$ is called a function type, and a type of the form $\foralltinfix\alpha\kind T $ is called a universal type. The type variable $\alpha$ is bound in $\foralltinfix\alpha\kind T $. Being interested in describing communication protocols, system F is rather simple and limited. Adding recursion lets us at least describe types such as $\tmuinfix\alpha\kind\Int$. However, this expresses no real pratical meaning for communication protocols. Proving system $\FMu$ is not expressive enough for our proposes.
+A type of the form $\function TT$ is called a function type, and a type of the form $\foralltinfix\alpha\tkind T $ is called a universal type. In $\foralltinfix\alpha\tkind T $, the type variable $\alpha$ is bound with kind $\tkind$, the functional base kind of this system. Being interested in describing communication protocols, system F is rather simple and limited. Adding recursion lets us at least describe types such as $\tmuinfix\alpha\tkind\Int$. However, this expresses no real pratical meaning for communication protocols. Proving system $\FMu$ is not expressive enough for our proposes.
 
-Building on top of this, with session types, the types of system $\FMuDot$ are given by the following grammar:
+Building on top of this, with recursion and session types, the types of system $\FMuDot$ are given by the following grammar:
 \begin{align*}
   \typec T \grmeq & (\FMu)
   \grmor \tmuinfix{\alpha}{\kind}{T} 
@@ -46,7 +24,7 @@ Building on top of this, with session types, the types of system $\FMuDot$ are g
   && (\FMuDot)
 \end{align*}
 
-Now we can express recursion through $\tmuinfix{\alpha}{\kind}{T}$, send or receive messages through the message construtors $\MSG TT$ and offer choices through $\tchoice{l_i:T_i}$, where $l_i$ are labels. The type $\End$ terminates a communication. Now we can specify a channel endpoint that receives a stream of integer values, $\tmuinfix{\alpha}{\skind}{\extchoice\records{\donel\colon\End,\morel\colon?\Int;\alpha}}$. If the label $\donel$ is selected, the channel closes, whereas if the label $\morel$ is chosen, we receive an integer value followed by the rest of the stream.
+Now we can express recursion through $\tmuinfix{\alpha}{\kind}{T}$, send or receive messages through the message construtors $\MSG TT$ and offer choices through $\tchoice{l_i:T_i}$, where $l_i$ are labels. The type $\End$ terminates a communication. We also need to introduce the kind of session types, kind $\skind$, to control type formation when dealing with both session and functional types alltogether. Now we can write a channel endpoint that receives a stream of integer values, $\tmuinfix{\alpha}{\skind}{\extchoice\records{\donel\colon\End,\morel\colon?\Int;\alpha}}$: if the label $\donel$ is selected, the channel closes, whereas if the label $\morel$ is chosen, we receive an integer value followed by the rest of the stream.
 
 \begin{align*}
   \typec T \grmeq & (\FMu)
@@ -68,12 +46,11 @@ Now we can express recursion through $\tmuinfix{\alpha}{\kind}{T}$, send or rece
 
 %A goal of this paper is the integration of higher-order context-free session types into system $\FMuOmega$. We want to be able to abstract the type that is received on a tree channel, which is now possible by writing $\tabs \alpha \tkind{\tmuinfix{\beta}{\skind}{\&\{\leafl: \Skip, \nodel: \beta;?\alpha;\beta\}}}\typec;\End$, where $\tkind$ is the kind of functional types.
 
-The next step of construction leads us to context-free session types, embodied in the type system $\FMuSemi$. We'll be needing a new construct for
-sequential composition $\semit TU$, and a new type $\Skip$, acting as the
-neutral element of sequential composition.%~\cite{DBLP:conf/icfp/ThiemannV16}. 
+The next step of construction leads us to context-free session types, embodied in the type system $\FMuSemi$. We'll be needing a new construct for sequential composition $\semit TU$, and a new type $\Skip$, acting as the neutral element of sequential composition.%~\cite{DBLP:conf/icfp/ThiemannV16}. 
 %The message constructors are now unary ($\INn T$ and $\OUTn T$) rather than binary.
 Now we can write a type $\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\Int\Semi\ \alpha}}\Semi\End_{\typec{?}}$ which describes a protocol for safely streaming integer trees on a channel. The channel presents an external choice $\extchoice$ with two labels: if the continuation of the channel is $\leafl$, then no communication occurs but the channel is still open for further composition whereas, if the continuation of the channel is $\nodel$, then we have a left subtree, followed by an integer and a right subtree. When the whole tree is received, the channel is closed. It is also important to distinguish type $\End_{\typec{?}}$ from $\Skip$---the former represents the closure of a channel, where no further communication is possible, while the latter allows continuing the communication. 
-We want to move beyond context-free session types, namely, we are interested in abstracting the type that is received on the tree channel, by writing $\tabs{\beta}{\tkind}{\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\beta\Semi\ \alpha}}\Semi\Wait}$. This desire brings the necessity for type abstractions, $\tabs\alpha\kind T$. This invites higher-order kinds into play which in turn lead to the introduction of type operators into our language.
+
+We've reached a point in time where we want to move beyond context-free session types, namely, we are interested in abstracting the type that is received on the tree channel, by writing $\tabs{\beta}{\tkind}{\tmuinfix{\alpha}{\skind}{\extchoice\rchannel{\leafl}{\Skip}{\nodel}{\alpha\Semi\ \INp\beta\Semi\ \alpha}}\Semi\Wait}$. This desire brings the necessity for type abstractions, $\tabs\alpha\kind T$, and kinds of the form $\karrow \kind \kind$. This invites higher-order kinds into play which in turn leads to the introduction of type operators into our language.
 
 %\begin{equation*}
 %\streamt = \tabs\alpha\tkind{(\tmuinfix{\beta}{\skind}{\extchoice\records{\donel\colon\End,\morel\colon\IN\alpha\beta}})}
@@ -83,17 +60,10 @@ We want to move beyond context-free session types, namely, we are interested in 
 
 \section{Adding Type Operators}
 
-
-\input{./tex/kinds-types.tex}
-
-\todo{rewrite this part.}
-In programming languages, terms are categorized by types, which in turn may be categorized by kinds. In our system, a \emph{kind} $\kind$ is either a base kind $\kast$---which is either a session or a functional kind, $\skind$ or $\tkind$, respectively---or a higher-order kind  $\karrow \kind \kindp$. A \emph{proper type} refers to a type that has a base kind. In contrast, \emph{type operators} act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. This is the core of our work. Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order kinds.
-
-
-A type is either a type constructor $\tiota$, a type variable $\talpha$, an abstraction $\tabs{\talpha}{\kind}{\typec{T}}$ or an application $\tapp{\typec{T}}{\typec{T}}$. 
+The types of system $\FMuSemiOmega$ can be either a type constructor $\tiota$, a type variable $\talpha$, an abstraction $\tabs{\talpha}{\kind}{\typec{T}}$ or an application $\tapp{\typec{T}}{\typec{T}}$. The type constructors consist on a function operator $\Arrow$, a record or variant $\typec{\varrecs{\overline{l_i}}}$, recursive operator $\tmu \kind$, message operator $\Sharp$, sequential composition operator $\Semi$, choice operator $\typec{\odot{\{\overline{l_i}\}}}$, quantifier operators $\quant \kind$, duality operator $\Dual$, waiting or closing operators $\End_{\typec{\sharp}}$ and the no action operator $\Skip$. Their respective kinds can be found in \cref*{fig:syntax-types}. It is to note that the kind of the operator $\quant \kind$ has been promoted to attend for polymorphic session types.
 
 %and we identify types up to renaming of bound variables; thus, ∀α.α → α and ∀β.β → β are the same type. 
-\todo{talk about each individual type operator.}
+
 \todo{forall é promovido para polimorfismo em sessões.}
 
 Observe that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\kind (\tlambda{\alpha}{\kind}{T})}$ and similarly for $\tquantinfix\alpha\kind \TT$.
@@ -101,7 +71,7 @@ Observe that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\k
 \paragraph{Substitution.}
 Some type operators act over variables and with them comes the problem to decide, for example, if $\typec{\forall\alpha.T}$ and $\typec{\forall\alpha.T}$ are equivalent, $\typec{\forall\alpha.T}\simeq\typec{\forall\alpha.T}$.
 In order to solve this problem, we need a notion of substitution. In lambda calculus \cite{Church1936AnUP}, substitution replaces all free occurrences of a variable in a expression with another expression, written as $[\typec{x} \rightarrow \typec{E_1}]\typec{E_2}$. We use this concept as well as the notion of free variables, $\typec{\fv (x)}$, later when describing our work.
-
+\input{./tex/kinds-types.tex}
 \section{Reduction and Normal Form}
 \input{./tex/type-reduction.tex}
 \input{./tex/whnf.tex}
