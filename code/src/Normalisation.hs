@@ -35,6 +35,7 @@ reduceBSD (App (App Semi t) u) = do --r-seq2
     Just (App (App Semi t') u)
 reduceBSD (App Dual (App (App Semi t) u)) =
     Just (App (App Semi (App Dual t)) (App Dual u)) --R-D;
+reduceBSD (App Dual (App Dual t)) = Just t --R-DDual
 reduceBSD (App Dual t) = do --r-dctx
     t' <- reduceBSD t
     Just (App Dual t')
