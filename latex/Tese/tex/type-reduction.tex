@@ -2,11 +2,11 @@
 \begin{figure}[t]
 	\declrel{Type reduction}{$\lambdared TT$}
 	\begin{mathpar}
-		\infer[\rseqone]{}{\lambdared{\semit \Skip T}{T}}
-		
-		\infer[\rseqtwo]{\lambdared{T}{V} \\ \typec{T} \neq \typec{T_1; T_2}}{\lambdared{\semit TU}{\semit VU}}
-		
+		\infer[\rneut]{}{\lambdared{\semit \Skip T}{T}}
+
 		\infer[\rassoc]{}{\lambdared{\semit {(\semit TU)}V}{\semit T {(\semit UV)}}}
+
+		\infer[\rseq]{\lambdared{T}{V} \\ \typec{T} \neq \typec{T_1; T_2}}{\lambdared{\semit TU}{\semit VU}}
 		
 		\infer[\rmu]{}{\lambdared{\tapp{\tmu{k}}\TT}{\tapp{T}({\tapp{\tmu{k}} \TT})}}
         
@@ -33,8 +33,10 @@
 		
 		\infer[\rdintc]{}{\lambdared{\tapp {\Dual} {( {\oplus\{\overline{l_i:T_i}\}})}}{\&\{\overline{l_i:\Dual(T_i)}\}}}
   
-		\infer[\rdctx]{\lambdared TU \\ \typec{T} \neq \typec{T_1;T_2}}{\lambdared{\tapp \Dual T}{\tapp \Dual U}}
+		\infer[\rdctx]{\lambdared TU \\ \typec{T} \neq \typec{T_1;T_2}, \tapp \Dual \TT}{\lambdared{\tapp \Dual T}{\tapp \Dual U}}
 		
+		\infer [\rddual]{}{\lambdared{\tapp \Dual (\tapp \Dual \TT)}{\TT}}
+
 		\infer[\rddvar]{m \geq 0}{\lambdared{\tapp {\Dual} {(\tapp \Dual (\alpha\ \TT_1\ldots \TT_m))}}{\alpha\ \TT_1\ldots \TT_m}}
 %
 %        \infer[\rdexists]{}{\lambdared{\tapp {\Dual}{(\texists{\kind} \TT)}}{}}{\tforall{\kind} \TT}
