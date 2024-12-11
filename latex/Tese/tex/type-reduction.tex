@@ -33,11 +33,11 @@
 		
 		\infer[\rdintc]{}{\lambdared{\tapp {\Dual} {( {\oplus\{\overline{l_i:T_i}\}})}}{\&\{\overline{l_i:\Dual(T_i)}\}}}
   
-		\infer[\rdctx]{\lambdared TU \\ \typec{T} \neq \typec{T_1;T_2}, \tapp \Dual \TT}{\lambdared{\tapp \Dual T}{\tapp \Dual U}}
+		\infer[\rdctx]{\lambdared TU \\ \typec{T} \neq \typec{T_1;T_2}, \tapp \Dual {\typec{T_1}}}{\lambdared{\tapp \Dual T}{\tapp \Dual U}}
 		
 		\infer [\rddual]{}{\lambdared{\tapp \Dual (\tapp \Dual \TT)}{\TT}}
 
-		\infer[\rddvar]{m \geq 0}{\lambdared{\tapp {\Dual} {(\tapp \Dual (\alpha\ \TT_1\ldots \TT_m))}}{\alpha\ \TT_1\ldots \TT_m}}
+		%\infer[\rddvar]{m \geq 0}{\lambdared{\tapp {\Dual} {(\tapp \Dual (\alpha\ \TT_1\ldots \TT_m))}}{\alpha\ \TT_1\ldots \TT_m}}
 %
 %        \infer[\rdexists]{}{\lambdared{\tapp {\Dual}{(\texists{\kind} \TT)}}{}}{\tforall{\kind} \TT}
 %

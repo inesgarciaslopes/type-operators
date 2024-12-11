@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Rename
     (rename,
-    used, --testing only
+    reachable, --testing only
     absorbing) --testing only
 where
 
@@ -9,6 +9,9 @@ import Syntax
 import Substitution
 import Normalisation
 import qualified Data.Set as Set
+import qualified Data.Map as Map
+import Data.IntMap (lookupMin)
+import Data.Maybe
 
 first :: Set.Set Variable -> Variable
 first s = Prelude.head $ filter (`Set.notMember` s) [0..]
@@ -34,17 +37,19 @@ first s = Prelude.head $ filter (`Set.notMember` s) [0..]
 -- used _ = Set.empty 
 
 -- | The set of type variables used in a type 
-used :: Type -> Set.Set Variable
-used (Var a) = Set.singleton a
-used (Abs x _ t) = Set.delete x (used t)
--- used (App (App Rec{} (Abs x k t)) u) 
---     | absorbing Set.empty t = 
-used (App (App Semi t) u)
-    | absorbing Set.empty t = used t
-    | otherwise = used t `Set.union` used u
-used (App t u)  = used t `Set.union` used u
-used _ = Set.empty
+reachable :: Type -> Set.Set Variable
+reachable (Var a) = Set.singleton a
+reachable (Abs x _ t) = Set.delete x (reachable t)
+reachable (Choice _ m) = Set.unions (Map.map reachable m)
+-- reachable (App (App Rec{} (Abs x k t)) u) 
+--     | absorbing Set.empty t =    
+reachable (App t u)
+    | pFirst (absorbing Set.empty t) = reachable t
+    | otherwise = reachable t `Set.union` reachable u
+reachable _ = Set.empty
 
+pFirst :: (Bool, Set.Set Variable) -> Bool
+pFirst (a, _) = a 
 -- | FreeST
 -- absorbing :: Set.Set Variable -> Type -> Bool
 -- absorbing _ End{} = True
@@ -59,28 +64,65 @@ used _ = Set.empty
 -- absorbing _ _ = False
 
 -- absorbing T implies T is a session type
-absorbing :: Set.Set Variable -> Type -> Bool
-absorbing _ End{} = True
-absorbing s (App (App Semi t) u) = absorbing s t || absorbing s u
+-- absorbing :: Set.Set Variable -> Type -> Bool
+-- absorbing _ End{} = True
+-- absorbing s (App Semi t) = absorbing s t
+-- absorbing s (Choice _ m) = all (absorbing s ) (Map.elems m)
+-- absorbing s (App (App Semi t) u) = absorbing s t || absorbing s u
+-- absorbing s (App (Rec{}) (Abs x _ t)) = absorbing (Set.insert x s) t
+-- absorbing s (App (Rec{}) t) = absorbing s t
+-- absorbing s (App (Quantifier{}) (Abs x _ t)) = absorbing s' t
+--     where s' = Set.delete x s
+-- absorbing s (App (Quantifier{}) t) = absorbing s t
+-- absorbing s (App Dual t) = absorbing s t
+-- absorbing s (Var a) = a `Set.member` s
+-- absorbing s (Abs x _ t) = absorbing (Set.insert x s) t
+-- -- absorbing s w@(App _ _) =
+-- --     case weaknorm Set.empty w of
+-- --         Just w' -> absorbing s w'
+-- --         Nothing -> False
+-- absorbing s (App (Abs x _ t) u) = absorbing s t' 
+--     where t' = substitution t u x 
+-- absorbing _ _ = False
+
+absorbing :: Set.Set Variable -> Type -> (Bool, Set.Set Variable)
+absorbing _ End{} = (True, Set.empty)
+absorbing s (App Semi t) = absorbing s t
+absorbing s (Choice _ m) = all (absorbing s ) (Map.elems m) --change
+absorbing s (App (App Semi t) u) = absorbing s t || absorbing s u --change
+absorbing s (App (Rec{}) (Abs x _ t)) = absorbing (Set.insert x s) t
 absorbing s (App (Rec{}) t) = absorbing s t
+absorbing s (App (Quantifier{}) (Abs x _ t)) = absorbing s' t
+    where s' = Set.delete x s
 absorbing s (App (Quantifier{}) t) = absorbing s t
 absorbing s (App Dual t) = absorbing s t
-absorbing s (Var a) = a `Set.member` s
+absorbing s (Var a) =
+    if a `Set.member` s then (True, Set.singleton a) else (False, Set.empty)
 absorbing s (Abs x _ t) = absorbing (Set.insert x s) t
-absorbing s w@(App _ _) =
-    case weaknorm Set.empty w of
-        Just w' -> absorbing s w'
-        Nothing -> False
-absorbing _ _ = False
+-- absorbing s w@(App _ _) =
+--     case weaknorm Set.empty w of
+--         Just w' -> absorbing s w'
+--         Nothing -> False
+absorbing s (App (Abs x _ t) u) = absorbing s t'
+    where t' = substitution t u x
+absorbing _ _ = (False, Set.empty)
 
 rename :: Set.Set Variable  -> Type -> Type
 rename _ (Var a) = Var a
 rename s u@(Abs a k t) = Abs v k (rename s (substitution t (Var v) a))
-    where s' = s `Set.union` used u
+    where s' = if absorbing s t && rightOf t a y
+                then Set.empty else s `Set.union` reachable u
           v = first s'
+          (_, y) = absorbing s t
 rename s (App t u ) = App (rename s' t) (rename s u)
-    where s' = s `Set.union` used u
+    --where s' = s `Set.union` reachable u
+    where s' = s `Set.union` reachable (App t u)
 rename _ t = t
+
+
+rightOf :: Type -> Variable -> Set.Set Variable -> Bool
+rightOf (App t u) v s  = v `Set.member` reachable u && lookupMin s `Set.member` reachable t
+rightOf _ _ s = False
 
 -- minimal :: Type -> Type
 -- minimal = minimal' Set.empty
