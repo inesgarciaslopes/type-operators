@@ -2,24 +2,16 @@
 \1:S. 1
 True
 
-Int
-Int
-True
-
-Int ->@T@T Int
-Int ->@T@T Int
-True
-
-forall@S@S (\0:S. (forall@S@S (\1:S. Close;0)))
-forall@S@S (\0:S. (forall@S@S (\1:S. Close;1)))
-True
-
 (\1:T. 1) Int
 Int
 True
 
-\1:S. (\2:S. (\3:S. rec@S (\4:S. (1;4;2);3)))
-\1:S. (\1:S. (\1:S. rec@S (\2:S. (1;2;1);1)))
+Int
+Int
+True
+
+Int ->@T@T Int
+Int ->@T@T Int
 True
 
 Dual (Dual 1)
@@ -38,5 +30,16 @@ Dual (Dual ((1 2) 3))
 (1 2) 3
 True
 
+forall@S@S (\0:S. (forall@S@S (\1:S. Close;0)))
+forall@S@S (\0:S. (forall@S@S (\1:S. Close;1)))
+True
+
+\1:S. (\2:S. (\3:S. rec@S (\4:S. (1;4;2);3)))
+\1:S. (\1:S. (\1:S. rec@S (\2:S. (1;2;1);1)))
+True
+
+\1:S. (\2:S. (rec@S (\1:S. (!@S Int);1);1))
+\1:S. (\2:S. (rec@S (\1:S. (!@S Int);1);2))
+True
 
 -- stack test :SystemFOmegaMuSemi-test-units --ta "-m SingleTest"
