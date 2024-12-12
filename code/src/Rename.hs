@@ -75,8 +75,8 @@ absorbing s (App (Abs x _ t) u) = absorbing s t'
 absorbing _ _ = (False, Set.empty)
 
 rename :: Set.Set Variable -> Type -> Type
-rename s u@(Abs a k t) = Abs v k (substitution t (Var v) a )
-    -- | a `Set.member` reachable s t = Abs v k (substitution t (Var v) a)
+rename s u@(Abs a k t) = Abs v k (rename s (substitution t (Var v) a ))
+    -- | a `Set.member` reachable s t = Abs v k (rename s (substitution t (Var v) a))
     -- | otherwise = Abs 0 k (substitution t (Var 0) a)
     where s' = s `Set.union` reachable s u
           v = first s'
