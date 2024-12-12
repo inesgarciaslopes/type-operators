@@ -17,7 +17,7 @@ first s = Prelude.head $ filter (`Set.notMember` s) [0..]
 
 -- | take the set of absorbing vars and returns a set of free and reachable vars. 
 reachable :: Set.Set Variable -> Type -> Set.Set Variable
-reachable s (Var a) = Set.delete a s
+reachable s (Var a) = Set.singleton a
 reachable s (Abs x _ t) = Set.delete x (reachable s t)
 --reachable s (Choice _ m) = Set.unions (map (\(_, t) -> reachable s t) (Map.toList m))
 reachable s (App (Rec{}) (Abs x _ t)) = reachable (x `Set.insert` s) t
