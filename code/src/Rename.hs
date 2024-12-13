@@ -68,21 +68,22 @@ absorbing s (App (Quantifier{}) (Abs x _ t)) = absorbing s' t
 absorbing s (App (Quantifier{}) t) = absorbing s t
 absorbing s (App Dual t) = absorbing s t
 absorbing s (Var a) =
-    if a `Set.member` s then (True, Set.singleton a) else (False, Set.empty)
+    if a `Set.member` s 
+        then (True, Set.singleton a) 
+        else (False, Set.empty)
 absorbing s (Abs x _ t) = absorbing (Set.insert x s) t
 absorbing s (App (Abs x _ t) u) = absorbing s t'
     where t' = substitution t u x
 absorbing _ _ = (False, Set.empty)
 
 rename :: Set.Set Variable -> Type -> Type
-rename s u@(Abs a k t) = Abs v k (rename s (substitution t (Var v) a ))
-    -- | a `Set.member` reachable s t = Abs v k (rename s (substitution t (Var v) a))
-    -- | otherwise = Abs 0 k (substitution t (Var 0) a)
-    where s' = s `Set.union` reachable s u
+rename s u@(Abs a k t) = Abs v k (rename s' (substitution t (Var v) a))
+    where s' = if a `Set.member` reachable Set.empty t 
+                then s `Set.union` reachable Set.empty u
+                else Set.empty
           v = first s'
 rename s (App t u) = App (rename s' t) (rename s u)
-    where s' = s `Set.union` reachable s (App t u)
-    --where s' = s `Set.union` reachable u
+    where s' = s `Set.union` reachable Set.empty (App t u)
 rename _ t = t
 
 
