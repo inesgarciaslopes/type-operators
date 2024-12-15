@@ -1,7 +1,8 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module TypeToGrammar
   ( word,
-    convertToGrammar
+    convertToGrammar,
+    normToSkip --testing only
   )
 where
 import Syntax
@@ -138,6 +139,13 @@ wordWhnf' u@(Abs a k t) = do -- \\a:k.T
     --gets productions >>= traceM . show
     putVisited u y
     return [y]
+wordWhnf' t@(Choice v m) = do
+    ps <- forM (zip [(0::Int)..] $ Map.toList m) $ \(j, (_, tj)) -> do
+      w <- word tj
+      return (show (head t) ++ "_" ++ show j, w)
+    y <- addProductions t (Map.fromList ps)
+    putVisited t y
+    return [y] 
 wordWhnf' u@(App (Quantifier p k1 _) t) = do
     w <- word t
     y <- addProductions u (Map.fromList [(show p ++ show k1 ++ "_l1", w ++ [bottom]), (show p ++ show k1 ++ "_l2", [])])

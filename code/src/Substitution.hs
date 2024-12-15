@@ -7,6 +7,7 @@ where
 
 import Syntax
 import qualified Data.Set as Set
+import qualified Data.Map as Map
 
 freeVars :: Type -> Set.Set Variable
 freeVars (Var a) = Set.singleton a
@@ -19,6 +20,7 @@ freshVar s = Prelude.head [v | v <- [0..], v `Set.notMember` s]
 
 -- | both types are renamed T [U/a]
 substitution :: Type -> Type -> Variable -> Type
+substitution (Choice v m) t b = Choice v (Map.map (\u -> substitution u t b) m)
 substitution u@(Var a) t b
     | a == b = t   
     | otherwise = u
