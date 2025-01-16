@@ -118,8 +118,8 @@ isArrowChoiceRecord _ = False
 -- Requires whnf t
 wordWhnf :: Type -> TransState Word
 wordWhnf t = do
-  v <- getVisited 
-  if Map.member t v then return $ [v Map.! t] else wordWhnf' t
+  v <- getVisited
+  if Map.member t v then return [v Map.! t] else wordWhnf' t
 
 wordWhnf' :: Type -> TransState Word
 wordWhnf' Skip = return [] -- Skip
@@ -145,7 +145,7 @@ wordWhnf' t@(Choice v m) = do
       return (show (head t) ++ "_" ++ show j, w)
     y <- addProductions t (Map.fromList ps)
     putVisited t y
-    return [y] 
+    return [y]
 wordWhnf' u@(App (Quantifier p k1 _) t) = do
     w <- word t
     y <- addProductions u (Map.fromList [(show p ++ show k1 ++ "_l1", w ++ [bottom]), (show p ++ show k1 ++ "_l2", [])])
@@ -165,7 +165,7 @@ wordWhnf' u@(App Dual t) = do -- Dual (T)
     y <- addProductions u (Map.fromList [(show (head t) ++ "_l1", w), (show (head t) ++ "_l2", [])])
     --gets productions >>= traceM . show
     putVisited u y
-    return [y] 
+    return [y]
 wordWhnf' t
     | isVar (head t) = do -- alpha T1...Tm
         ps <- forM (zip [(0::Int)..] $ args t) $ \(j, arg) -> do
@@ -175,7 +175,7 @@ wordWhnf' t
         putVisited t y
         return [y]
     | isConstant (head t) && not (isSkipEnd (head t)) = do -- iota, iota != Skip, Wait, Close
-        y <- addProductions t (Map.singleton (show t) []) 
+        y <- addProductions t (Map.singleton (show t) [])
         putVisited t y
         return [y]
     | isArrowChoiceRecord (head t) = do -- iota T1...Tm, iota = ->, Choice, Records
@@ -184,4 +184,4 @@ wordWhnf' t
             return (show (head t) ++ show j, w ++ [bottom])
         y <- addProductions t (Map.fromList ps)
         putVisited t y
-        return [y] 
+        return [y]

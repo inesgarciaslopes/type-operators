@@ -16,37 +16,36 @@ import Data.Maybe
 first :: Set.Set Variable -> Variable
 first s = Prelude.head $ filter (`Set.notMember` s) [0..]
 
--- | take the set of absorbing vars and returns a set of free and reachable vars. 
+-- | returns the set of free and reachable vars of the type with regards to a set of potentialy absorbing variables.
 reachable :: Set.Set Variable -> Type -> Set.Set Variable
-reachable s (Var a) = Set.singleton a
+reachable s (Var a) 
+    | a `Set.member` s = Set.empty
+    | otherwise = Set.singleton a
 reachable s (Abs x _ t) = Set.delete x (reachable s t)
 reachable s (Choice _ m) = Set.unions (map (\(_, t) -> reachable s t) (Map.toList m))
-reachable s (App (Rec{}) (Abs x _ t)) = reachable (x `Set.insert` s) t
+reachable s (App Rec{} (Abs x _ t)) = reachable (x `Set.insert` s) t
 reachable s (App t u)
-    | fst (absorbing s t) = reachable s t
+    | absorbing s t = reachable s t
     | otherwise = reachable s t `Set.union` reachable s u
 reachable _ _ = Set.empty
 
-absorbing :: Set.Set Variable -> Type -> (Bool, Set.Set Variable)
-absorbing _ End{} = (True, Set.empty)
+absorbing :: Set.Set Variable -> Type -> Bool
+absorbing _ End{} = True
 absorbing s (App Semi t) = absorbing s t
-absorbing s (Choice _ m) =  foldr (join . absorbing s) (True, Set.empty) (Map.elems m)
-    where join (bl, sl) (br, sr) = (bl && br, Set.union sl sr)
-absorbing s (App (App Semi t) u) =
-    let (bl, sl) = absorbing s t in
-    if bl then (bl, sl) else absorbing s u
-absorbing s (App (Rec{}) (Abs x _ t)) = absorbing (Set.insert x s) t
-absorbing s (App (Rec{}) t) = absorbing s t
-absorbing s (App (Quantifier{}) (Abs x _ t)) = absorbing (Set.delete x s) t
-absorbing s (App (Quantifier{}) t) = absorbing s t
+absorbing s (Choice _ m) =  foldr (join . absorbing s) True (Map.elems m)
+    where join bl br = bl && br
+absorbing s (App (App Semi t) u) = absorbing s t || absorbing s u
+    -- let (bl, sl) = absorbing s t in
+    -- if bl then (bl, sl) else absorbing s u
+absorbing s (App Rec{} (Abs x _ t)) = absorbing (Set.insert x s) t
+absorbing s (App Rec{} t) = absorbing s t
+absorbing s (App Quantifier{} (Abs x _ t)) = absorbing (Set.delete x s) t
+absorbing s (App Quantifier{} t) = absorbing s t
 absorbing s (App Dual t) = absorbing s t
-absorbing s (Var a) =
-    if a `Set.member` s
-        then (True, Set.singleton a)
-        else (False, Set.empty)
+absorbing s (Var a) = a `Set.member` s
 absorbing s (Abs x _ t) = absorbing (Set.insert x s) t
 absorbing s (App (Abs x _ t) u) = absorbing s (substitution t u x)
-absorbing _ _ = (False, Set.empty)
+absorbing _ _ = False
 
 rename :: Set.Set Variable -> Type -> Type
 rename s u@(Abs a k t) = Abs v k (rename s' (substitution t (Var v) a))

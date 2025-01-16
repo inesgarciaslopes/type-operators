@@ -1,102 +1,175 @@
 \chapter{Type Operators in FreeST: Implementation}
 
+This chapter outlines the implementation of type operators in FreeST, detailing the modular design and techniques employed to extend the language's capabilities. A concise overview of the implementation is provided in \cref*{tab:modules}, summarizing the Haskell modules developed and their respective functionalities. These contributions collectively broaden FreeST's capabilities while preserving its theoretical foundations.
+\\
+
 \input{./tex/modules.tex}
 
-\todo{either table 4.1 here as an overview/introduction or at the end as a summary.}
-
 \section{Types}
+The implementation begins by defining fundamental type distinctions, such as message polarity (\lstinline|Polarity|), channel choice (\lstinline|View|), and distinctions between records and variants (\lstinline|Sort|). The structure aligns closely with FreeST for consistency and ease of integration. These correspond to the elements $\sharp$, $\choicep$ and $\varrecs{}$ in \cref*{fig:syntax-types}:\
 
+\begin{lstlisting}
+    data Polarity = Out | In deriving (Eq)
+
+    data View = External | Internal deriving (Eq)
+
+    data Sort = Record | Variant  deriving (Eq)
+\end{lstlisting}
+Building on these, let's tackle kinds next. Base kinds are categorized into session kind (\lstinline|Session|) and functional kind (\lstinline|Top|). Now with our work focusing on the introduction of type operators, kinds can also be of higher-order (\lstinline|ArrowK|).
+
+\begin{lstlisting}
+    data BaseKind = Session | Top deriving (Ord, Eq) 
+
+    data Kind = ProperK BaseKind | ArrowK Kind Kind deriving (Ord, Eq)
+\end{lstlisting}
+FreeST further enriches kinds by incorporating \lstinline|Multiplicity| (covered in Section 2.4) and \lstinline|Span| (used for error handling). Additionally, FreeST introduces a third base kind, the absorbing base kind, which addresses (local) type inference. These features were not explored in this study as they lie beyond the primary scope of the work.
+
+% Starting simple, we need to define how to distinguish whether we want to send a message or receive. This Output/Input relation is expressed through the data type \lstinline|Polarity|. This corresponds to the $\sharp$ (definition?) in \cref*{fig:syntax-types}.
+% We also need to express whether a channel choice is internal or external. This is represented by the data type \lstinline|View|, that directly correlates to the $\choicep$ (definition?) in \cref*{fig:syntax-types}. Next we want to differentiate between records and variants. The $\varrecs{}$ (definition?) found in \cref*{fig:syntax-types} is expressed through the data type \lstinline|Sort|.
+% This can also be found in FreeST as we try not to deviate a lot from it's original syntax.
+
+In order to define the types of $\FMuSemiOmega$ we presented in \cref*{fig:syntax-types} two definitions: one for types $\TT$, another for type constructors $\typec{\iota}$. However, when it comes to the concrete implementation, types are unified into a single \lstinline|Type| data type for simplicity. Both approaches are equivalent, as our first attempt closely resembled the definitions and prior work found in [ref Pocas]. In the end we diverged from the dual-definition approach to simplify the integration of this work into FreeST.
+Straightforwardly, a type can be either:
+\begin{itemize}
+  \item a type operator $\typec{\iota}$. 
+  \item a type variable $\typec{\alpha}$. We represent $\typec{\alpha}$ as \lstinline|Var Variable|, where \lstinline|Var| is the name constructor and \lstinline|Variable| the internal representation, in our case, an Integer.
+  \item an abstraction $\tabs{\alpha}{\kind}{\TT}$. We represent this as \lstinline|Abs Variable Kind Type| where: \begin{itemize}
+    \item \lstinline|Abs| is the name constructor.
+    \item \lstinline|Variable| is the bound type variable $\typec{\alpha}$.
+    \item \lstinline|Kind| is the kind $\kind$ of the associated bound variable $\typec{\alpha}$.
+    \item \lstinline|Type| is the body of the abstraction $\TT$.
+  \end{itemize}  
+  \item an application $\tapp T U$. We represent this as \lstinline|App Type Type|, where \lstinline|App| is the name constructor that takes two types as arguments.
+\end{itemize}
+
+We define the type operators skip, dual and sequential composition $\Semi$ as \lstinline|Skip|, \lstinline|Dual|, \lstinline|Semi| respectively. To distinguish between the Wait and Close operators and avoid duplicate code, we define a single type \lstinline|End| that takes a \lstinline|Polarity| to differentiate between the two: $\End_\typec?$ (Close) and $\End_\typec!$ (Wait). The type operator \lstinline|Arrow| takes two base kinds. If we consider the fully applied type operator, $\lambdared{T}{U}$, these kinds correspond to the kind of the type on the left ($\TT$) and right  ($\typec{U}$) side of the type operator. 
+% \todo{explain their limitation when type formation what kind do they have?}
+Records and variants are expressed through the type \lstinline|Labelled Sort LabelMap|. We already know what the data type \lstinline|Sort| represents, thus we must talk about the \lstinline|LabelMap| type. As the name suggest, this is a map that maps variables, i.e labels, to types. 
+% \todo{Maybe example of a record?There's a paper with this example.}.
+To define the recursive type operator we write \lstinline|Rec BaseKind|, where the base kind is the kind of the bound variable. Of course, if we want to write $\mu a:k . T$, one must apply the type operator to a lambda abstraction. 
+Dealing with quantifiers next. We want to account for universal and existial types and differentiate between the two through \lstinline|Polarity|. Thus, a quantifier takes a polarity and two kinds. A message takes a polarity and a base kind.
+At last, a channel choice is very similar to a \lstinline|Labelled| operator but instead takes a \lstinline|View| and a \lstinline|LabelMap|.
+The biggest difference from FreeST shines in, now we only have four types and the introduction of type operators. We also promoted the polymorphic universal type to also account for existential types, therefore defining quantifier types which can be used for further research. 
+
+The finished module contains 133 LoC. The module header:
 \begin{lstlisting}
 module Syntax (Type(..), LabelMap, Polarity(..), Sort(..), View(..), Variable, Kind(..), BaseKind(..), dual) where
 \end{lstlisting}
 
-A \lstinline{LabelMap} consists on a map where the keys are Variables, i.e integers, and the values are Types.
-
-A \lstinline{Polarity} defines whether a type has an output functionality or input. 
-
-A \lstinline{View} defines whether a choice is considered to be internal () or external ().
-
-A \lstinline{Sort} defines whether a type is a record or a variant.
-
-A \lstinline{BaseKind} can be either a session kind or a functional kind. 
-
-The datatype \lstinline{Kind} tells us a kind can be a proper-kind, i.e a basekind, or constructed by an arrow, $k -> k$.
-
-\todo{define used haskell syntax carefully}
-
 \section{Reduction and Weak Head Normal Form}
+Let's cover first the module Substitution. This
+implements the literature capture-avoiding substitution on types $[\TT/\typec{U}]\alpha$, such that we substitute $\TT$ for for every occurrence of $\alpha$ in $\typec{U}$, and the set of free variables in a type, $\fv(\TT)$. 
+
+\input{./tex/substitution.tex}
+
 
 \begin{lstlisting}
 module WeakHeadNormalForm (isVar, head, isConstant, args, iswhnf) where
 \end{lstlisting}
 
+This modules deals with types in weak head normal form.
+We also provide auxiliar functions that prove to be useful in other modules as well:
+
+\begin{itemize}
+  \item \textbf{isVar}, given a type $\TT$ check whether $\TT$ is a type variable.
+  \item \textbf{isConstant}, given a type $\TT$ check whether $\TT$ is a type operator.
+  \item \textbf{head}, given a type $\TT$ return the head of the type.
+  % \item \todo{explain depth and neck}
+\end{itemize}
+
+The function \lstinline|iswhnf|        implements the rules found in \cref*{fig:whnf}.
+
 \begin{lstlisting}
     iswhnf :: Type -> Bool
 \end{lstlisting}
 
-\lstinline{iswhnf} takes a type and returns if it is in weak head normal form, according to the rules in fig.[]. This function depends on the functions isVar, isConstant, head, neck and depth, that we export with the module, as well as functions that verifiy the pre-conditions of each rule present in fig. [].
+Rule x states that any type operator is a weak head normal form. This means we just need to check if $\TT$ is a type operator, i.e we simply call function isConstant. For rule $\wabs$, since we don't permit reductions under lambda terms, a lambda abstraction is in weak head normal form. We can just pattern match the type and return True. The partially applied type $;T$ is also in weak head normal form and we can just pattern match it. For rule w-const1, a type operator, except $\Semi \mu \Dual$, applied to one or more types is in weak head normal form. Let's take for example the type $T = !\Int$:
+
+\begin{itemize}
+  \item first we must check if the head of type $\TT$ is a type operator. The call to function $head (T)$ returns the type operator $!$, thus function isConstant returns True.
+  \item Then we must make sure that the head of type $\TT$ is neither a sequential composition, a recursive operator or a dual operator. We have a function that deals with checking these preconditions. 
+  \item Finally we must make sure the depth of the type is at least one. The call to function $depth (T)$ returns exactly one.
+\end{itemize}
+We can conclude that $!\Int$ is in weak head normal form.
+What about a type of form $\tapp{\Semi}{T_1...T_m}$? Rule w-seq2 says the type must be applied to at least two types, where the neck of the type must be in weak head normal form and different from $U;V$ and $\Skip$. Consider type $T = !Int;Close$, is this type in weak head normal form?
+
+\begin{itemize}
+  \item first we must check if the head of type $\TT$ is a type operator, in particular a sequential composition. Note, we write the types in infix notation so it is easier to read. Type $\TT$ is equivalent to writing $\tapp{(\tapp{\Semi}{(\tapp{!}{Int})})}{\Close}$ and thus follows rule w-seq2.
+  \item then we must check if the neck of the type $\TT$ is also in weak head normal form and is different from $U;V$ and $\Skip$. 
+  \item Then we check if the depth of the type $\TT$ is greater than two. The call to function $depth (T)$ returns exactly two. 
+\end{itemize}
+Since all these conditions meet, we can confirm that $!Int;Close$ is in weak head normal form. 
+Similarly following rule w-dual, we must check first that the head of the type is the type operator $\Dual$, then that the neck of the type is a weak head normal form and that it differs from the preconditions stated in the rule in \cref*{fig:whnf}.
+
+We have divided the rules in \cref*{fig:reduction} into two functions: \lstinline|reduceBSD| and \lstinline|reduceMu|. Both these functions take a type $\TT$ as argument and return a \lstinline|Maybe Type|. 
+% \todo{explain why we use monad maybe from haskell}.\lstinline|reduceMu| includes the rules in []. \todo{explain rules.}
+
 
 \begin{lstlisting}
 module Normalisation (norm, weaknorm, red) where
 \end{lstlisting}
 
+Does a type $\TT$ reduce to a weak head normal form? Function $norm$ returns True if type $\TT$ normalises and false otherwise. Checking if type $\TT$ normalises might not always terminate because some recursive types might not terminate.
+
 \begin{lstlisting}
     norm :: Type -> Bool
     weaknorm :: MuSet -> Type -> Maybe Type
+    red :: Type -> Maybe Type
 \end{lstlisting}
 
 \lstinline{norm} returns true if a type normalises to a weak head normal form, otherwise returns false.
 
-\lstinline{weaknorm} takes two arguments, a set (containing only mu types) and a type, returns the monadic Maybe of a type---Nothing if the type does not reduce to a weak head normal form, Just if the type reduces.
+\lstinline{weaknorm} takes two arguments, a set (containing only mu types) and a type, returns the monadic Maybe of a type---Nothing if the type does not reduce to a weak head normal form, Just if the type reduces. Let's check if type $T$ normalises:
 
-\todo{probably take this code out but explain carefully each step.}
-\begin{lstlisting}
-weaknorm :: MuSet -> Type -> Maybe Type
-weaknorm visited t = 
-  case reduceBSD t of
-    Just t' -> weaknorm visited t'
-    Nothing -> case t of
-      (App (Rec _) _) -> weaknorm' visited t
-      (App (App Semi u@(App (Rec _) _)) _) -> weaknorm' visited u
-      (App Dual u@(App (Rec _) _)) -> weaknorm' visited u
-      (App (App Semi (App Dual u@(App (Rec _) _))) _) -> weaknorm' visited u
-      _ -> Just t
-  where
-    weaknorm' s t
-      | t `Set.member` s = Nothing -- been here before
-      | otherwise = 
-        case reduceMu t of
-          Just t' -> weaknorm (Set.insert t s) t'
-          Nothing -> Just t
-\end{lstlisting}
+\begin{itemize}
+  \item We initiate \lstinline|weaknorm| with an empty set and type $\TT$. Next, we try to reduce $\TT$ through reduction rules without mu operator. If this returns the reduced (one-step) type $\typec{T_1}$, we recursively call function \lstinline|weaknorm| with an empty set on $\typec{T_1}$. If the type does not reduce through BSD rules, then it must fall into one of the four patterns explained in \cref*{sec:recursion_restriction}.
+  \item We pattern match the type and check whether we have visited this type yet. If the visited types set contains ype $\TT$ then we terminate the algorithm. Otherwise, we try to reduce the type through a mu reduction rule. If this returns a reduced type $\typec{T_2}$, we insert type $\TT$ into the visited set and recursively call function \lstinline|weaknorm| with the updated set on $\typec{T_2}$. If the type does not reduce through a mu reduction rule, then it means the type doesn't reduce further. Therefore we terminate the algorithm returning the normalised type.
+\end{itemize}
 
-\begin{lstlisting}
-module Rename (rename) where
-\end{lstlisting}
-
-\todo{talk about example that changed rename. }
-\begin{lstlisting}
-module Substitution (substitution, freeVars) where
-
-\end{lstlisting}
 \section{Type Formation}
 
-\todo{Os kinds de arrow têm de estar totalmente aplicados, se não, não conseguimos distinguir se temos S -> T, T -> T, S -> S. }
-\todo{Esta escolha foi feita porque não temos sub-typing.}
-
 \begin{lstlisting}
-module TypeFormation (synthetise, preSynthetise -- tests only) where
-
+  module TypeFormation (synthetise) where 
 \end{lstlisting}
 
 \begin{lstlisting}
-    synthetise :: KindingCtx -> Type -> Maybe Kind
+  synthetise :: KindingCtx -> Type -> Maybe Kind
 \end{lstlisting}
 
-synthetise takes a kinding context (a map Variable-Kind) a type and returns if the type is well-formed. It consists on two steps: first we check if the type is pre-kinded, where we invoce function \lstinline{preSynthetise}; then we check if T normalises. 
+\lstinline|synthetise| takes two arguments---a kinding context, i.e. a map Variable-Kind, and a type---and returns the monadic Maybe of a kinda---Nothing if the type is not well-formed, Just k if type checks. It consists on two steps: first we check if the type $\TT$ is pre-kinded, where we invoce function \lstinline{preSynthetise}; then we check if $\TT$ and all its sub-terms normalise, through a function call \lstinline|valid|. 
 
-\todo{take figure where the rules are written and overlay in a darker grey which part represents each phase of synthetising a type.}
-\todo{Another take would be do to a diagram: Is T a type? }
+Function \lstinline|preSynthetise| takes:
+\begin{itemize}
+  \item \textbf{KindingCtx}, a map that stores as keys variables and as values their associated kinds $\kind$.
+  \item \textbf{Type}, a type $\TT$.
+  \item \textbf{Maybe Kind}, the pre-kind $\kind$ of type $\TT$ or Nothing.
+\end{itemize}
+
+The pre-kinds of type operators can be found in \cref*{fig:syntax-types}.
+% \todo{Os kinds de arrow têm de estar totalmente aplicados, se não, não conseguimos distinguir se temos S -> T, T -> T, S -> S. }
+% \todo{Esta escolha foi feita porque não temos sub-typing.}
+
+We want to write: the type operator $\iota$ has pre-kind $\kind$ or $\kind'$. In terms of implementation, this is not so trivial. In reality, the type operator arrow can have the following forms:
+\begin{itemize}
+  \item It can take two functional type, bearing pre-kind $\karrow{\karrow{\tkind}{\tkind}}{\tkind}$.
+  \item It can take two session types, culminating in pre-kind $\karrow{\karrow{\skind}{\skind}}{\skind}$.
+  \item Or it can take one session type and one functional type. That means either $\karrow{\karrow{\skind}{\tkind}}{\tkind}$ or $\karrow{\karrow{\tkind}{\skind}}{\tkind}$.
+\end{itemize}
+
+This works for type operators with a finite arity. We could have four kinds of arrow operators, translated into code as:
+
+\begin{lstlisting}
+  preSynthetise Arrow = Just (ArrowK (ProperK Top) (ArrowK (ProperK Top) (ProperK Top)))
+  preSynthetise Arrow = Just (ArrowK (ProperK Session) (ArrowK (ProperK Session) (ProperK Top)))
+  preSynthetise Arrow = Just (ArrowK (ProperK Top) (ArrowK (ProperK Session) (ProperK Top)))
+  preSynthetise Arrow = Just (ArrowK (ProperK Session) (ArrowK (ProperK Top) (ProperK Top)))
+\end{lstlisting}
+However, this is not a viable solution for type operators with infinite applications such as records and choices. To solve this problem, we explictly declare the kinds on either side of the Arrow operator. Another possible solution would be to introduce sub-typing. This goes beyond the objectives within our work. 
+
+A type variable $\alpha$ is pre-kinded if its kind is stored in the kinding context. Thus, we can just lookup for its kind $\kind$ in the map, as stated in rule pk-var.
+For abstractions, we first need to store the kind of the bound variable in the kinding context, \lstinline|Map.insert x k ctx|, and then we have to make sure the body of the abstraction is also well-formed. If this is found to be True, we return the pre-kind $k => k'$. Trivially, an application $\tapp T U$ is pre-kinded if each side of the application is pre-kinded, that is if $\TT$ and $\typec{U}$ pre-kinds.
+% \todo{take figure where the rules are written and overlay in a darker grey which part represents each phase of synthetising a type.}
+% \todo{Another take would be do to a diagram: Is T a type? }
 
 \subsection{Decidability of type formation}
 \subsection{Restrictions to Recursion}
@@ -107,7 +180,116 @@ synthetise takes a kinding context (a map Variable-Kind) a type and returns if t
 module Grammar ( Grammar(..), Word, Label, Productions, Transitions) where
 \end{lstlisting}
 
+Terminal symbols are called labels. We consider them as \lstinline|String|. Non-terminal symbols are type variables and words are strings of non-terminals. 
 \begin{lstlisting}
-module TypeToGrammar (word, convertToGrammar) where
+type Word = [Variable]
 \end{lstlisting}
+A transition from a given non-terminal is a map from \lstinline|Label| keys to \lstinline|Word| values. Productions in a grammar map \lstinline|Variable| keys to \lstinline|Transitions|. Finally, a grammar is a data type of a list of words and \lstinline|Productions|.
+
+\begin{lstlisting}
+data Grammar = Grammar [Word] Productions 
+\end{lstlisting}
+
+% \todo{what can we do with this monad.}
+Our module TypeToGrammar deals with the monad State. 
+We will need to store in our state: a map of \lstinline|Productions|, the next index available, and a map of visited types.
+\begin{lstlisting}
+  data BState = BState {
+    productions  :: Productions
+  , nextIndex    :: Int
+  , visited :: Visited
+  }
+\end{lstlisting}
+
+We then need an initial state, that is, with no productions \lstinline|Map.empty|, the first available index is \lstinline|1| and no visited types \lstinline|Map.empty|. We also have trivial functions that retrieve information from the state---\lstinline|freshNonTerminal|, \lstinline|getProductions| and \lstinline|getVisited|---as well as functions to update the state---\lstinline|putProductions| and \lstinline|putVisited|.
+
+\begin{lstlisting}
+convertToGrammar :: [Type] -> Grammar
+convertToGrammar ts = Grammar w prods
+  where
+    (w, s) = runState (mapM word ts) initial
+    prods         = productions s
+\end{lstlisting}
+So how can we translate a type into a grammar? Function \lstinline|convertToGrammar| takes a list of types and returns a Grammar. This will invoke \lstinline|runState| from the State monad to map the function \lstinline|word| to every element of the list of types. The initial state is also passed as an argument to \lstinline|runState|.
+
+% \todo{explicar o que retorna o runState.}
+
+Following \cref*{fig:word}, the implemented function \lstinline|word| takes a type as argument and returns a State Word. Given a type $\TT$:
+\begin{itemize}
+  \item If $\TT$ is in weak head normal form, then we invoke an auxiliar function that translates types in weak head normal form to words of a grammar. Let's look at them individualy: \begin{itemize}
+    \item The type operator $\Skip$, trivially returns the empty word of a grammar, $[]$.
+    \item The type operator $T = \End\Sharp$ returns a fresh non-terminal with a transition to $\bot$, the non-terminal symbol with no productions. We update the \lstinline|productions| map and add the type to the visited map.
+    \item The type $T = \Sharp\TT$ returns a fresh non-terminal with two transitions, one to $word(T)$ another one to the empty word. We update the \lstinline|productions| map and add the type to the visited map.
+    \item The type $T = \tabs{\alpha}{\kind}{\TT}$ returns a fresh non-terminal with a transition to $word(T)$. We update the \lstinline|productions| map and add the type to the visited map.
+    \item The type $T = Quantifier$ returns a fresh non-terminal with a transition to the concatenation of $word(T)$ and $\bot$. We update the \lstinline|productions| map and add the type to the visited map.
+    \item The partially applied type $;T$ returns a fresh non-terminal with a transition to $word(T)$. We update the \lstinline|productions| map and add the type to the visited map.
+    \item The type $T;U$ returns a call to $word(T)$ and $word(U)$.
+    \item The partially applied type $T = Dual U$ returns a fresh non-terminal with a two transitions, one to $word(U)$ and another to the empty word. We update the \lstinline|productions| map and add the type to the visited map.
+    \item The type $T = \tapp{\alpha}{T_1...T_m}$ returns a fresh non-terminal with two transitions, one to the empty word, another to the concatenation of $word(Tj)$ and $\bot$. First we extract each of the applied types and associate them to a number $j$, then we calculate each word of $Tj$ and update the \lstinline|production| map. Then, we can add the type to the visited type map.
+    \item For all type operators except $\Skip$ and $\End\Sharp$, we return a fresh non-terminal with a transition to the empty word. We update the \lstinline|productions| map and add the type to the visited map.
+    \item For the types whose head are either an $Arrow$, $Choice$ or $record$, we return a fresh non-terminal with transitions to $word(Tj)$. Again, we first extract each of the types and then enumerate them. Finally we update the \lstinline|productions| map and mark the type as visited.
+  \end{itemize}
+  \item If $\TT$ is not in weak head normal form but $\TT$ normalises to $\Skip$, then we simply return the empty word.
+  \item Otherwise, $\TT$ normalises to type $\typec{U}$. We first calculate the $word(U)$ such that it has a form $Z:delta$, where $Z$ is the first non-terminal of the word. Then, for each transition of $Z$ to $gamma$, we will have a transition from a fresh non-terminal to the concatenation of $gamma$ and $delta$. Finally we update the \lstinline|productions| map and mark the type as visited.
+\end{itemize}
+
+Our implementation has an otimization regarding words of terminal we have already visited. This is why we include in the State a set of visited types, so whenever we see a type that we've already visited we can just lookup its corresponding word in the map, instead of calculating it again. This module has 188 LoC. 
+
+% \begin{lstlisting}
+%   instance Rename T.Type where
+%   -- Functional types
+%   rename σ τ (T.Arrow p m t u) = T.Arrow p m <$> rename σ τ t <*> rename σ τ u
+%   rename σ τ (T.Labelled p s m) = T.Labelled p s <$> tMapM (rename σ τ) m
+%   -- Session types
+%   rename σ τ (T.Semi p t u) = T.Semi p <$> rename σ τ t <*> rename σ τ u
+%   rename σ τ (T.Message p pol t) = T.Message p pol <$> rename σ τ t
+%   -- Polymorphism and recursive types
+%   rename σ τ (T.Forall p b) = T.Forall p <$> rename σ τ b
+%   -- Without rec-cleaning
+%   rename σ τ (T.Rec p b) = T.Rec p <$> rename σ τ b
+%   -- With rec-cleaning
+%   -- rename σ τ (T.Rec p b@(Bind _ a _ t))
+%   --   | a `T.isFreeIn` t = T.Rec p <$> rename σ τ b
+%   --   | otherwise = rename σ τ t
+%   rename σ _ (T.Var p a) = return $ T.Var p (Map.findWithDefault a a σ)
+%   -- Type operators
+%   rename σ τ (T.Dualof p t@T.Var{}) = T.Dualof p <$> rename σ τ t
+%   rename _ _ t@T.Dualof{} = internalError "Typing.Rename.rename" t
+%   -- Int, Float, Char, String, Skip, End
+%   rename _ _ t = return t
+% \end{lstlisting}
+
+\begin{lstlisting}
+  module Rename (rename) where
+\end{lstlisting}
+
+This modules has 79 LoC and depends on the Syntax and Substitution module.
+
+The function \lstinline|rename| takes:
+\begin{itemize}
+  \item \textbf{Set Variable}, a set of available variables for renaming $form$.
+  \item \textbf{Type}, the type $\TT$ for renaming.
+\end{itemize}
+
+The renaming of a type operator or a type variable is equal to themselves. In order to rename an abstraction $\tabs{\alpha}{\kind}{\TT}$ we must know if the bound variable $\alpha$ is reachable within its body $\TT$ or not. We have implemented a function \lstinline|reachable| that takes a set of absorbing type variables and a type $\TT$ and returns a set containing only free and reachable variables. 
+% \todo{example of reachable abs.}
+
+\input{./tex/absorbing.tex}
+
+\todo{describe reachable types and how it is implemented.}
+\todo{finish rename.}
+
+% \begin{lstlisting}
+%   rename :: Set.Set Variable -> Type -> Type
+% rename s u@(Abs a k t) = Abs v k (rename s' (substitution t (Var v) a))
+%     where s' = if a `Set.member` reachable Set.empty t
+%                 then s `Set.union` reachable Set.empty u
+%                 else Set.empty
+%           v = first s'
+% rename s w@(App t u) = App (rename s' t) (rename s u)
+%     where s' = s `Set.union` reachable Set.empty w
+% rename _ t = t
+% \end{lstlisting}
+
+
 \LIMPA

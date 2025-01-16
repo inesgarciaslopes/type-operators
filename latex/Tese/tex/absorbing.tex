@@ -1,0 +1,65 @@
+\begin{figure}[h]
+    \declrel{Absorbing}{$\absorbing \TT$}
+    \begin{align*}
+      \absorbing{\End\Sharp}&= (\truerulename, \emptyset)
+      \\
+      \absorbing{\tapp{\Semi}{T}}&=\absorbing{\TT}
+      \\
+      \absorbing{\tapp{\tapp{\Semi}{T}}{U}}&=\absorbing{\TT}\|\absorbing{\typec{U}}
+      \\
+      \absorbing{\tapp{\mu}{\tabs{\alpha}{\kind}{\TT}}}&=\absorbings{S\cup\alpha}{\TT}
+      \\
+      \absorbing{\tapp{\quant\kind}{\tabs{\alpha}{\kind}{\TT}}}&=\absorbings{S\cup\alpha}{\TT}
+      \\
+      \absorbing{\tappdual{\TT}}&=\absorbing{\TT}
+      \\
+      \absorbing{\tabs{\alpha}{\kind}{\TT}}&=\absorbings{S\cup\alpha}{\TT}
+      \\
+      \absorbing{\tapp{(\tabs{\alpha}{\kind}{\TT})}{\typec{U}}}&= \absorbing{\TT\subs{\typec{U}}\alpha}
+    \end{align*}
+    \caption{Absorbing types.}
+    \label{fig:absorbing}
+  \end{figure}
+  \begin{figure}[h]
+    \declrel{Reachable}{$\reachable \TT$}
+    \begin{align*}
+      \reachable{\tiota}&=\emptyset
+      \\
+      \reachable{\talpha}&= \{\talpha\}
+      \\
+      \reachable{\tabs{\alpha}{\kind}{\TT}}&=\reachables{S\setminus\{\talpha\}}{\TT}
+      \\
+      \reachable{\tapp{\mu}{\tabs{\alpha}{\kind}{\TT}}}&=\reachables{S\cup{\{\talpha\}}}{\TT}
+      \\
+      \reachable{\tapp{\TT}{\typec{U}}}&= \begin{cases}
+          \reachable{\TT} & \operatorname{fst}(\absorbing{\TT})\\
+          \reachable{\TT}\cup{\reachable{\typec{U}}}
+        \end{cases}
+    \end{align*}
+    \caption{Reachable and free variables.}
+    \label{fig:reachable}
+  \end{figure}
+  \begin{figure}[h]
+    \declrel{Type renaming}{$\rename_S(\TT)$}
+    \begin{align*}
+      \rename_S(\typec\iota)&=\typec\iota
+      \\
+      \rename_S(\typec\alpha)&=\typec\alpha
+      \\
+      \rename_S(\tabs{\alpha}{\kind}{T}) &=
+      \tabs{\upsilon}{\kind}{{\blk{\rename_S(}}T\subs\upsilon\alpha})
+      \quad\text{where } \typec{\upsilon} = \begin{cases}
+        \operatorname{first}_{S\cup\reachables{\emptyset}{\typec{\tabs{\alpha}{\kind}{T}}}} 
+        & \talpha\in{\reachable{\TT}}
+        \\
+        \operatorname{first}_{\emptyset}
+        & \talpha\notin{\reachable{\TT}}
+      \end{cases}
+      \\
+      \rename_S(\tapp{T}{U}) &= \rename_{S\cup\reachables{\emptyset}{\tapp{T}{U}}}(\TT)\rename_S(\UT)
+    \end{align*}
+
+    \caption{Type renaming.}
+    \label{fig:rename}
+  \end{figure}
+

@@ -1,0 +1,26 @@
+\begin{figure}[h]
+    \declrel{Substitution}{$[\TT/\typec{U}]\alpha$}
+    \begin{align*}
+      [\typec{\iota}/\typec{U}]\alpha &=\typec{\iota}
+      \\
+      [\typec\alpha/\typec{U}]\alpha &=\typec{U}
+      \\
+      [\typec\alpha/\typec{U}]\beta &=\typec{\alpha} 
+      &\text{if}\hspace{0.5em} \typec{\alpha}\ne\beta
+      \\
+      [\tabs\alpha\kind\TT/\typec{U}]\alpha &=\tabs\alpha\kind\TT
+      \\
+      [\tabs\alpha\kind\TT/\typec{U}]\beta &=\tabs{\alpha}{\kind}{[\TT/\typec{U}]\beta}
+      &\text{if}\hspace{0.5em} \typec{\alpha}\ne\beta 
+      \hspace{0.5em}\text{and}\hspace{0.5em} \beta\notin\fv(\typec{U})
+      \\
+      [\tabs\alpha\kind\TT/\typec{U}]\beta &=\tabs{\gamma}{\kind}{[{([\TT/\gamma]\alpha)}/\typec{U}]\beta}
+      &\text{if}\hspace{0.5em} \typec{\alpha}\ne\beta 
+      \hspace{0.5em}\text{and}\hspace{0.5em} \beta\in\fv(\typec{U})
+      \\
+      [\tapp{T}{V}/\typec{U}]\alpha &=\tapp{([\TT/\typec{U}]\alpha)}{[\typec{V}/\typec{U}]\alpha}
+    \end{align*}
+    where $\typec \gamma = \operatorname{freshvar}_{\fv(\typec{U})\cup\fv(\TT)}$
+    \caption{Substitution.}
+    \label{fig:subs}
+  \end{figure}

@@ -52,7 +52,7 @@ neck (App t u)
   | otherwise = neck t
 
 args :: Type -> [Type]
-args (App w@(App{}) v) = args w ++ [v]
+args (App w@App{} v) = args w ++ [v]
 args (App (Var _) t) = [t]
 args _ = []
 
@@ -69,11 +69,11 @@ preSeq2 _ = False
 
 preDual :: Type -> Bool
 preDual Skip = True
-preDual (Quantifier {}) = True
-preDual (End _) = True
-preDual (Message _ _) = True
+preDual Quantifier {} = True
+preDual End {} = True
+preDual Message {} = True
 preDual (App (App Semi _) _) = True
-preDual (Choice _ _) = True
+preDual Choice {} = True
 preDual (App Dual t) | isVar (head t) = True
 preDual _ = False
 

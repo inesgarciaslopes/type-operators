@@ -1,109 +1,147 @@
 \chapter{Validation}
 
-\todo{p. ligação}
-\todo{talk about testing structure}
+This chapter focuses on the process of validation through both property and unit testing. It details the implementation of unit tests and explores property-based testing by using the QuickCheck library in Haskell. We also highlight the challenges that come along with trying to comprehensively test systems as this. A summary list of properties can be found in \cref*{tab:properties}.
 
-
-\begin{description}[wide=0pt, leftmargin=1.5em, itemsep=0.2em]
-  \item[test]
-    \begin{description}[wide=0pt, leftmargin=1.5em, itemsep=0.2em]
-      \item[\textgreater] QuickCheck
-      \item[\textgreater] UnitTests
-      \item[\textcolor{purple}{Spec.hs}]
-      \item[\textcolor{purple}{UnitSpec.hs}]
-    \end{description}
-\end{description}
+\input{./tex/quickcheck.tex}
 
 %The current FreeST compiler features an algorithm for checking the bisimilarity of simple grammars, which we use for testing. The testing process takes a suite of randomly generated types---a small subset of FreeST's types, based on the syntax presented in fig:syntax-typesleveraging the Quickcheck library~ DBLP:conf/icfp/ClaessenH00 to ensure these types have specific properties. Formal proofs regarding decidability of type formation and equivalence can be found elsewhere DBLP:conf/esop/PocasCMV23.
 
-\section{Unit Testing}
-\todo{sub-section: on how to compile/run :units}
-
-\todo{a regra do dual só estava definida para m >=2, logo muitos testes não eram apanhados.}
-\todo{motivação para testes unitários.}
-\todo{e nos records e labels? Não podiamos ter todas as labels a S ou só T. Logo descartamos a ideia das 4 setas.}
 \section{Property Testing}
 
-An arbitrary type generator is defined using the \lstinline{Arbitrary} typeclass, employing the \lstinline{frequency} function to generate type operators with specific probabilities. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \lstinline{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. For better statistics we ensure proper distribution of type constructors. A total of 200.000 tests were made for each property.
+Property testing is based on verifying that a system or function behaves accordingly to a set of predefined properties. These properties, previously defined by a developer, state rules that a system should satisfy. A well-known property-testing framework is Quickcheck, it runs numerous tests with randomly generated instances of data types to check if specific properties are met. If any property is violated, the library gives back to the developer a counterexample, the cause of failure.
 
-Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3.
+Since most of the properties we will cover deal with types, the first step we must follow is to define a type generator. To cover a wider spectrum of inputs, we've decided we would like test over arbitrary type instances. An arbitrary type generator is defined using the \lstinline{Arbitrary} typeclass. Essentially, since our type system is defined over four types ( constants, variables, abstractions and applications), our generator must cover these four arbitrary types (arbitraryConstant, arbitraryVariable, arbitraryAbs and arbitraryApp). Whenever we want to generate types with specific probabilities we employ the \lstinline{frequency} function, allowing for a more distributed test input probability. Variables are selected from a predefined range, abstractions are created by generating a variable, a kind, and a sub-type, and applications are formed by recursively generating two sub-types. The \lstinline{sized} function is used to control the size of the generated types, ensuring manageable recursion depth. 
+% Property testing complements traditional unit testing by providing a higher level of assurance that the code behaves correctly across a broad spectrum of inputs.
 
-
-\begin{lstlisting}
-    prop_distribution :: Type -> Type  -> Property
-\end{lstlisting}
+Typically, a property is a logical function that returns either Bool or \lstinline|Property| type. Let's dwelve into our properties.
 
 \begin{lstlisting}
     prop_rename :: Type -> Bool
 \end{lstlisting}
 
-The number of nodes in $\TT$ is the same as the number of nodes in \lstinline{rename} of $\TT$. 
+This property takes an arbitrary instance of $\TT$ and checks that the number of nodes in $\TT$ is the same as the number of nodes in $\renames{(\TT)}$. To define this property we implemented an auxiliar function that counts the number of nodes in a tree of type $\TT$.
+Let's consider type $\TT$ as $\semit{\Skip}{\tabs{\alpha}{\kind}{\alpha}}$ and its' binary tree representation:
 
-\todo{example of renaming an abstraction (tree).}
+\begin{center}
+    \begin{tikzpicture}
+    % Define matrix
+        \matrix (m) [matrix of math nodes, row sep=3em, column sep=1em]
+        {
+            && \typec{@}\\
+            & \typec{@} && \tabs{\alpha}{\kind}{\alpha}\\
+            \typec{;} && \Skip\\
+        };
+        % Draw arrows
+        \draw[-] (m-1-3) -- (m-2-2) node[midway, left] {};
+        \draw[-] (m-1-3) -- (m-2-4) node[midway, left] {};
+        \draw[-] (m-2-2) -- (m-3-1) node[midway, left] {};
+        \draw[-] (m-2-2) -- (m-3-3) node[midway, left] {};
+    \end{tikzpicture}
+\end{center}
+
+Running function nodes on type $\TT$ outputs the number $5$. Now if we try to run function $\renames{(\TT)}$, we get $\semit{\Skip}{\tabs{\alpha}{\kind}{\alpha}}$. Trivially, we can conclude that calling nodes on this renamed type will give us back the same number of nodes.
 
 \begin{lstlisting}
     prop_rename_idempotent :: Type -> Property
 \end{lstlisting}
 
-Rename is an idempotent function, that is, if we rename a renamed type $\TT$, it is equal to applying the function rename once. 
+Rename is an idempotent function, that is, if we rename a renamed type $\TT$, it is equal to applying the function rename once. Let's look at the previous example where $\TT =\semit{\Skip}{\tabs{\alpha}{\kind}{\alpha}}$ and calling rename produced $\TT$ again. Running $\renames{(\renames{(\TT)})}$ outputs the same as $\renames{(\TT)}$.
 
-\todo{show example in practice.}
 
 \begin{lstlisting}
     prop_reduction_preserves_renaming :: Type -> Property
 \end{lstlisting}
 
-This property verifies that if a type $\TT$ is equal to its' rename and $\TT$ reduces to another type $\typec{U}$, then the rename of $\typec{U}$ is the same as $\typec{U}$. 
-
-\todo{example.}
+This property verifies that if a type $\TT$ is equal to its' rename and there is a type $\typec{U}$ such that $\TT$ reduces to $\typec{U}$, then the rename of $\typec{U}$ is the same as $\typec{U}$. Let's look at type $\TT$ one more time. We already know that $\TT=\renames{(\TT)}$. Now if we look at the reduction rules in \cref*{fig:reduction}, there's one rule we can follow, $\rneut$. Therefore, we can consider the right side of the sequential composition operator as type $\typec{U}$ such that $\typec{U}=\tabs{\alpha}{\kind}{\alpha}$. Calling the function rename on type $\typec{U}$ we get the same type back, which proves $\typec{U} = \renames{(\typec{U})}$.
 
 \begin{lstlisting}
     prop_renaming_preserves_alpha_congruence :: Type -> Type -> Property
 \end{lstlisting}
 
-This means that if the rename of type $\TT$ and $\typec{U}$ is the same, then $\TT$ and $\typec{U}$ are alpha-congruent.
-This mean that they differ only in the names of bound-variables. 
-
-\todo{example.} The opposite is also true: if $\TT$ and $\typec{U}$ are alpha-congruent, then there renames must be equal.
+Given two types $\TT$ and $\typec{U}$, if their renames are the same ($\renames{(\TT)}=\renames{(\typec{U})}$), then $\TT$ and $\typec{U}$ are alpha-congruent. This mean that they differ only in the names of bound-variables. Let's look at an example. Consider $\TT =\tforall{\tabs{\alpha}{\kind}{\alpha}}$ and $\typec{U} =\tforall{\tabs{\beta}{\kind}{\beta}}$. Calling rename on these two types, we get $\renames{(\TT)}=\tforall{\tabs{0}{\kind}{0}}$ and $\renames{(\typec{U})}=\tforall{\tabs{0}{\kind}{0}}$. We can now make a call to a function that checks alpha-congruence. This outputs the boolean value $True$, meaning the types only differed in names of bound variables as expected. We took advantage of FreeST alpha-congruence function and made some small adjustments to cover for the new types that came along this work. Note that the opposite affirmation is also true: if $\TT$ and $\typec{U}$ are alpha-congruent, then there renames must be equal, $\renames{(\TT)}=\renames{(\typec{U})}$. We can take $\TT =\tforall{\tabs{\alpha}{\kind}{\alpha}}$ and $\typec{U} =\tforall{\tabs{\beta}{\kind}{\beta}}$, since we now know they are alpha-congruent and trivially prove their renames are equal to $\tforall{\tabs{0}{\kind}{0}}$.
 
 \begin{lstlisting}
     prop_whnf_does_not_reduce :: Type -> Property
 \end{lstlisting}
 
-This property checks the theorem []: If $\TT$ is in weak head normal form then it does not reduce further. 
-
-\todo{example.} The opposite states that is $\TT$ reduces, then it has not reach a weak head normal form.
+Given a type $\TT$ in weak head normal form, this property proves that $\TT$ does not reduce any further. Let's consider $\TT$ as $\tabs{\alpha}{\kind}{\alpha}$. If we go back to the definition of a type in weak head normal form in \cref*{fig:whnf}, we can see that $\TT$ clearly follows rule $\wabs$. Since our system doesn't allow for reductions under lmabda terms and there are no rules that apply to $\TT$ in \cref*{fig:reduction}, thus $\TT$ cannot reduce any further.
+The opposite states that if a type $\TT$ reduces, then it has not yet reach a weak head normal form. For instances, take $\TT$ as $\semit{\Skip}{\tabs{\alpha}{\kind}{\alpha}}$. We've already seen that this type has a reduction path through rule $\rneut$. Let's look at it as $\tapp{(\tapp{\Semi}{\Skip})}{\tabs{\alpha}{\kind}{\alpha}}$
+and check the rules in \cref*{fig:whnf}. Rule \rseqtwo states that $\tapp{\Semi}{T_1...T_m}$ is in weak head normal form if the neck of the type ($\typec{T_1}$) is in weak head normal form and is different from $\seqcomp{U}{V}$ and $\Skip$, which means $\TT$ cannot be a weak head normal form as it violates these preconditions ($\typec{T_1}=\Skip$).
 
 \begin{lstlisting}
     prop_preservation :: Type -> Property
 \end{lstlisting}
 
-Given type $\TT$ (well-formed) and $\TT$ reduces to some type $\typec{U}$ then $\typec{U}$ is a type.
+Given a type $\TT$ (well-formed) and $\TT$ reduces to some type $\typec{U}$ then $\typec{U}$ is also a (well-formed) type.
+\todo{example.}
+% Given a type $\TT$ (well-formed) and $\TT$ reduces to some type $\typec{U}$ then $\typec{U}$ is also a (well-formed) type. Let's look at the previous example where $\TT=\semit{\Skip}{\tabs{\alpha}{\skind}{\alpha}}$ and check if it is well-formed. This is the type formation derivation tree of type $\TT$:
+% \todo{derivation tree.}
+% We know that $\TT$ reduces in one step to $\tabs{\alpha}{\skind}{\alpha}$, through rule $\rneut$. This leaves us left with the need to check if $\tabs{\alpha}{\skind}{\alpha}$ is a (well-formed) type. Here is its' type formation derivation tree, concluding that $\tabs{\alpha}{\skind}{\alpha}$ is a type:
+
 
 \begin{lstlisting}
     prop_bisimilar :: Type -> Property
 \end{lstlisting}
 
 Given type $\TT$ (well-formed) and $\TT$ reduces to some type $\typec{U}$ then their respective grammars are equivalent.
+\todo{example.}
 
-\todo{update properties in table 5.1}
+A total of 200.000 tests were made for each property. For better statistics we ensure proper distribution of type constructors and verify this condition through a property \lstinline|prop_distribution|. Data was collected on a machine equipped with an Apple M3 Pro and 18GB of RAM, and tested with Haskell's version 9.6.3. Here's how you can run these tests:
+
+\todo{how to run :test. Combine all specs into one and use verboseCheckAll.}
+
+The statistics of each test can be found in \cref*{tab:properties}. The results we got were expected, ones even more challenging than we accounted for. While randomly generated types facilitate a robust analysis, certain properties, such as the type-formation preservation property and bisimilarity of simple grammars, prove challenging to test comprehensively. The difficulty arises from
+the simplicity of our generator and the inherent low probability that randomly generated test cases yield types that are both well-formed and reduce.
+Therefore, most of the tests cases do not satisfy the precondition $\istype{} T \kind$ and $\betared{T}{U}$, and Quickcheck ends up discarding 2.000.000 tests for the last two properties. To achieve better results, more
+complex generators, tailored to specific properties, would be required. Such generators are often challenging to design and implement. This may well be an area to focus on future work due to lack of time.
+
+\section{Unit Testing}
+Since property-based testing and unit testing go hand-in-hand, it was to expect that unit testing would help us tremendously to narrow down specific test cases. FreeST already has a vast catalogue of unit tests which we had to rewrite in order to fit our system. We also had to implement a small parser to facilitate the testing process. 
+
+The unit test that proved we could not rely only on property-based testing failed the main concept behind our renaming process. Types $\foralltinfix{\beta}{\kind}{(\foralltinfix{\alpha}{\kind}{\semit{\Close}{\beta}})}$ and $\foralltinfix{\beta}{\kind}{(\foralltinfix{\alpha}{\kind}{\semit{\Close}{\alpha}})}$ must be bisimilar. However, their renames did not match. Following [ref] lts definition, these two types are bisimilar:
+
+\begin{center}
+    \begin{tikzpicture}
+    % Define matrix
+        \matrix (m) [matrix of math nodes, row sep=3em, column sep=1em]
+        {
+             \foralltinfix{\beta}{\kind}{(\foralltinfix{\alpha}{\kind}{\semit{\Close}{\beta}})} & \foralltinfix{\beta}{\kind}{(\foralltinfix{\alpha}{\kind}{\semit{\Close}{\alpha}})}  \\
+            \foralltinfix{\alpha}{\kind}{\semit{\Close}{\beta}} & \foralltinfix{\alpha}{\kind}{\semit{\Close}{\alpha}} \\
+            \semit{\Close}{\beta} & \semit{\Close}{\alpha}\\
+            \Skip & \Skip\\
+        };
+        % Draw arrows
+        \draw[->] (m-1-1) -- (m-2-1) node[midway, left] {\symkeyword{\forall_0}};
+        \draw[->] (m-1-2) -- (m-2-2) node[midway, right] {\symkeyword{\forall_0}};
+        \draw[->] (m-2-1) -- (m-3-1) node[midway, left] {\symkeyword{\forall_1}};
+        \draw[->] (m-2-2) -- (m-3-2) node[midway, right] {\symkeyword{\forall_1}};
+        \draw[->] (m-3-1) -- (m-4-1) node[midway, left] {\symkeyword{close}};
+        \draw[->] (m-3-2) -- (m-4-2) node[midway, right] {\symkeyword{close}};
+    \end{tikzpicture}
+\end{center}
+
+Certaintly, we expect the types $\semit{\Close}{\beta}$ and $\semit{\Close}{\alpha}$ to be alpha-congruent, thus yielding equal renames. However, this type presents a very particular case: not only is it a sequential composition but also terminates communication through the special type $\Close$. Therefore, we end up never reaching the continuation of the sequential composition, that is consuming either $\tbeta$ or $\talpha$. Here's what our first version of rename returned:
+\begin{itemize}
+    \item For type $\foralltinfix{\beta}{\skind}{(\foralltinfix{\alpha}{\skind}{\semit{\Close}{\beta}})}$, rename returned $\foralltinfix{v_0}{\skind}{(\foralltinfix{v_1}{\skind}{\semit{\Close}{v_0}})}$. In this case, $v_1$ is an example of a bound-variable that is not reachable within the type. This means $v_1$ could be anything else, in particular, since we are interested in the smallest variable available, it could also be $v_0$.  This brought the necessity to explore what it means to be a free reachable bound-variable in a type into the renaming process.
+    \item For type $\foralltinfix{\beta}{\skind}{(\foralltinfix{\alpha}{\skind}{\semit{\Close}{\alpha}})}$, rename returned $\foralltinfix{v_0}{\skind}{(\foralltinfix{v_1}{\skind}{\semit{\Close}{v_1}})}$. On the other hand, $v_1$ is an example of a bound-variable that will never the consumed because type $\Close$ terminates the communication process. This means $v_1$ can be renamed to anything, since $\Close$ is absorbing. This time $v_0$ is a free bound-variable that is not reachable within the type. Thus, $v_0$ and $v_1$ can actually be renamed to $v_0$, the smallest available variable.
+\end{itemize}
+
+While exploring this unit test case, we arrived at our current definition of renaming, which takes into account not only absorbing types but also which variables are reachable within a type. 
+
+It was also through unit testing that we later found out that our rules in \cref*{fig:reduction} were only defined for a depth bigger than $2$. This meant that a lot of tests we had done couldn't catch such corner test case. Throughout my academic journey, never had I experienced such eye opening experience. This proved not only how slept on unit testing really is but the everlasting necessity to thrive for better testing techniques.
 
 
-\todo{how to run :test}
-\todo{show results from table 5.1}
-\input{./tex/quickcheck.tex}
+% \todo{e nos records e labels? Não podiamos ter todas as labels a S ou só T. Logo descartamos a ideia das 4 setas.}
 
-While randomly generated types facilitate a robust analysis, certain properties,
-such as the type-formation preservation property and bisimilarity of simple
-grammars, prove challenging to test comprehensively. The difficulty arises from
-the simplicity of our generator and the inherent low probability that randomly
-generated test cases yield types that are both well-formed and reduce.
-Therefore, most of the tests cases do not satisfy the precondition
-$\istype{} T \kind$ and $\betared{T}{U}$, and Quickcheck ends up discarding
-2.000.000 tests for the last two properties. To achieve better results, more
-complex generators, tailored to specific properties, would be required. Such
-generators are often challenging to design and implement.
-
-
+% \todo{talk about testing structure}
+% \begin{description}[wide=0pt, leftmargin=1.5em, itemsep=0.2em]
+%     \item[test]
+%       \begin{description}[wide=0pt, leftmargin=1.5em, itemsep=0.2em]
+%         \item[\textgreater] QuickCheck
+%         \item[\textgreater] UnitTests
+%         \item[\textcolor{purple}{Spec.hs}]
+%         \item[\textcolor{purple}{UnitSpec.hs}]
+%       \end{description}
+%   \end{description}
 
 \LIMPA

@@ -13,8 +13,6 @@ import Data.Maybe as Maybe
 import Substitution
 import qualified Data.Map.Strict as Map
 import Control.Applicative ((<|>))
-import WeakHeadNormalForm (isVar, head)
-import Prelude hiding (head)
 
 reduceBSD :: Type -> Maybe Type
 reduceBSD (App (App Semi Skip) t ) = Just t --R-SEQ1

@@ -5,7 +5,6 @@ module TypeFormation (
     preSynthetise -- tests only
     )
     where
-
 import Syntax
 import Normalisation ( norm )
 import qualified Data.Map.Strict as Map

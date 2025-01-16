@@ -9,7 +9,6 @@ Type systems are a fundamental tool in programming language theory, providing a 
 
 Type systems manage a program's data types through type checking, which can be classified as either static---occurs at compile time, where the types of all variables and expressions are known and checked before the program runs---or dynamic---occurs at run-time, where the types are checked as the program executes. 
 
-\todo{p. ligação}
 Type equivalence establishes the criteria by which two types are equivalent within a programming language. In presence of polymorphism, type equivalence enables functions to work with different types as long as it can determine whether two types are interchangeable without causing runtime erros or unexpected behavior. Type equivalence can be viewed as structural---where types are equivalent if they share the same structure---or nominal---where types are only equivalent if they share the same name.
 
 Over the course of time, type systems have evolved to become more expressive, moving from simple type assignments to more powerful systems that support polymorphism, recursion, and structured communication patterns.
@@ -151,7 +150,7 @@ A production rule in $\mathcal{R}$ is written as $X \rightarrow \sigma$: the lef
 
 These type systems prove interesting to implement since they closely represent programs. Therefore, we want to incorporate these type systems into programming languages.
 
-\section{The FreeST Programming Language}
+\section{The FreeST Programming Language}\label{sec:freest}
 FreeST [ref], a concurrent functional programming language based on system $F^{\mu;}$, is regulated by context-free session types. Resembling Haskell's syntax, FreeST offers primitives to create channels and communicate trough them.
 
 Typically in programming languages, a value can be used as many times as needed. However, FreeST uses a linear type system: a resource may be used exactly once---represented by $1$---or unrestrictely, meaning a resource can be used zero or more times---represented by a $*$. Session type channels are linear and must be used exactly once. Therefore, linear programming languages help ensure the channels protocols are fulfilled. 
@@ -210,8 +209,8 @@ treeSum c =
 
 Then we can implement a function that serializes a tree over a channel: this function takes a \lstinline{Tree} argument and a channel and either selects a Leaf, or selects a Node, sends an integer value and recursively writes the left and right subtree. If we want to sum all the values in a Tree, we can read from a TreeChannel and compute the sum of all the nodes in a Tree. 
 
-\todo{p. to connect to next section}
-\todo{more examples: mathserver?}
+% \todo{p. to connect to next section}
+% \todo{more examples: mathserver?}
 
 
 \section{Algorithms for Type Equivalence}
@@ -345,7 +344,7 @@ A common ad-hoc polymorphism example would be addition through the $+$ operator.
 
 %Scala’s implicits notion have a similar function to haskell's type classes, where the compiler ensures the correctness of these operations based on resolving these implicit types. %The code provided below is the equivalent type class \lstinline{Eq} implemented in Scala: \todo{scala code.}
 
-\todo{p. context + introduce ocaml}
+% \todo{p. context + introduce ocaml}
 
 Type classes in Haskell and modules in OCaml represent two distinct approaches to program abstraction and component organization. Type classes in Haskell primarily serve \textit{ad-hoc polymorphism}. They enable you to define behavior that can work across multiple types while maintaining type safety. 
 In contrast, OCaml's module system focuses on explicit program structuring and strong data abstraction. 
@@ -382,7 +381,7 @@ The key differences between the two approaches reside in instance resolution and
 
 The trade-off between these approaches focuses on either convenience or explicit control. Nevertheless, an harmonious approach combining type classes and modules was provided by Robert Harper et al. \todo{ref: Modular Type Classes}.
 
-\todo{p. context}
+% \todo{p. context}
 
 Type classes went on to influence how Generics work in Java. Generics are an interface or class that takes a number of type parameters, which are written within angle brackets, that must be declared when we create a new instance of the said class.
 
@@ -404,8 +403,8 @@ We can see that \lstinline|ArrayList<E>| implements the interface \lstinline|Lis
     assert s.equals(Hello world!');
 \end{lstlisting}
 
-\todo{this is possible because of type erasure.}
+% \todo{this is possible because of type erasure.}
 
-\todo{show wadler's graphic about type classes constraints and interfaces. (maybe)}
+% \todo{show wadler's graphic about type classes constraints and interfaces. (maybe)}
 
 \LIMPA

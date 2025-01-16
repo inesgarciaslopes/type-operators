@@ -24,18 +24,14 @@ data View = External | Internal deriving (Ord, Eq)
 
 data Sort = Record | Variant  deriving (Ord, Eq)
 
--- data Quantify = Forall | Exists  deriving (Ord, Eq)
-
 -- Kinds
-
-data BaseKind = Session | Top deriving (Ord, Eq) --baseKind
+data BaseKind = Session | Top deriving (Ord, Eq)
 
 data Kind = ProperK BaseKind
           | ArrowK Kind Kind
           deriving (Ord, Eq)
 
 -- Types
-
 data Type =
     Int
   | Arrow BaseKind BaseKind
@@ -91,10 +87,6 @@ instance Show Kind where
   show (ProperK k) = show k
   show (ArrowK k1 k2) = "("++show k1 ++ " => " ++ show k2++")"
 
--- instance Show Quantify where
---   show Forall = "∀"
---   show Exists = "∃"
-
 -- Duality 
 class Dual a where
   dual :: a -> a
@@ -106,10 +98,6 @@ instance Dual Polarity where
 instance Dual View where
   dual External = Internal
   dual Internal = External
-
--- instance Dual Quantify where
---   dual Forall = Exists
---   dual Exists = Forall
 
 -- == alpha congruent
 type VarMap = Set.Set (Variable, Variable)
@@ -143,4 +131,3 @@ instance Equiv Type where
       where vm' = Set.insert (v,v2) vm
   alphaCongruent vm (App t1 t2) (App t1' t2') = alphaCongruent vm t1 t1' && alphaCongruent vm t2 t2'
   alphaCongruent _ _ _ = False
-

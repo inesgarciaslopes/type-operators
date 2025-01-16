@@ -1,6 +1,6 @@
 \chapter{System $\FMuSemiOmega$}
 
-\todo{What will we talk about in this chapter?}
+% \todo{What will we talk about in this chapter?}
 
 \section{From System F to $\FMuSemi$}\label{sec:system}
 
@@ -66,23 +66,24 @@ The types of system $\FMuSemiOmega$ are an extension of system $\FMuOmega$, acco
 
 In our system, a \emph{kind} $\kind$ is either a base kind $\kast$---which is either a session or a functional kind, $\skind$ or $\tkind$, respectively---or a higher-order kind  $\karrow \kind \kindp$. A \emph{proper type} refers to a type that has a base kind. In contrast, \emph{type operators} act upon types to create more complex types, and are associated with higher-order kinds. For example, the type operator $\Arrow$ takes two types, $\typec{T}$ and $\typec{U}$, and constructs a new type, a function type $\Arrow \typec{T} \typec{U}$, which we sometimes write in infix notation as $\typec{T}\ \Arrow\ \typec{U}$. 
 
-\todo{[Maybe not here. Section with differences with freest?] Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order kinds.}
+% \todo{do a graph of how the applications look like (a tree)}
+% \todo{[Maybe not here. Section with differences with freest?] Our goal is to expand the programming language FreeST, currently limited to types of kind $\kast$, to higher-order kinds.}
 
 %and we identify types up to renaming of bound variables; thus, ∀α.α → α and ∀β.β → β are the same type. 
 
-\todo{It is to note that the kind of the operator $\quant \kind$ has been promoted to attend for polymorphic session types.[Confusing here? Maybe in a section where show the differences with freest?]}
+% \todo{It is to note that the kind of the operator $\quant \kind$ has been promoted to attend for polymorphic session types.[Confusing here? Maybe in a section where show the differences with freest?]}
 
 Observe that $\tmuinfix{\alpha}{\kind}{T}$ is syntactic sugar for $\typec{\tmu\kind (\tlambda{\alpha}{\kind}{T})}$ and similarly for $\tquantinfix\alpha\kind \TT$.
 
 Not all types are of interest---for example $\tapp{\Dual}{\forallt{\skind}{\tabs{\alpha}{\skind}{\alpha}}}$ since the dual operator makes no sense being applied to a functional type. We'll tackle this concern later on in section x. 
 
-\todo{paragrafo de ligação.}
+% \todo{paragrafo de ligação.}
 
 
 \section{Reduction and Normal Form}
 \input{./tex/type-reduction.tex}
 
-For now, let's define the \emph{weak head normal form} of a type; We do this so by defining a system of reduction rules in \cref*{fig:reduction}. This definition provides reduction steps for sequential composition, recursive types (one-step unfold) and $\Dual$ types. It is important to note that there are no reductions under lambda abstractions: thus, when invoking rule $\rbeta$, only a \textit{substitution} is performed. In lambda calculus [ref], substitution replaces all free occurrences of a variable in a expression with another expression, written as $[\typec{x} \rightarrow \typec{E_1}]\typec{E_2}$. A new Dual rule was introduced, $\rddual$ that is $\lambdared{\tapp \Dual (\tapp \Dual \TT)}{\TT}$, providing that $\rdctx$ was equally corrected such that $\TT\neq \tapp \Dual {\typec{T_1}}$. This system is that of Poças et al.[] made confluent by adding the proviso that $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \rseqtwo and \rdctx. 
+For now, let's define the \emph{weak head normal form} of a type; We do this so by defining a system of reduction rules in \cref*{fig:reduction}. This definition provides reduction steps for sequential composition, recursive types (one-step unfold) and $\Dual$ types. It is important to note that there are no reductions under lambda abstractions: thus, when invoking rule $\rbeta$, only a \textit{substitution} is performed. In lambda calculus [ref], substitution replaces all free occurrences of a variable in a expression with another expression, written as . A new Dual rule was introduced, $\rddual$ that is $\lambdared{\tapp \Dual (\tapp \Dual \TT)}{\TT}$, providing that $\rdctx$ was equally corrected such that $\TT\neq \tapp \Dual {\typec{T_1}}$. This system is that of Poças et al.[] made confluent by adding the proviso that $\typec{T} \neq \typec{\seqcomp{T_1}{T_2}}$ to rules \rseqtwo and \rdctx. 
 
 \textbf{(Confluence) } If $\afunction{T}{U}$ and $\afunction{T}{V}$, then $\afunctionstar{U}{W}$ and $\afunctionstar{V}{W}$.\\
 \emph{Confluence} states that, if there are two distinct reductions for a given type, $\afunction{T}{U}$ and $\afunction{T}{V}$, then both paths will eventually converge into the same final reduced type $\typec{W}$. One may visualize this property in the following latice:
@@ -137,6 +138,7 @@ In this case, the two reductions do not converge into the same type since neithe
 
 Another way to express weak head normal form is through inference-based characterisation. Any type operator $\typec{\iota}$ or abstraction $\tabs{\alpha}{\kind}{\TT}$ is in weak head normal form. Note that, we consider the partially-applied sequential composition $\tapp{\Semi}{T}$ to be in normal form, as expressed by rule $\wseqone$ in \cref*{fig:whnf}. The notion of normal form comes from the lambda calculus. This lets us know when an expression is fully evaluated. We say a type $\TT$ is in \emph{normal form}, denoted $\iswhnf{T}$, if it has been completely reduced, \textit{i.e.}, no further reductions are possible. In other words, both characterisations (\cref*{fig:reduction} and \cref*{fig:whnf}) are equivalent; $\iswhnf{T}$ is equivalent to irreducibility, $\typec{T} \nrightarrow$. 
 
+\todo{explain what m is.}
 Then we can say that type $\typec{T}$ \emph{normalises} to type $\typec{U}$, written $\isnorm{T}{U}$, if $\iswhnf{U}$ and $\typec{U}$ is reached from $\typec{T}$ in a finite number of reduction steps. The predicate $\isnormalised{T}$ means that $\isnorm{T}{U}$ for some $\typec{U}$.
 Note that not all types normalise, \ie some have an infinite sequence of reductions, such as $\TT = \typec{(\lambda x. xx)(\lambda x. xx)} \longrightarrow \typec{(\lambda x. xx)\subs{(\lambda x. xx)} {x}} = \TT \longrightarrow \typec{\cdots}$---which is stuck in a loop of reductions to itself via the application of rule \rbeta---and $\UT = \typec{\tmu\skind (\tlambda{\alpha}{\skind}{\alpha;\Skip})} \rightarrow (\tlambda{\alpha}{\skind}{\alpha;\Skip})\UT \rightarrow \typec{U;\Skip} \rightarrow_2 \typec{U;\Skip;\Skip} \rightarrow \typec{\cdots}$---which successively applies rules \rmu and \rbeta in combination with \rseqtwo, resulting in the unending addition of a trailing $\Skip$.
 
@@ -200,7 +202,7 @@ In order to check if a type $\TT$ is well-formed, we first determine if $\prekin
 
 \todo{why was it necessary to check all application types ? example.}
 
-\subsection{Restrictions to Recursion}
+\subsection{Restrictions to Recursion}\label{sec:recursion_restriction}
 The approach to determine if a type normalises seeks infinite reduction sequences. In the case of recursive types, such sequences would have a finite number of $\beta$-reductions between two $\mu$-reductions.
 $\TT = \lseqnormalred{\typec{T_0}}{\typec{T'_0}}\mured{}{\typec{T_1}}\lseqnormalred{}{\typec{T'_1}}\mured{}{\typec{T_2}}\lseqnormalred{}{\typec{T'_2}}\mured{}{\cdots}$.
 If $\typec{T'_i}$ does not reduce by any $\mu$-reduction, we can conclude that
@@ -237,12 +239,12 @@ We can easily notice that expression $\tmu\kast\UT$ reappears after the $\mu$-re
 
 \section{Type equivalence + Decidability of type equivalence}
 
-\todo{paragrafo de ligação}
+% \todo{paragrafo de ligação}
 
 Type equivalence allows us to check whether two types, even if syntactically different, correspond to the same protocol. 
 It is expected that two types that are alpha-congruent are equivalent, like for example $\tlambda{\alpha}{\kind}{\alpha}$ and $\tlambda{\beta}{\kind}{\beta}$. However, the task of checking if two types are equivalent may involve substitutions on-the-fly as one crosses along the types. We will avoid this by performing a renaming operation once on both types, right at the beginning of the type equivalence checking process. 
 
-Inspired by the renaming approach of Gauthier and Pottier \cite{GauthierP04}, we introduce \textit{minimal renaming}, which uses the least amount of variable names necessary.
+\todo{Review rename.} Inspired by the renaming approach of Gauthier and Pottier \cite{GauthierP04}, we introduce \textit{minimal renaming}, which uses the least amount of variable names necessary.
 %This notion of minimal renaming enables the translation of types into simple grammars.
 This renaming operation, defined in figure \ref{fig:rename} consists on replacing a type \typec{T} by its minimal alpha-conversion. We assume that a countable ordered set of (fresh) type variables, $\{\typec{\upsilon_1},\ldots,\typec{\upsilon_n},\ldots\}$, is available. We rename bound variables in \typec{T} by the smallest possible variable available, \textit{i.e.}, the first which is not free on the type. Note that the $S$ parameter in the definition corresponds to the set of unavailable type variables for renaming.  Also, by $\first(S)$ we mean the smallest variable not in the set $S$. The notion of variable substitution, $\typec{T}\subs{v}{\talpha}$, is the one from literature \cite{tapl}. 
 and free variables of a type, $\fv(\TT)$, are the standard ones from literature \cite{tapl}.
@@ -333,26 +335,6 @@ Putting everything together, we obtain the following simple grammar:
 \end{align*}
 
 
-\todo{this is a problematic example for rename. }
-\begin{center}
-    \begin{tikzpicture}
-    % Define matrix
-        \matrix (m) [matrix of math nodes, row sep=3em, column sep=1em]
-        {
-             \foralltinfix{\beta}{\kind}{(\foralltinfix{\alpha}{\kind}{\semit{\Close}{\beta}})} & \foralltinfix{\beta}{\kind}{(\foralltinfix{\alpha}{\kind}{\semit{\Close}{\alpha}})}  \\
-            \foralltinfix{\alpha}{\kind}{\semit{\Close}{\beta}} & \foralltinfix{\alpha}{\kind}{\semit{\Close}{\alpha}} \\
-            \semit{\Close}{\beta} & \semit{\Close}{\alpha}\\
-            \Skip & \Skip\\
-        };
-        % Draw arrows
-        \draw[->] (m-1-1) -- (m-2-1) node[midway, left] {\symkeyword{\forall_0}};
-        \draw[->] (m-1-2) -- (m-2-2) node[midway, right] {\symkeyword{\forall_0}};
-        \draw[->] (m-2-1) -- (m-3-1) node[midway, left] {\symkeyword{\forall_1}};
-        \draw[->] (m-2-2) -- (m-3-2) node[midway, right] {\symkeyword{\forall_1}};
-        \draw[->] (m-3-1) -- (m-4-1) node[midway, left] {\symkeyword{close}};
-        \draw[->] (m-3-2) -- (m-4-2) node[midway, right] {\symkeyword{close}};
-    \end{tikzpicture}
-\end{center}
 
 
 \LIMPA
